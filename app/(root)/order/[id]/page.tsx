@@ -17,7 +17,7 @@ const OrderDetailsPage = async (props : {
     const session = await auth();
 
   // Redirect the user if they don't own the order
-  if (order.userId !== session?.user.id && session?.user.role !== 'admin') {
+  if (order.userId !== session?.user?.id ) {
     return redirect('/unauthorized');
   }
 

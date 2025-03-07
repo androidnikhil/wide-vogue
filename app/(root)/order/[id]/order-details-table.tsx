@@ -13,7 +13,6 @@ import { toast } from "sonner";
 
 const OrderDetailsTable = ({ order, paypalClientId }: { order: Order, paypalClientId:string }) => {
   const {
-    id,
     shippingAddress,
     orderitems,
     itemsPrice,

@@ -1,26 +1,35 @@
 import { Product } from "@/types";
 import ProductCard from "./product-card";
 
-const ProductList = ({data, title, limit}: {data: Product[], title?: string, limit?: number} ) => {
-    const limitedData = limit ? data.slice(0, limit) : data;
-    return ( 
-        <div className="my-10">
-            <h2 className="h2-bold mb-4">
-                {title}
-            </h2>
-            {data.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                    {limitedData.map((product: Product) => (
-                       <ProductCard key={product.slug} product={product} />
-            ))}
-            </div>
-            ) : (
-                <div className="text-center">
-                <p>No products found</p>
-                </div>
-            )}
+const ProductList = ({
+  data,
+  title,
+  limit,
+}: {
+  data: Product[];
+  title?: string;
+  limit?: number;
+}) => {
+  const limitedData = limit ? data.slice(0, limit) : data;
+  return (
+    <div className="my-10">
+      <h2 className="text-[36px] font-extrabold text-[#ca6d6f] flex-center before:content-[''] before:border-[#e0e0e0] before:border-b-2 before:flex-1 after:flex-1 after:content-[''] after:border-[#e0e0e0] after:border-t-2">
+        {title}
+      </h2>
+      <p className="font-[18px] flex-center mb-4">Go With The Trend </p>
+      {data.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {limitedData.map((product: Product) => (
+            <ProductCard key={product.slug} product={product} />
+          ))}
         </div>
-     );
-}
- 
+      ) : (
+        <div className="text-center">
+          <p>No products found</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default ProductList;

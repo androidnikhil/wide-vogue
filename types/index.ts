@@ -4,8 +4,10 @@ import {
   cartItemSchema,
   shippingAddressSchema,
   insertOrderItemSchema,
-  insertOrderSchema
+  insertOrderSchema,
+  paymentResultSchema
 } from "@/lib/validators";
+import exp from "constants";
 import { z } from "zod";
 
 export type Product = z.infer<typeof insertProductSchema> & {
@@ -31,3 +33,4 @@ export type Order = z.infer<typeof insertOrderSchema> & {
   };
   createdAt: Date;
 };
+export type PaymentResult = z.infer<typeof paymentResultSchema>;

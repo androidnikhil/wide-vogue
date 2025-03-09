@@ -9,8 +9,8 @@ const sampleData = {
       role: 'admin'
     },
     {
-      name: 'Sarita',
-      email: 'sarita@example.com',
+      name: 'Rishabh',
+      email: 'rishabh@example.com',
       password: hashSync('123456', 10),
       role: 'user'
     }

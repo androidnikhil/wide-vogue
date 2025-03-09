@@ -29,8 +29,8 @@ const OrdersPage = async (props: {
     <div className='space-y-2'>
       <h2 className='h2-bold'>Orders</h2>
       <div className='overflow-x-auto'>
-        <Table>
-          <TableHeader>
+        <Table className='border border-gray-300 mb-4'>
+          <TableHeader className="bg-gray-200">
             <TableRow>
               <TableHead>ID</TableHead>
               <TableHead>DATE</TableHead>
@@ -42,7 +42,7 @@ const OrdersPage = async (props: {
           </TableHeader>
           <TableBody>
             {orders.data.map((order) => (
-              <TableRow key={order.id}>
+              <TableRow key={order.id} className="odd:bg-white even:bg-gray-100">
                 <TableCell>{formatId(order.id)}</TableCell>
                 <TableCell>
                   {formatDateTime(order.createdAt).dateTime}

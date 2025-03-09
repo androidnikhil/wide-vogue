@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 const barlow = Barlow({
   subsets: ["latin"],
-  weight: "100"
+  weight: "400"
 });
 
 export const metadata: Metadata = {

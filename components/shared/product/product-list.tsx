@@ -13,7 +13,7 @@ const ProductList = ({
   const limitedData = limit ? data.slice(0, limit) : data;
   return (
     <div className="my-10">
-      <h2 className="text-[36px] font-extrabold text-[#ca6d6f] flex-center before:content-[''] before:border-[#e0e0e0] before:border-b-2 before:flex-1 after:flex-1 after:content-[''] after:border-[#e0e0e0] after:border-t-2">
+      <h2 className="text-[36px] font-extrabold text-[#ca6d6f] flex-center before:content-[''] before:border-[#e0e0e0] before:border-b-2 before:flex-1 after:flex-1 after:content-[''] after:border-[#e0e0e0] after:border-t-2 uppercase gap-4">
         {title}
       </h2>
       <p className="font-[18px] flex-center mb-4">Go With The Trend </p>

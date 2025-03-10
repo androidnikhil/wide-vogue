@@ -70,7 +70,7 @@ const AdminProductsPage = async (props: {
         </TableHeader>
         <TableBody>
           {products.data.map((product) => (
-            <TableRow key={product.id}>
+            <TableRow key={product.id} className='odd:bg-white even:bg-gray-100'>
               <TableCell>{formatId(product.id)}</TableCell>
               <TableCell>{product.name}</TableCell>
               <TableCell className='text-right'>

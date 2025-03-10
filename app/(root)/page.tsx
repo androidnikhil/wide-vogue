@@ -1,15 +1,28 @@
-import ProductList from "@/components/shared/product/product-list";
-import { Button } from "@/components/ui/button";
-import { getLatestproduct } from "@/lib/actions/product.action";
+import ProductList from '@/components/shared/product/product-list';
+import {
+  getLatestProducts,
+  getFeaturedProducts,
+} from '@/lib/actions/product.action';
+import ProductCarousel from '@/components/shared/product/product-carousel';
+import ViewAllProductsButton from '@/components/view-all-products-button';
+// import IconBoxes from '@/components/icon-boxes';
+// import DealCountdown from '@/components/deal-countdown';
 
-const Home = async() => {
-  const latestProducts = await getLatestproduct();
+const Homepage = async () => {
+  const latestProducts = await getLatestProducts();
+  const featuredProducts = await getFeaturedProducts();
+
   return (
-   <>
-   <ProductList data={latestProducts} title="Newest Arrivals" limit={4} />
-   <Button className="text-center">Homepage</Button>
-   </>
+    <>
+      {featuredProducts.length > 0 && (
+        <ProductCarousel data={featuredProducts} />
+      )}
+      <ProductList data={latestProducts} title='Newest Arrivals' limit={4} />
+      <ViewAllProductsButton />
+      {/* <DealCountdown />
+      <IconBoxes /> */}
+    </>
   );
 };
 
-export default Home;
+export default Homepage;

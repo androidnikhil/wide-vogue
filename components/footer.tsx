@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Linkedin } from "lucide-react";
+import { FaFacebook, FaInstagram } from "react-icons/fa";
 
 const Footer = () => {
     const year = new Date().getFullYear();
@@ -71,13 +71,10 @@ const Footer = () => {
       <div className="mt-10 pt-6 text-center">
       <div className="flex space-x-4 items-center justify-center">
       <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-        <Facebook className="w-6 h-6 text-gray-400 hover:text-blue-500" />
+        <FaFacebook className="w-6 h-6 text-gray-400 hover:text-blue-500" />
       </a>
       <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-        <Instagram className="w-6 h-6 text-gray-400 hover:text-pink-500" />
-      </a>
-      <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-        <Linkedin className="w-6 h-6 text-gray-400 hover:text-blue-700" />
+        <FaInstagram className="w-6 h-6 text-gray-400 hover:text-pink-500" />
       </a>
     </div>
     </div>

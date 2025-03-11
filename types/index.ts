@@ -33,6 +33,7 @@ export type Order = z.infer<typeof insertOrderSchema> & {
     email: string;
   };
   createdAt: Date;
+  paymentResult: PaymentResult;
 };
 export type PaymentResult = z.infer<typeof paymentResultSchema>;
 export type Review = z.infer<typeof insertReviewSchema> & {

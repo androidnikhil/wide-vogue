@@ -4,8 +4,8 @@ export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000
 export const LATEST_PRODUCT_LIMIT = Number(process.env.LATEST_PRODUCT_LIMIT) || 4;
 
 export const signInDefaultValues = {
-    email: 'admin@example.com',
-    password: '123456',
+    email: '',
+    password: '',
   };
    
 export const signUpDefaultValues = {
@@ -44,3 +44,9 @@ export const signUpDefaultValues = {
   };
 
   export const USER_ROLES = process.env.USER_ROLES ? process.env.USER_ROLES.split(',') : ['user', 'admin'];
+
+  export const reviewFormDefaultValues = {
+    title: '',
+    comment: '',
+    rating: 0,
+  };

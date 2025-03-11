@@ -8,7 +8,7 @@ import {
   updateUserSchema
 } from '../validators';
 import { auth, signIn, signOut } from '@/auth';
-import { hash } from '../encrypt';
+import { hashSync } from 'bcrypt-ts-edge';
 import { prisma } from '@/db/prisma';
 import { formatError } from '../utils';
 import { ShippingAddress } from '@/types';
@@ -66,7 +66,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
     const plainPassword = user.password;
 
-    user.password = await hash(user.password);
+    user.password = await hashSync(user.password);
 
     await prisma.user.create({
       data: {

@@ -25,6 +25,7 @@ import { UploadButton } from '@/lib/uploadthing';
 import { Card, CardContent } from '../ui/card';
 import Image from 'next/image';
 import { Checkbox } from '../ui/checkbox';
+import { X } from 'lucide-react';
 
 const ProductForm = ({
   type,
@@ -255,14 +256,27 @@ const ProductForm = ({
                   <CardContent className='space-y-2 mt-2 min-h-48'>
                     <div className='flex-start space-x-2'>
                       {images.map((image: string) => (
-                        <Image
-                          key={image}
-                          src={image}
-                          alt='product image'
-                          className='w-20 h-20 object-cover object-center rounded-sm'
-                          width={100}
-                          height={100}
-                        />
+                        <div key={image} className='relative'>
+                          <Image
+                            src={image}
+                            alt='product image'
+                            className='w-20 h-20 object-cover object-center rounded-sm'
+                            width={100}
+                            height={100}
+                          />
+                          <button
+                            type='button'
+                            className='absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-sm'
+                            onClick={() => {
+                              form.setValue(
+                                'images',
+                                images.filter((i: string) => i !== image)
+                              );
+                            }}
+                          >
+                            <X className='w-4 h-4' />
+                          </button>
+                        </div>
                       ))}
                       <FormControl>
                         <UploadButton

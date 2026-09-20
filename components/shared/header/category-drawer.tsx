@@ -33,7 +33,7 @@ const CategoryDrawer = async () => {
                 asChild
               >
                 <DrawerClose asChild>
-                  <Link href={`/search?category=${x.category}`}>
+                  <Link href={`/search?category=${encodeURIComponent(x.category)}`}>
                     {x.category} ({x._count})
                   </Link>
                 </DrawerClose>

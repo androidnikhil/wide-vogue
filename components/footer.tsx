@@ -1,9 +1,9 @@
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 
 const Footer = () => {
-    const year = new Date().getFullYear();
+  const year = new Date().getFullYear();
 
-    return    <footer className="bg-[#1E1E1C] text-white py-12">
+  return <footer className="bg-[#1E1E1C] text-white py-12">
     <div className="max-w-7xl mx-auto px-6 lg:px-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
         {/* Column 1 - Company Info */}
@@ -32,21 +32,21 @@ const Footer = () => {
         <div className="lg:col-span-1">
           <h2 className="text-white text-xl font-semibold uppercase">CONTACT US</h2>
           <p className="mt-4 text-white">
-              Phone :
-            </p>
-            <a href="tel:9354002399">
-                <span>
-                +91-9354002399 
-                </span>
-            </a>
-            <p className="mt-4 text-white">
-              Email :
-            </p>
-            <a href="mailto:widevogue@gmail.com">
-                <span>
-                widevogue@gmail.com
-                </span>
-            </a>
+            Phone :
+          </p>
+          <a href="tel:9354002399">
+            <span>
+              +91-9354002399
+            </span>
+          </a>
+          <p className="mt-4 text-white">
+            Email :
+          </p>
+          <a href="mailto:widevogue@gmail.com">
+            <span>
+              noeply@madhavposhaak.com
+            </span>
+          </a>
         </div>
 
         {/* Column 4 - Newsletter */}
@@ -69,22 +69,22 @@ const Footer = () => {
       </div>
 
       <div className="mt-10 pt-6 text-center">
-      <div className="flex space-x-4 items-center justify-center">
-      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-        <FaFacebook className="w-6 h-6 text-gray-400 hover:text-blue-500" />
-      </a>
-      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-        <FaInstagram className="w-6 h-6 text-gray-400 hover:text-pink-500" />
-      </a>
-    </div>
-    </div>
+        <div className="flex space-x-4 items-center justify-center">
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+            <FaFacebook className="w-6 h-6 text-gray-400 hover:text-blue-500" />
+          </a>
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+            <FaInstagram className="w-6 h-6 text-gray-400 hover:text-pink-500" />
+          </a>
+        </div>
+      </div>
 
       {/* Footer Bottom */}
       <div className="mt-4 pt-4 text-center">
-        <p>Copyright &copy; {year} | Wide Vogue</p>
+        <p>Copyright &copy; {year} | Madhav Poshaak</p>
       </div>
     </div>
   </footer>;
 }
- 
+
 export default Footer;

@@ -323,13 +323,24 @@ const ProductForm = ({
                 )}
               />
               {isFeatured && banner && (
-                <Image
-                  src={banner}
-                  alt='banner image'
-                  className='w-full object-cover object-center rounded-sm'
-                  width={1920}
-                  height={680}
-                />
+                <div className='relative'>
+                  <Image
+                    src={banner}
+                    alt='banner image'
+                    className='w-full object-cover object-center rounded-sm'
+                    width={1920}
+                    height={680}
+                  />
+                  <button
+                    type='button'
+                    className='absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-sm'
+                    onClick={() => {
+                      form.setValue('banner', '');
+                    }}
+                  >
+                    <X className='w-4 h-4' />
+                  </button>
+                </div>
               )}
 
               {isFeatured && !banner && (

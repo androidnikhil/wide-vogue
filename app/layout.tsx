@@ -12,7 +12,7 @@ const barlow = Barlow({
 
 export const metadata: Metadata = {
   title: {
-    template: `%s | Wide Vogue`,
+    template: `%s | Madhav Shringaar`,
     default: APP_NAME
   },
   description: APP_DESCRIPTION,
@@ -28,13 +28,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${barlow.className}`}>
         <ThemeProvider
-        attribute='class'
-        defaultTheme="light"
-        enableSystem
-        disableTransitionOnChange
+          attribute='class'
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
         >
-        {children}
-        <Toaster />
+          {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

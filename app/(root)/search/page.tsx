@@ -125,16 +125,16 @@ const SearchPage = async (props: {
   const categories = await getAllCategories();
 
   return (
-    <div className='grid md:grid-cols-5 md:gap-5'>
-      <div className='filter-links'>
+    <div className='container mx-auto px-4 lg:px-8 grid md:grid-cols-5 md:gap-8 my-10'>
+      <div className='md:col-span-1 bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/30 h-fit sticky top-24'>
         {/* Category Links */}
-        <div className='text-xl mb-2 mt-3'>Department</div>
+        <div className='font-title-lg text-primary mb-3 border-b border-outline-variant/30 pb-2'>Department</div>
         <div>
-          <ul className='space-y-1'>
+          <ul className='space-y-2'>
             <li>
               <Link
-                className={`${
-                  (category === 'all' || category === '') && 'font-bold'
+                className={`block text-on-surface-variant hover:text-primary transition-colors ${
+                  (category === 'all' || category === '') && 'font-semibold text-primary'
                 }`}
                 href={getFilterUrl({ c: 'all' })}
               >
@@ -144,7 +144,7 @@ const SearchPage = async (props: {
             {categories.map((x) => (
               <li key={x.category}>
                 <Link
-                  className={`${category === x.category && 'font-bold'}`}
+                  className={`block text-on-surface-variant hover:text-primary transition-colors ${category === x.category && 'font-semibold text-primary'}`}
                   href={getFilterUrl({ c: x.category })}
                 >
                   {x.category}
@@ -154,12 +154,12 @@ const SearchPage = async (props: {
           </ul>
         </div>
         {/* Price Links */}
-        <div className='text-xl mb-2 mt-8'>Price</div>
+        <div className='font-title-lg text-primary mb-3 mt-8 border-b border-outline-variant/30 pb-2'>Price</div>
         <div>
-          <ul className='space-y-1'>
+          <ul className='space-y-2'>
             <li>
               <Link
-                className={`${price === 'all' && 'font-bold'}`}
+                className={`block text-on-surface-variant hover:text-primary transition-colors ${price === 'all' && 'font-semibold text-primary'}`}
                 href={getFilterUrl({ p: 'all' })}
               >
                 Any
@@ -168,7 +168,7 @@ const SearchPage = async (props: {
             {prices.map((p) => (
               <li key={p.value}>
                 <Link
-                  className={`${price === p.value && 'font-bold'}`}
+                  className={`block text-on-surface-variant hover:text-primary transition-colors ${price === p.value && 'font-semibold text-primary'}`}
                   href={getFilterUrl({ p: p.value })}
                 >
                   {p.name}
@@ -178,12 +178,12 @@ const SearchPage = async (props: {
           </ul>
         </div>
         {/* Rating Links */}
-        <div className='text-xl mb-2 mt-8'>Customer Ratings</div>
+        <div className='font-title-lg text-primary mb-3 mt-8 border-b border-outline-variant/30 pb-2'>Customer Ratings</div>
         <div>
-          <ul className='space-y-1'>
+          <ul className='space-y-2'>
             <li>
               <Link
-                className={`${rating === 'all' && 'font-bold'}`}
+                className={`block text-on-surface-variant hover:text-primary transition-colors ${rating === 'all' && 'font-semibold text-primary'}`}
                 href={getFilterUrl({ r: 'all' })}
               >
                 Any
@@ -192,7 +192,7 @@ const SearchPage = async (props: {
             {ratings.map((r) => (
               <li key={r}>
                 <Link
-                  className={`${rating === r.toString() && 'font-bold'}`}
+                  className={`block text-on-surface-variant hover:text-primary transition-colors ${rating === r.toString() && 'font-semibold text-primary'}`}
                   href={getFilterUrl({ r: `${r}` })}
                 >
                   {`${r} stars & up`}
@@ -202,37 +202,37 @@ const SearchPage = async (props: {
           </ul>
         </div>
       </div>
-      <div className='md:col-span-4 space-y-4'>
-        <div className='flex-between flex-col md:flex-row my-4'>
-          <div className='flex items-center'>
-            {q !== 'all' && q !== '' && 'Query: ' + q}
-            {category !== 'all' && category !== '' && 'Category: ' + category}
-            {price !== 'all' && ' Price: ' + price}
-            {rating !== 'all' && ' Rating: ' + rating + ' stars & up'}
-            &nbsp;
-            {(q !== 'all' && q !== '') ||
-            (category !== 'all' && category !== '') ||
-            rating !== 'all' ||
-            price !== 'all' ? (
-              <Button variant={'link'} asChild>
-                <Link href='/search'>Clear</Link>
+      
+      <div className='md:col-span-4 space-y-6'>
+        <div className='flex flex-col md:flex-row justify-between items-start md:items-center bg-surface-container p-4 rounded-xl border border-outline-variant/30'>
+          <div className='flex items-center text-on-surface-variant flex-wrap gap-2'>
+            {q !== 'all' && q !== '' && <span className="bg-white px-2 py-1 rounded-md text-sm border shadow-sm">Query: {q}</span>}
+            {category !== 'all' && category !== '' && <span className="bg-white px-2 py-1 rounded-md text-sm border shadow-sm">Category: {category}</span>}
+            {price !== 'all' && <span className="bg-white px-2 py-1 rounded-md text-sm border shadow-sm">Price: {price}</span>}
+            {rating !== 'all' && <span className="bg-white px-2 py-1 rounded-md text-sm border shadow-sm">Rating: {rating}+ stars</span>}
+            
+            {((q !== 'all' && q !== '') || (category !== 'all' && category !== '') || rating !== 'all' || price !== 'all') && (
+              <Button variant='outline' size="sm" asChild className="ml-2 h-7 px-3 text-xs border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700">
+                <Link href='/search'>Clear Filters</Link>
               </Button>
-            ) : null}
+            )}
           </div>
-          <div>
-            Sort by{' '}
-            {sortOrders.map((s) => (
-              <Link
-                key={s}
-                className={`mx-2 ${sort == s && 'font-bold'}`}
-                href={getFilterUrl({ s })}
-              >
-                {s}
-              </Link>
-            ))}
+          <div className="flex items-center gap-2 mt-4 md:mt-0 text-sm font-medium">
+            <span className="text-on-surface-variant">Sort by:</span>
+            <div className="flex bg-white rounded-lg border border-outline-variant/30 p-1 shadow-sm">
+              {sortOrders.map((s) => (
+                <Link
+                  key={s}
+                  className={`px-3 py-1 rounded-md capitalize transition-colors ${sort == s ? 'bg-primary text-white font-medium shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'}`}
+                  href={getFilterUrl({ s })}
+                >
+                  {s}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
           {products.data.length === 0 && <div>No products found</div>}
           {products.data.map((product) => (
             <ProductCard key={product.id} product={product} />

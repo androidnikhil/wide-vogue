@@ -36,10 +36,10 @@ const AdminProductsPage = async (props: {
   });
 
   return (
-    <div className='space-y-2'>
+    <div className='space-y-6'>
       <div className='flex-between'>
         <div className='flex items-center gap-3'>
-          <h1 className='h2-bold'>Products</h1>
+          <h1 className='text-3xl font-display-lg text-primary font-bold'>Products</h1>
           {searchText && (
             <div>
               Filtered by <i>&quot;{searchText}&quot;</i>{' '}
@@ -56,8 +56,9 @@ const AdminProductsPage = async (props: {
         </Button>
       </div>
 
-      <Table>
-        <TableHeader>
+      <div className='bg-surface shadow-md rounded-2xl border border-secondary/10 overflow-hidden'>
+        <Table>
+          <TableHeader className="bg-surface-container/50">
           <TableRow>
             <TableHead>ID</TableHead>
             <TableHead>NAME</TableHead>
@@ -70,8 +71,8 @@ const AdminProductsPage = async (props: {
         </TableHeader>
         <TableBody>
           {products.data.map((product) => (
-            <TableRow key={product.id} className='odd:bg-white even:bg-gray-100'>
-              <TableCell>{formatId(product.id)}</TableCell>
+            <TableRow key={product.id} className='hover:bg-surface-container-lowest'>
+              <TableCell className="font-medium font-mono text-primary">{formatId(product.id)}</TableCell>
               <TableCell>{product.name}</TableCell>
               <TableCell className='text-right'>
                 {formatCurrency(product.price)}
@@ -89,6 +90,7 @@ const AdminProductsPage = async (props: {
           ))}
         </TableBody>
       </Table>
+      </div>
       {products.totalPages > 1 && (
         <Pagination page={page} totalPages={products.totalPages} />
       )}

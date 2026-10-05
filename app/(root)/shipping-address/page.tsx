@@ -15,16 +15,30 @@ const ShippingAddressPage = async () => {
     if(!cart || cart.items.length === 0) return redirect('/cart');
 
     const session = await auth();
-    const userId = session?.user?.id
+    const userId = session?.user?.id;
 
-    if(!userId)throw new Error('User Id not found');
+    let userAddress = cart.shippingAddress as ShippingAddress | null;
 
-    const user = await getUserById(userId);
+    let savedAddresses: ShippingAddress[] = [];
+
+    if (userId) {
+      const user = await getUserById(userId);
+      if (user.address) {
+        userAddress = user.address as ShippingAddress;
+      }
+      if (Array.isArray(user.addresses)) {
+        savedAddresses = user.addresses as ShippingAddress[];
+      }
+    }
 
     return ( 
         <>
         <CheckoutSteps current={1} />
-        <ShippingAddressForm address={user.address as ShippingAddress} />
+        <ShippingAddressForm 
+          address={userAddress || ({} as ShippingAddress)} 
+          isGuest={!userId} 
+          savedAddresses={savedAddresses}
+        />
         </>
      );
 }

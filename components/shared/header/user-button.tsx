@@ -51,20 +51,20 @@ const UserButton = async () => {
             </div>
           </DropdownMenuLabel>
 
-          <DropdownMenuItem>
-            <Link href='/user/profile' className='w-full'>
+          <DropdownMenuItem className="p-0 cursor-pointer">
+            <Link href='/user/profile' className='w-full px-2 py-1.5'>
              Profile
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link href='/user/orders' className='w-full'>
+          <DropdownMenuItem className="p-0 cursor-pointer">
+            <Link href='/user/orders' className='w-full px-2 py-1.5'>
               Orders
             </Link>
           </DropdownMenuItem>
 
           {session?.user?.role === 'admin' && (
-            <DropdownMenuItem>
-              <Link href='/admin/overview' className='w-full'>
+            <DropdownMenuItem className="p-0 cursor-pointer">
+              <Link href='/admin/overview' className='w-full px-2 py-1.5'>
                 Admin
               </Link>
             </DropdownMenuItem>

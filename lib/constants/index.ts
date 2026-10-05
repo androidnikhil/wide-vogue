@@ -19,12 +19,14 @@ export const signUpDefaultValues = {
     fullName: '',
     streetAddress: '',
     city: '',
+    state: '',
     postalCode: '',
+    contactNumber: '',
     country: '',
   }
 
-  export const PAYMENT_METHODS = process.env.PAYMENT_METHODS ? process.env.PAYMENT_METHODS.split(',') : ['PayPal', 'Stripe', 'CashOnDelivery'];
-  export const DEFAULT_PAYMENT_METHOD = process.env.DEFAULT_PAYMENT_METHOD || 'PayPal';
+  export const PAYMENT_METHODS = process.env.PAYMENT_METHODS ? process.env.PAYMENT_METHODS.split(',') : ['UPI', 'Card', 'NetBanking', 'CashOnDelivery'];
+  export const DEFAULT_PAYMENT_METHOD = process.env.DEFAULT_PAYMENT_METHOD || 'UPI';
 
   export const PAGE_SIZE = Number(process.env.PAGE_SIZE) || 12;
 
@@ -33,6 +35,7 @@ export const signUpDefaultValues = {
     slug: '',
     category: '',
     images: [],
+    sizes: [],
     brand: '',
     description: '',
     price: '0',
@@ -41,6 +44,9 @@ export const signUpDefaultValues = {
     numReviews: '0',
     isFeatured: false,
     banner: null,
+    isReturnable: false,
+    returnWindowDays: 0,
+    returnPolicyText: '',
   };
 
   export const USER_ROLES = process.env.USER_ROLES ? process.env.USER_ROLES.split(',') : ['user', 'admin'];

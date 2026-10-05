@@ -9,10 +9,12 @@ import { convertToPlainObject, formatError } from "../utils";
 import { insertOrderSchema } from "../validators";
 import { CartItem, PaymentResult, ShippingAddress } from "@/types";
 import { paypal } from "../paypal";
+import { razorpay } from "../razorpay";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "@prisma/client";
 import { sendPurchaseReceipt } from "@/email";
+import crypto from "crypto";
 
 export async function createOrder() {
   try {
@@ -25,12 +27,17 @@ export async function createOrder() {
     // Get cart
     const cart = await getMyCart();
     const userId = session?.user?.id;
-    if (!userId) throw new Error("User not found");
 
-    // Get user
-    const user = await getUserById(userId);
+    let userAddress = cart.shippingAddress as ShippingAddress | null;
+    let paymentMethod = cart.paymentMethod;
 
-    // Check if cart and user exists
+    if (userId) {
+      const user = await getUserById(userId);
+      if (user.address) userAddress = user.address as ShippingAddress;
+      if (user.paymentMethod) paymentMethod = user.paymentMethod;
+    }
+
+    // Check if cart and address exists
     if (!cart || cart.items.length === 0) {
       return {
         success: false,
@@ -39,7 +46,7 @@ export async function createOrder() {
       };
     }
 
-    if (!user.address) {
+    if (!userAddress) {
       return {
         success: false,
         message: "No shipping address",
@@ -47,7 +54,7 @@ export async function createOrder() {
       };
     }
 
-    if (!user.paymentMethod) {
+    if (!paymentMethod) {
       return {
         success: false,
         message: "No payment method",
@@ -57,12 +64,16 @@ export async function createOrder() {
 
     // Create order object
     const order = insertOrderSchema.parse({
-      userId: user.id,
-      shippingAddress: user.address,
-      paymentMethod: user.paymentMethod,
+      userId: userId || null,
+      guestEmail: userAddress.guestEmail || null,
+      shippingAddress: userAddress,
+      paymentMethod: paymentMethod,
       itemsPrice: cart.itemsPrice,
       shippingPrice: cart.shippingPrice,
       taxPrice: cart.taxPrice,
+      couponCode: cart.couponCode || null,
+      discountPrice: cart.discountPrice || 0,
+      isGiftWrapped: cart.isGiftWrapped,
       totalPrice: cart.totalPrice,
     });
 
@@ -89,6 +100,8 @@ export async function createOrder() {
           taxPrice: 0,
           shippingPrice: 0,
           itemsPrice: 0,
+          couponCode: null,
+          discountPrice: 0,
         },
       });
 
@@ -434,6 +447,7 @@ export async function deliverOrder(orderId: string) {
       data: {
         isDelivered: true,
         deliveredAt: new Date(),
+        status: 'DELIVERED',
       },
     });
 
@@ -443,6 +457,115 @@ export async function deliverOrder(orderId: string) {
       success: true,
       message: 'Order has been marked delivered',
     };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// Update order status (Admin)
+export async function updateOrderStatus(orderId: string, status: string, awbNumber?: string) {
+  try {
+    const order = await prisma.order.findFirst({
+      where: { id: orderId },
+    });
+
+    if (!order) throw new Error('Order not found');
+
+    const updateData: any = { status };
+    if (awbNumber) {
+      updateData.awbNumber = awbNumber;
+    }
+    
+    if (status === 'DELIVERED') {
+      updateData.isDelivered = true;
+      updateData.deliveredAt = new Date();
+    }
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: updateData,
+    });
+
+    revalidatePath(`/order/${orderId}`);
+    revalidatePath('/admin/orders');
+
+    return {
+      success: true,
+      message: `Order status updated to ${status}`,
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// Create Razorpay Order
+export async function createRazorpayOrder(orderId: string) {
+  try {
+    const order = await prisma.order.findFirst({
+      where: {
+        id: orderId,
+      },
+    });
+
+    if (order) {
+      const options = {
+        amount: Math.round(Number(order.totalPrice) * 100), // amount in smallest currency unit (paise)
+        currency: "INR",
+        receipt: order.id,
+      };
+
+      const razorpayOrder = await razorpay.orders.create(options);
+      
+      return {
+        success: true,
+        message: 'Order created successfully',
+        data: razorpayOrder.id,
+      };
+    } else {
+      throw new Error('Order not found');
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// Approve Razorpay Order
+export async function approveRazorpayOrder(orderId: string, paymentData: { razorpay_payment_id: string, razorpay_order_id: string, razorpay_signature: string }) {
+  try {
+    const order = await prisma.order.findFirst({
+      where: {
+        id: orderId,
+      },
+    });
+
+    if (!order) throw new Error('Order not found');
+
+    const body = paymentData.razorpay_order_id + "|" + paymentData.razorpay_payment_id;
+    const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || 'YOUR_SECRET')
+                                  .update(body.toString())
+                                  .digest('hex');
+                                  
+    if (expectedSignature === paymentData.razorpay_signature) {
+      await updateOrderToPaid({
+        orderId,
+        paymentResult: {
+          id: paymentData.razorpay_payment_id,
+          status: 'COMPLETED',
+          email_address: order.user?.email || '',
+          pricePaid: order.totalPrice.toString(),
+        },
+      });
+
+      revalidatePath(`/order/${orderId}`);
+
+      return {
+        success: true,
+        message: 'Order paid successfully',
+      };
+    } else {
+       throw new Error('Invalid signature');
+    }
+
   } catch (error) {
     return { success: false, message: formatError(error) };
   }

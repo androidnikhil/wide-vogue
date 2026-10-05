@@ -54,14 +54,17 @@ export async function getProductById(productId: string) {
     rating?: string;
     sort?: string;
   }) {
+    // Split query into words to allow partial matches (e.g., "laddu gopal" matching "Laadu Gopal" because "Gopal" matches)
+    const queryWords = query && query !== 'all' ? query.split(' ').filter(w => w.length > 1) : [];
+
     // Query filter
     const queryFilter: Prisma.ProductWhereInput =
-      query && query !== 'all'
+      queryWords.length > 0
         ? {
-            name: {
-              contains: query,
-              mode: 'insensitive',
-            } as Prisma.StringFilter,
+            OR: queryWords.flatMap((word) => [
+              { name: { contains: word, mode: 'insensitive' } as Prisma.StringFilter },
+              { category: { contains: word, mode: 'insensitive' } as Prisma.StringFilter },
+            ]),
           }
         : {};
   

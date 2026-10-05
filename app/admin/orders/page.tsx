@@ -32,9 +32,9 @@ import {
     });
   
     return (
-      <div className='space-y-2'>
-        <div className='flex items-center gap-3'>
-          <h1 className='h2-bold'>Orders</h1>
+      <div className='space-y-6'>
+        <div className='flex items-center justify-between'>
+          <h1 className='text-3xl font-display-lg text-primary font-bold'>Orders</h1>
           {searchText && (
             <div>
               Filtered by <i>&quot;{searchText}&quot;</i>{' '}
@@ -46,9 +46,9 @@ import {
             </div>
           )}
         </div>
-        <div className='overflow-x-auto'>
+        <div className='bg-surface shadow-md rounded-2xl border border-secondary/10 overflow-hidden'>
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-surface-container/50">
               <TableRow>
                 <TableHead>ID</TableHead>
                 <TableHead>DATE</TableHead>
@@ -61,8 +61,8 @@ import {
             </TableHeader>
             <TableBody>
               {orders.data.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>{formatId(order.id)}</TableCell>
+                <TableRow key={order.id} className="hover:bg-surface-container-lowest">
+                  <TableCell className="font-medium font-mono text-primary">{formatId(order.id)}</TableCell>
                   <TableCell>
                     {formatDateTime(order.createdAt).dateTime}
                   </TableCell>
@@ -88,13 +88,13 @@ import {
               ))}
             </TableBody>
           </Table>
+        </div>
           {orders.totalPages > 1 && (
             <Pagination
               page={Number(page) || 1}
               totalPages={orders?.totalPages}
             />
           )}
-        </div>
       </div>
     );
   };

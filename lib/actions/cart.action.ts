@@ -10,19 +10,20 @@ import { revalidatePath } from 'next/cache';
 import { Prisma } from '@prisma/client';
 
 // Calculate cart prices
-const calcPrice = (items: CartItem[]) => {
+const calcPrice = (items: CartItem[], discountPrice: number = 0, isGiftWrapped: boolean = false) => {
   const itemsPrice = round2(
       items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0)
     ),
-    shippingPrice = round2(itemsPrice > 100 ? 0 : 10),
-    taxPrice = round2(0.15 * itemsPrice),
-    totalPrice = round2(itemsPrice + taxPrice + shippingPrice);
+    shippingPrice = round2(itemsPrice > 999 ? 0 : 50),
+    taxPrice = 0,
+    giftWrapFee = isGiftWrapped ? 50 : 0,
+    totalPrice = round2(itemsPrice + taxPrice + shippingPrice + giftWrapFee - discountPrice);
 
   return {
     itemsPrice: itemsPrice.toFixed(2),
     shippingPrice: shippingPrice.toFixed(2),
     taxPrice: taxPrice.toFixed(2),
-    totalPrice: totalPrice.toFixed(2),
+    totalPrice: Math.max(0, totalPrice).toFixed(2),
   };
 };
 
@@ -35,6 +36,7 @@ export async function addItemToCart(data: CartItem) {
     // Get session and user ID
     const session = await auth();
     const userId = session?.user?.id ? (session.user.id as string) : undefined;
+
 
     // Get cart
     const cart = await getMyCart();
@@ -72,7 +74,7 @@ export async function addItemToCart(data: CartItem) {
     } else {
       // Check if item is already in cart
       const existItem = (cart.items as CartItem[]).find(
-        (x) => x.productId === item.productId
+        (x) => x.productId === item.productId && x.size === item.size
       );
 
       if (existItem) {
@@ -83,7 +85,7 @@ export async function addItemToCart(data: CartItem) {
 
         // Increase the quantity
         (cart.items as CartItem[]).find(
-          (x) => x.productId === item.productId
+          (x) => x.productId === item.productId && x.size === item.size
         )!.qty = existItem.qty + 1;
       } else {
         // If item does not exist in cart
@@ -99,7 +101,7 @@ export async function addItemToCart(data: CartItem) {
         where: { id: cart.id },
         data: {
           items: cart.items as Prisma.CartUpdateitemsInput[],
-          ...calcPrice(cart.items as CartItem[]),
+          ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), cart.isGiftWrapped),
         },
       });
 
@@ -144,10 +146,11 @@ export async function getMyCart() {
     totalPrice: cart.totalPrice.toString(),
     shippingPrice: cart.shippingPrice.toString(),
     taxPrice: cart.taxPrice.toString(),
+    discountPrice: cart.discountPrice?.toString() || "0",
   });
 }
 
-export async function removeItemFromCart(productId: string) {
+export async function removeItemFromCart(productId: string, size?: string) {
   try {
     // Check for cart cookie
     const sessionCartId = (await cookies()).get('sessionCartId')?.value;
@@ -165,7 +168,7 @@ export async function removeItemFromCart(productId: string) {
 
     // Check for item
     const exist = (cart.items as CartItem[]).find(
-      (x) => x.productId === productId
+      (x) => x.productId === productId && x.size === size
     );
     if (!exist) throw new Error('Item not found');
 
@@ -173,11 +176,11 @@ export async function removeItemFromCart(productId: string) {
     if (exist.qty === 1) {
       // Remove from cart
       cart.items = (cart.items as CartItem[]).filter(
-        (x) => x.productId !== exist.productId
+        (x) => !(x.productId === exist.productId && x.size === exist.size)
       );
     } else {
       // Decrease qty
-      (cart.items as CartItem[]).find((x) => x.productId === productId)!.qty =
+      (cart.items as CartItem[]).find((x) => x.productId === productId && x.size === size)!.qty =
         exist.qty - 1;
     }
 
@@ -186,7 +189,7 @@ export async function removeItemFromCart(productId: string) {
       where: { id: cart.id },
       data: {
         items: cart.items as Prisma.CartUpdateitemsInput[],
-        ...calcPrice(cart.items as CartItem[]),
+        ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), cart.isGiftWrapped),
       },
     });
 
@@ -196,6 +199,93 @@ export async function removeItemFromCart(productId: string) {
       success: true,
       message: `${product.name} was removed from cart`,
     };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+export async function applyCoupon(code: string) {
+  try {
+    const cart = await getMyCart();
+    if (!cart) throw new Error('Cart not found');
+
+    if (!code) {
+      // Remove coupon
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: {
+          couponCode: null,
+          discountPrice: 0,
+          ...calcPrice(cart.items as CartItem[], 0, cart.isGiftWrapped),
+        },
+      });
+      revalidatePath('/cart');
+      return { success: true, message: 'Coupon removed' };
+    }
+
+    const coupon = await prisma.coupon.findUnique({
+      where: { code },
+    });
+
+    if (!coupon || !coupon.isActive) {
+      throw new Error('Invalid or expired coupon');
+    }
+
+    if (coupon.expiryDate && coupon.expiryDate < new Date()) {
+      throw new Error('Coupon has expired');
+    }
+
+    if (coupon.maxUses && coupon.currentUses >= coupon.maxUses) {
+      throw new Error('Coupon usage limit reached');
+    }
+
+    // Calculate discount
+    const itemsPrice = (cart.items as CartItem[]).reduce(
+      (acc, item) => acc + Number(item.price) * item.qty,
+      0
+    );
+
+    let discountValue = 0;
+    if (coupon.discountType === 'percentage') {
+      discountValue = (itemsPrice * Number(coupon.discountValue)) / 100;
+    } else {
+      discountValue = Number(coupon.discountValue);
+    }
+
+    // Don't discount more than itemsPrice
+    discountValue = Math.min(discountValue, itemsPrice);
+
+    await prisma.cart.update({
+      where: { id: cart.id },
+      data: {
+        couponCode: code,
+        discountPrice: discountValue,
+        ...calcPrice(cart.items as CartItem[], discountValue, cart.isGiftWrapped),
+      },
+    });
+
+    revalidatePath('/cart');
+    return { success: true, message: 'Coupon applied successfully' };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+export async function toggleGiftWrap(isGiftWrapped: boolean) {
+  try {
+    const cart = await getMyCart();
+    if (!cart) throw new Error('Cart not found');
+
+    await prisma.cart.update({
+      where: { id: cart.id },
+      data: {
+        isGiftWrapped,
+        ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), isGiftWrapped),
+      },
+    });
+
+    revalidatePath('/cart');
+    return { success: true, message: isGiftWrapped ? 'Gift wrap added' : 'Gift wrap removed' };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }

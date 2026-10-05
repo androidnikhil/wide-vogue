@@ -25,9 +25,11 @@ import {
   createPayPalOrder,
   approvePayPalOrder,
   updateOrderToPaidCOD,
-  deliverOrder,
+  updateOrderStatus,
 } from '@/lib/actions/order.actions';
 import StripePayment from './stripe-payment';
+import RazorpayPayment from './razorpay-payment';
+import OrderTimeline from '@/components/shared/order/order-timeline';
 
 const OrderDetailsTable = ({
   order,
@@ -47,6 +49,9 @@ const OrderDetailsTable = ({
     itemsPrice,
     shippingPrice,
     taxPrice,
+    couponCode,
+    discountPrice,
+    isGiftWrapped,
     totalPrice,
     paymentMethod,
     isDelivered,
@@ -118,17 +123,18 @@ const OrderDetailsTable = ({
     );
   };
 
-  // Button to mark order as delivered
-  const MarkAsDeliveredButton = () => {
+  // Button to update order status
+  const UpdateStatusButton = ({ statusLabel, statusValue }: { statusLabel: string, statusValue: string }) => {
     const [isPending, startTransition] = useTransition();
 
     return (
       <Button
         type='button'
-        disabled={isPending}
+        variant={order.status === statusValue ? 'default' : 'outline'}
+        disabled={isPending || order.status === statusValue}
         onClick={() =>
           startTransition(async () => {
-            const res = await deliverOrder(order.id);
+            const res = await updateOrderStatus(order.id, statusValue);
             toast(res.message, {
               style: {
                 backgroundColor: res.success ? 'green' : 'red',
@@ -138,49 +144,77 @@ const OrderDetailsTable = ({
           })
         }
       >
-        {isPending ? 'processing...' : 'Mark As Delivered'}
+        {isPending ? '...' : statusLabel}
       </Button>
     );
   };
 
   return (
     <>
-      <h1 className='py-4 text-2xl'>Order {formatId(id)}</h1>
-      <div className='grid md:grid-cols-3 md:gap-5'>
-        <div className='col-span-2 space-4-y overlow-x-auto'>
-          <Card>
-            <CardContent className='p-4 gap-4'>
-              <h2 className='text-xl pb-4'>Payment Method</h2>
-              <p className='mb-2'>{paymentMethod}</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 mt-4 gap-4">
+        <div>
+          <h1 className='h2-bold text-primary'>Order Details</h1>
+          <p className="text-on-surface-variant font-mono mt-1 text-sm bg-surface-container px-2 py-1 rounded-md inline-block border border-outline-variant/30">ID: {id}</p>
+        </div>
+      </div>
+      <div className='grid lg:grid-cols-3 gap-6 lg:gap-8'>
+        <div className='col-span-2 space-y-6 overflow-x-auto pb-10'>
+          <Card className="border-secondary/10 shadow-sm rounded-2xl overflow-hidden bg-surface">
+            <div className="bg-primary-container text-surface p-4 border-b border-secondary/20">
+              <h2 className='font-title-lg flex items-center gap-2'><span className="material-symbols-outlined text-[20px]">local_shipping</span> Track Your Order</h2>
+            </div>
+            <CardContent className='p-6 md:p-8'>
+              <OrderTimeline order={order} />
+            </CardContent>
+          </Card>
+          
+          <Card className="border-secondary/10 shadow-sm rounded-2xl overflow-hidden bg-surface">
+            <div className="bg-surface-container-lowest p-4 border-b border-outline-variant/30">
+              <h2 className='font-title-lg text-primary flex items-center gap-2'><span className="material-symbols-outlined text-[20px]">payments</span> Payment Method</h2>
+            </div>
+            <CardContent className='p-6 space-y-3'>
+              <p className='font-medium text-lg text-on-surface flex items-center gap-2'>{paymentMethod}</p>
               {isPaid ? (
                 <Badge variant='secondary'>
                   Paid at {formatDateTime(paidAt!).dateTime}
                 </Badge>
               ) : (
-                <Badge variant='destructive'>Not paid</Badge>
+                  <Badge className="bg-red-500 hover:bg-red-600 text-white rounded-full px-3 py-1 font-medium shadow-sm">Not paid</Badge>
               )}
             </CardContent>
           </Card>
-          <Card className='my-2'>
-            <CardContent className='p-4 gap-4'>
-              <h2 className='text-xl pb-4'>Shipping Address</h2>
-              <p>{shippingAddress.fullName}</p>
-              <p className='mb-2'>
+
+          <Card className="border-secondary/10 shadow-sm rounded-2xl overflow-hidden bg-surface">
+            <div className="bg-surface-container-lowest p-4 border-b border-outline-variant/30">
+              <h2 className='font-title-lg text-primary flex items-center gap-2'><span className="material-symbols-outlined text-[20px]">location_on</span> Shipping Address</h2>
+            </div>
+            <CardContent className='p-6 space-y-2'>
+              <p className="font-title-lg text-on-surface">{shippingAddress.fullName}</p>
+              <p className='text-on-surface-variant font-body-md leading-relaxed'>
                 {shippingAddress.streetAddress}, {shippingAddress.city}
                 {shippingAddress.postalCode}, {shippingAddress.country}
+              </p>
+              <p className="flex items-center text-secondary font-medium mb-4">
+                <span className="w-4 h-4 mr-1 inline-block">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </span>
+                +91 {shippingAddress.contactNumber}
               </p>
               {isDelivered ? (
                 <Badge variant='secondary'>
                   Delivered at {formatDateTime(deliveredAt!).dateTime}
                 </Badge>
               ) : (
-                <Badge variant='destructive'>Not Delivered</Badge>
+                  <Badge className="bg-red-500 hover:bg-red-600 text-white rounded-full px-3 py-1 font-medium shadow-sm">Not Delivered</Badge>
               )}
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className='p-4 gap-4'>
-              <h2 className='text-xl pb-4'>Order Items</h2>
+
+          <Card className="border-secondary/10 shadow-sm rounded-2xl overflow-hidden bg-surface">
+            <div className="bg-surface-container-lowest p-4 border-b border-outline-variant/30">
+              <h2 className='font-title-lg text-primary flex items-center gap-2'><span className="material-symbols-outlined text-[20px]">inventory_2</span> Order Items</h2>
+            </div>
+            <CardContent className='p-0 sm:p-4'>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -194,22 +228,25 @@ const OrderDetailsTable = ({
                     <TableRow key={item.slug}>
                       <TableCell>
                         <Link
-                          href={`/product/{item.slug}`}
-                          className='flex items-center'
+                          href={`/product/${item.slug}`}
+                          className='flex items-center gap-3 hover:bg-surface-container-lowest p-2 rounded-lg transition-colors'
                         >
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            width={50}
-                            height={50}
-                          />
-                          <span className='px-2'>{item.name}</span>
+                          <div className="w-16 h-16 relative rounded-md overflow-hidden border border-outline-variant/30 shadow-sm flex-shrink-0">
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              fill
+                              sizes="64px"
+                              className="object-cover"
+                            />
+                          </div>
+                          <span className='font-medium text-on-surface line-clamp-2'>{item.name}</span>
                         </Link>
                       </TableCell>
-                      <TableCell>
-                        <span className='px-2'>{item.qty}</span>
+                      <TableCell className="text-center">
+                        <span className='font-medium text-on-surface-variant bg-surface-container px-3 py-1 rounded-full'>{item.qty}</span>
                       </TableCell>
-                      <TableCell className='text-right'>
+                      <TableCell className='text-right font-title-lg text-primary'>
                         {formatCurrency(item.price)}
                       </TableCell>
                     </TableRow>
@@ -219,24 +256,42 @@ const OrderDetailsTable = ({
             </CardContent>
           </Card>
         </div>
-        <div>
-          <Card>
-            <CardContent className='p-4 gap-4 space-y-4'>
-              <div className='flex justify-between'>
-                <div>Items</div>
-                <div>{formatCurrency(itemsPrice)}</div>
+
+        <div className="lg:col-span-1">
+          <Card className="bg-surface border-secondary/10 shadow-md sticky top-24 overflow-hidden rounded-xl">
+            <div className="bg-primary-container text-surface p-4 border-b border-secondary/20">
+              <h2 className="font-title-lg flex items-center gap-2"><span className="material-symbols-outlined text-[20px]">receipt_long</span> Order Summary</h2>
+            </div>
+            <CardContent className='p-6 space-y-4'>
+              <div className='flex justify-between items-center text-on-surface-variant'>
+                <span>Items Subtotal</span>
+                <span className="font-medium text-on-surface">{formatCurrency(itemsPrice)}</span>
               </div>
-              <div className='flex justify-between'>
-                <div>Tax</div>
-                <div>{formatCurrency(taxPrice)}</div>
+              {isGiftWrapped && (
+                <div className='flex justify-between items-center text-on-surface-variant'>
+                  <span>Gift Wrapping</span>
+                  <span className="font-medium text-on-surface">{formatCurrency(50)}</span>
+                </div>
+              )}
+              <div className='flex justify-between items-center text-on-surface-variant'>
+                <span>Taxes</span>
+                <span className="font-medium text-on-surface">{formatCurrency(taxPrice)}</span>
               </div>
-              <div className='flex justify-between'>
-                <div>Shipping</div>
-                <div>{formatCurrency(shippingPrice)}</div>
+              <div className='flex justify-between items-center text-on-surface-variant pb-4 border-b border-outline-variant/30'>
+                <span>Shipping</span>
+                <span className="font-medium text-on-surface">{formatCurrency(shippingPrice)}</span>
               </div>
-              <div className='flex justify-between'>
-                <div>Total</div>
-                <div>{formatCurrency(totalPrice)}</div>
+              
+              {Number(discountPrice) > 0 && (
+                <div className='flex justify-between items-center text-emerald-600 font-medium pt-2 pb-2'>
+                  <span>Discount (Code: {couponCode})</span>
+                  <span>-{formatCurrency(discountPrice || "0")}</span>
+                </div>
+              )}
+              
+              <div className='flex justify-between font-title-lg text-primary pt-2 pb-2'>
+                <span>Total</span>
+                <span className="font-bold">{formatCurrency(totalPrice)}</span>
               </div>
 
               {/* PayPal Payment */}
@@ -252,6 +307,14 @@ const OrderDetailsTable = ({
                 </div>
               )}
 
+              {/* Razorpay Payment (Handles UPI, Card, NetBanking) */}
+              {!isPaid && ['UPI', 'Card', 'NetBanking'].includes(paymentMethod) && (
+                <RazorpayPayment
+                  orderId={order.id}
+                  amount={Number(order.totalPrice)}
+                />
+              )}
+
               {/* Stripe Payment */}
               {!isPaid && paymentMethod === 'Stripe' && stripeClientSecret && (
                 <StripePayment
@@ -265,7 +328,17 @@ const OrderDetailsTable = ({
               {isAdmin && !isPaid && paymentMethod === 'CashOnDelivery' && (
                 <MarkAsPaidButton />
               )}
-              {isAdmin && isPaid && !isDelivered && <MarkAsDeliveredButton />}
+              {isAdmin && (
+                <div className='flex flex-col gap-3 mt-6 border-t pt-4'>
+                  <h3 className='font-bold text-sm text-secondary uppercase tracking-wider'>Admin Actions: Update Status</h3>
+                  <div className='flex flex-wrap gap-2'>
+                    <UpdateStatusButton statusLabel='Processing' statusValue='PROCESSING' />
+                    <UpdateStatusButton statusLabel='Shipped' statusValue='SHIPPED' />
+                    <UpdateStatusButton statusLabel='Out for Delivery' statusValue='OUT_FOR_DELIVERY' />
+                    <UpdateStatusButton statusLabel='Delivered' statusValue='DELIVERED' />
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

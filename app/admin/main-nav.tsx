@@ -21,6 +21,10 @@ const links = [
     title: 'Users',
     href: '/admin/users',
   },
+  {
+    title: 'Gift Cards',
+    href: '/admin/gift-cards',
+  },
 ];
 
 const MainNav = ({
@@ -38,7 +42,7 @@ const MainNav = ({
           key={item.href}
           href={item.href}
           className={cn(
-            'text-sm font-medium transition-colors hover:text-primary',
+            'text-sm font-medium transition-colors hover:text-primary whitespace-nowrap',
             pathname.includes(item.href) ? '' : 'text-muted-foreground'
           )}
         >

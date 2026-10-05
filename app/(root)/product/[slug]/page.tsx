@@ -7,8 +7,10 @@ import ProductImages from '@/components/shared/product/product-images';
 import AddToCart from '@/components/shared/product/add-to-cart';
 import { getMyCart } from '@/lib/actions/cart.action';
 import ReviewList from './review-list';
+import WishlistButton from '@/components/shared/product/wishlist-button';
 import { auth } from '@/auth';
 import Rating from '@/components/shared/product/rating';
+import ProductTrustBadges from '@/components/shared/product/product-trust-badges';
 
 const ProductDetailsPage = async (props: {
   params: Promise<{ slug: string }>;
@@ -25,55 +27,52 @@ const ProductDetailsPage = async (props: {
 
   return (
     <>
-      <section>
-        <div className='grid grid-cols-1 md:grid-cols-5'>
-          {/* Images Column */}
-          <div className='col-span-2'>
+      <section className="pb-10 pt-4 max-w-7xl mx-auto px-4 md:px-8">
+        <div className='grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12'>
+          {/* Images Column (Left) */}
+          <div className='lg:col-span-6 xl:col-span-7'>
             <ProductImages images={product.images} />
           </div>
-          {/* Details Column */}
-          <div className='col-span-2 p-5'>
-            <div className='flex flex-col gap-6'>
-              <p>
+          
+          {/* Details & Action Column (Right) */}
+          <div className='lg:col-span-6 xl:col-span-5 flex flex-col'>
+            {/* Header / Title */}
+            <div className='flex flex-col gap-3 pb-6 border-b border-outline-variant/30'>
+              <p className='font-label-lg text-label-lg text-secondary uppercase tracking-widest font-bold'>
                 {product.brand} {product.category}
               </p>
-              <h1 className='h3-bold'>{product.name}</h1>
-              <Rating value={Number(product.rating)} />
-              <p>{product.numReviews} reviews</p>
-              <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
-                <ProductPrice
-                  value={Number(product.price)}
-                  className='w-24 rounded-full bg-green-100 text-green-700 px-5 py-2'
-                />
+              <h1 className='font-headline-lg text-headline-lg lg:text-4xl text-primary font-bold'>{product.name}</h1>
+              
+              <div className="flex items-center gap-4 mt-1">
+                <Rating value={Number(product.rating)} />
+                <span className="text-on-surface-variant font-body-sm">
+                  ({product.numReviews} reviews)
+                </span>
+                <span className="text-outline-variant">|</span>
+                {product.stock > 0 ? (
+                  <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none font-semibold px-3">In Stock</Badge>
+                ) : (
+                  <Badge variant='destructive' className="font-semibold px-3">Out Of Stock</Badge>
+                )}
               </div>
             </div>
-            <div className='mt-10'>
-              <p className='font-semibold'>Description</p>
-              <p>{product.description}</p>
-            </div>
-          </div>
-          {/* Action Column */}
-          <div>
-            <Card>
-              <CardContent className='p-4'>
-                <div className='mb-2 flex justify-between'>
-                  <div>Price</div>
-                  <div>
-                    <ProductPrice value={Number(product.price)} />
-                  </div>
-                </div>
-                <div className='mb-2 flex justify-between'>
-                  <div>Status</div>
-                  {product.stock > 0 ? (
-                    <Badge variant='outline'>In Stock</Badge>
-                  ) : (
-                    <Badge variant='destructive'>Out Of Stock</Badge>
-                  )}
-                </div>
-                {product.stock > 0 && (
-                  <div className='flex-center'>
+
+            {/* Price & Cart Actions */}
+            <div className='py-6 border-b border-outline-variant/30'>
+              <div className='mb-6 flex items-baseline gap-4'>
+                <ProductPrice
+                  value={Number(product.price)}
+                  className='text-4xl font-bold text-on-surface'
+                />
+                <span className="text-sm text-on-surface-variant font-medium">(Inclusive of all taxes)</span>
+              </div>
+
+              {product.stock > 0 && (
+                <div className='flex items-center gap-3 w-full'>
+                  <div className="flex-1">
                     <AddToCart
                       cart={cart}
+                      sizes={product.sizes}
                       item={{
                         productId: product.id,
                         name: product.name,
@@ -84,13 +83,35 @@ const ProductDetailsPage = async (props: {
                       }}
                     />
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                  <WishlistButton 
+                    productId={product.id} 
+                    className="h-12 w-12 flex-shrink-0 bg-surface-container-low border border-outline-variant/30 hover:bg-surface-container rounded-lg shadow-sm active:scale-95 transition-all flex items-center justify-center text-on-surface-variant hover:text-secondary"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Trust Badges & Pincode Checker */}
+            <div className="py-2">
+              <ProductTrustBadges 
+                isReturnable={product.isReturnable} 
+                returnWindowDays={product.returnWindowDays} 
+              />
+            </div>
+
+            {/* Description */}
+            <div className='mt-8 bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 shadow-sm'>
+              <p className='font-title-lg text-title-lg text-primary font-bold mb-4 flex items-center gap-2'>
+                <span className="material-symbols-outlined text-secondary">info</span>
+                Devotional Description
+              </p>
+              <p className='font-body-md text-body-md text-on-surface-variant leading-relaxed'>{product.description}</p>
+            </div>
+            
           </div>
         </div>
       </section>
-      <section className='mt-10'>
+      <section className='mt-10 max-w-7xl mx-auto px-4 md:px-8'>
         <h2 className='h2-bold mb-5'>Customer Reviews</h2>
         <ReviewList
           userId={userId || ''}

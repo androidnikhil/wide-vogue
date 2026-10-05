@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import ModeToggle from "./mode-toggle";
 import Link from "next/link";
-import { EllipsisVertical, ShoppingCart } from "lucide-react";
+import { EllipsisVertical, ShoppingCart, MapPin } from "lucide-react";
 import {
     Sheet,
   SheetContent,
@@ -17,6 +17,11 @@ const Menu = () => {
       <nav className="hidden md:flex w-full max-w-xs gap-1">
         <ModeToggle />
         <Button asChild variant="ghost">
+          <Link href="/track-order">
+            <MapPin size={24} /> Track Order
+          </Link>
+        </Button>
+        <Button asChild variant="ghost">
           <Link href="/cart">
             <ShoppingCart size={24} /> Cart
           </Link>
@@ -31,6 +36,11 @@ const Menu = () => {
           <SheetContent className="flex flex-col items-start">
             <SheetTitle>Menu</SheetTitle>
             <ModeToggle />
+            <Button asChild variant="ghost">
+              <Link href="/track-order">
+                <MapPin size={24} /> Track Order
+              </Link>
+            </Button>
             <Button asChild variant="ghost">
               <Link href="/cart">
                 <ShoppingCart size={24} /> Cart

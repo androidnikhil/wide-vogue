@@ -108,14 +108,38 @@ export async function updateUserAddress(data: ShippingAddress) {
       where: { id: session?.user?.id },
     });
 
-    if (!currentUser) throw new Error('User not found');
-
     const address = shippingAddressSchema.parse(data);
 
-    await prisma.user.update({
-      where: { id: currentUser.id },
-      data: { address },
-    });
+    if (currentUser) {
+      const currentAddresses = Array.isArray(currentUser.addresses) ? currentUser.addresses as Prisma.JsonObject[] : [];
+      
+      // Check if address already exists (simple match on streetAddress and city)
+      const addressExists = currentAddresses.some(
+        (a: any) => a.streetAddress === address.streetAddress && a.city === address.city
+      );
+
+      let newAddresses = currentAddresses;
+      if (!addressExists) {
+        newAddresses = [address, ...currentAddresses].slice(0, 5); // Keep max 5
+      }
+
+      await prisma.user.update({
+        where: { id: currentUser.id },
+        data: { 
+          address,
+          addresses: newAddresses
+        },
+      });
+    }
+
+    // Always update the cart's shipping address
+    const cart = await getMyCart();
+    if (cart) {
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: { shippingAddress: address },
+      });
+    }
 
     return {
       success: true,
@@ -169,16 +193,22 @@ export async function updateUserPaymentMethod(
       where: { id: session?.user?.id },
     });
 
-    if (!currentUser) throw new Error('User not found');
-
     const paymentMethod = paymentMethodSchema.parse(data);
 
-    console.log(paymentMethod);
+    if (currentUser) {
+      await prisma.user.update({
+        where: { id: currentUser.id },
+        data: { paymentMethod: paymentMethod.type },
+      });
+    }
 
-    await prisma.user.update({
-      where: { id: currentUser.id },
-      data: { paymentMethod: paymentMethod.type },
-    });
+    const cart = await getMyCart();
+    if (cart) {
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: { paymentMethod: paymentMethod.type },
+      });
+    }
 
     return {
       success: true,

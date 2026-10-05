@@ -1,90 +1,100 @@
-import { FaFacebook, FaInstagram } from "react-icons/fa";
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 
-const Footer = () => {
-  const year = new Date().getFullYear();
-
-  return <footer className="bg-[#1E1E1C] text-white py-12">
-    <div className="max-w-7xl mx-auto px-6 lg:px-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-        {/* Column 1 - Company Info */}
-        <div className="lg:col-span-1">
-          <h2 className="text-white text-xl font-semibold uppercase">Information</h2>
-          <ul className="mt-4 space-y-3">
-            <li><a href="#" className="hover:text-white">Contact Us</a></li>
-            <li><a href="#" className="hover:text-white">Shipping & Return</a></li>
-            <li><a href="#" className="hover:text-white">Terms & Condition</a></li>
-            <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
-          </ul>
-        </div>
-
-        {/* Column 2 - Links */}
-        <div className="lg:col-span-1">
-          <h2 className="text-white text-xl font-semibold uppercase">Categories</h2>
-          <ul className="mt-4 space-y-3">
-            <li><a href="#" className="hover:text-white">All Products</a></li>
-            <li><a href="#" className="hover:text-white">Box Tote</a></li>
-            <li><a href="#" className="hover:text-white">Shoulder Bags</a></li>
-            <li><a href="#" className="hover:text-white">Sling Bags Crossbody Bags</a></li>
-          </ul>
-        </div>
-
-        {/* Column 3 - Support */}
-        <div className="lg:col-span-1">
-          <h2 className="text-white text-xl font-semibold uppercase">CONTACT US</h2>
-          <p className="mt-4 text-white">
-            Phone :
+export default function Footer() {
+  return (
+    <>
+      <footer className="bg-primary-container text-surface border-t border-secondary/20 docked full-width bottom mt-auto">
+<div className="w-full px-6 py-12 md:px-12 max-w-7xl mx-auto flex flex-col gap-8 text-surface">
+{/* Top Columns */}
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+{/* Col 1: Brand Anchor Card */}
+<div className="space-y-4">
+<div className="bg-surface p-3 rounded-lg inline-block shadow-sm">
+<img alt="Madhav Shringaar" className="h-20 w-auto min-w-[200px] object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD75rl5ZEaBmmpEx8y3K6w9XKaa_YtA4qg-eZYvR09fY8aGbt8WfkJzr6vIa1EErPd-NEnnR0qn0ASZMdDyMkwAbgo7Kwm9uHSzGH7PszRApulz6AhHNGWrWP2vTxv7i4rQcfqBIsZLVKjaXbMN5JUFRib8F6LobfCqnxBN8DjAGaRO5a_qAJy4lM5R6Hr0W5fLylioAMZdWhKuNSlx6MarSv-oxVReVcEX5KO8YC6M1D_lyxi_VXYf7Vq3uPSLH6ARog" />
+</div>
+<p className="font-body-sm text-body-sm text-white/80 leading-relaxed">
+            Bringing divine adornments, authentic fabrics, and revered seva essentials to every Kanha devotee with eternal dedication.
           </p>
-          <a href="tel:9354002399">
-            <span>
-              +91-9354002399
-            </span>
-          </a>
-          <p className="mt-4 text-white">
-            Email :
-          </p>
-          <a href="mailto:widevogue@gmail.com">
-            <span>
-              noeply@madhavposhaak.com
-            </span>
-          </a>
-        </div>
-
-        {/* Column 4 - Newsletter */}
-        <div className="lg:col-span-2">
-          <h2 className="text-white text-xl font-semibold uppercase">Subscribe Now</h2>
-          <p className="mt-4 text-white">Sign up to our mailing list and recieve 10% off your first order. We’ll also keep you updated with the latest news and exclusive offers.</p>
-          <form className="mt-4 flex">
-            <input
-              type="email"
-              placeholder="Email Address"
-              className="w-full p-3 h-10 text-black focus:outline-none"
-            />
-            <input
-              type="submit"
-              className="bg-[#211f20] px-4 py-2 h-auto border-[#FFF] border text-white hover:border-[#E1E1E1]"
-              value="Submit"
-            />
-          </form>
-        </div>
-      </div>
-
-      <div className="mt-10 pt-6 text-center">
-        <div className="flex space-x-4 items-center justify-center">
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-            <FaFacebook className="w-6 h-6 text-gray-400 hover:text-blue-500" />
-          </a>
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-            <FaInstagram className="w-6 h-6 text-gray-400 hover:text-pink-500" />
-          </a>
-        </div>
-      </div>
-
-      {/* Footer Bottom */}
-      <div className="mt-4 pt-4 text-center">
-        <p>Copyright &copy; {year} | Madhav Poshaak</p>
-      </div>
-    </div>
-  </footer>;
+<div className="flex items-center gap-3 pt-2">
+<a aria-label="WhatsApp" className="w-8 h-8 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="#">
+<span className="material-symbols-outlined text-sm">chat</span>
+</a>
+<a aria-label="YouTube" className="w-8 h-8 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="#">
+<span className="material-symbols-outlined text-sm">play_arrow</span>
+</a>
+<a aria-label="Instagram" className="w-8 h-8 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="#">
+<span className="material-symbols-outlined text-sm">photo_camera</span>
+</a>
+</div>
+</div>
+{/* Col 2: Quick Links */}
+<div>
+<h3 className="font-title-lg text-title-lg text-secondary-fixed mb-4">Quick Seva Links</h3>
+<ul className="space-y-2 text-white/90 font-label-md text-label-md">
+<li><a className="hover:text-secondary-fixed transition-colors" href="#">Home</a></li>
+<li><a className="hover:text-secondary-fixed transition-colors" href="#">About Us</a></li>
+<li><a className="hover:text-secondary-fixed transition-colors" href="#size-guide">Size Chart Guide (0-6 No.)</a></li>
+<li><a className="hover:text-secondary-fixed transition-colors" href="#">Authentic Fabric Promise</a></li>
+<li><Link className="hover:text-secondary-fixed transition-colors" href="/policies/shipping">Shipping &amp; Pan-India Delivery</Link></li>
+<li><Link className="hover:text-secondary-fixed transition-colors" href="/policies/returns">Exchange &amp; Return Policy</Link></li>
+</ul>
+</div>
+{/* Col 3: Shop Collections */}
+<div>
+<h3 className="font-title-lg text-title-lg text-secondary-fixed mb-4">Devotional Categories</h3>
+<ul className="space-y-2 text-white/90 font-label-md text-label-md">
+<li><a className="hover:text-secondary-fixed transition-colors" href="#categories">Poshak Collection</a></li>
+<li><a className="hover:text-secondary-fixed transition-colors" href="#categories">Mukut &amp; Pagdi</a></li>
+<li><a className="hover:text-secondary-fixed transition-colors" href="#categories">Moti Mala &amp; Haar</a></li>
+<li><a className="hover:text-secondary-fixed transition-colors" href="#categories">Golden Bansuri</a></li>
+<li><a className="hover:text-secondary-fixed transition-colors" href="#categories">Carved Singhasan</a></li>
+<li><a className="hover:text-secondary-fixed transition-colors" href="#combos">Festive Combo Sets</a></li>
+</ul>
+</div>
+{/* Col 4: Devotee Support */}
+<div>
+<h3 className="font-title-lg text-title-lg text-secondary-fixed mb-4">Devotee Care Support</h3>
+<div className="space-y-3 font-body-sm text-body-sm text-white/80">
+<div className="flex items-start gap-2.5">
+<span className="material-symbols-outlined text-secondary-fixed text-lg mt-0.5">call</span>
+<div>
+<div className="font-bold text-surface flex flex-col md:flex-row md:gap-2">
+  <a href="tel:+917078211946" className="hover:text-secondary transition-colors">+91 70782 11946</a>
+  <span className="hidden md:inline">/</span>
+  <a href="tel:+917982160480" className="hover:text-secondary transition-colors">+91 79821 60480</a>
+</div>
+<p className="text-xs">Mon-Sat (10:00 AM - 7:00 PM IST)</p>
+</div>
+</div>
+<div className="flex items-start gap-2.5">
+<span className="material-symbols-outlined text-secondary-fixed text-lg mt-0.5">mail</span>
+<div>
+<a href="mailto:info@madhavshringaar.com" className="font-bold text-surface hover:text-secondary transition-colors">info@madhavshringaar.com</a>
+<p className="text-xs">Devotional Inquiries &amp; Orders</p>
+</div>
+</div>
+<div className="flex items-start gap-2.5">
+<span className="material-symbols-outlined text-secondary-fixed text-lg mt-0.5">location_on</span>
+<p className="text-xs">Vrindavan Dham &amp; Mathura Craft Workshop, Uttar Pradesh, India</p>
+</div>
+</div>
+</div>
+</div>
+{/* Bottom Disclaimer & Copyright */}
+<div className="border-t border-secondary/20 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-on-primary-container">
+<p>© 2025 Madhav Shringaar. Dedicated with utmost reverent seva to Shri Laddu Gopal Ji. All Rights Reserved.</p>
+<div className="flex items-center gap-4">
+<Link className="hover:text-secondary-fixed transition-colors" href="/policies/privacy">Privacy Policy</Link>
+<span>•</span>
+<Link className="hover:text-secondary-fixed transition-colors" href="/policies/terms">Terms of Service</Link>
+<span>•</span>
+<a className="hover:text-secondary-fixed transition-colors" href="#">Authenticity Promise</a>
+</div>
+</div>
+</div>
+</footer>
+    </>
+  );
 }
-
-export default Footer;

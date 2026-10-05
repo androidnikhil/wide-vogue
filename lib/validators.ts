@@ -24,9 +24,13 @@ export const insertProductSchema = z.object({
   images: z.array(
     z.string().min(1, "Product should have at least 1 image")
   ),
+  sizes: z.array(z.string()).default([]),
   isFeatured: z.boolean(),
   banner: z.string().nullable(),
   price: currency,
+  isReturnable: z.boolean().default(false),
+  returnWindowDays: z.coerce.number().int().min(0).default(0),
+  returnPolicyText: z.string().nullable().optional(),
 });
 
 // Schema for updating products
@@ -62,6 +66,7 @@ export const cartItemSchema = z.object({
   qty: z.number().int().nonnegative('Quantity must be a positive number'),
   image: z.string().min(1, 'Image is required'),
   price: currency,
+  size: z.string().optional(),
 });
 
 export const insertCartSchema = z.object({
@@ -70,19 +75,44 @@ export const insertCartSchema = z.object({
   totalPrice: currency,
   shippingPrice: currency,
   taxPrice: currency,
+  couponCode: z.string().optional().nullable(),
+  discountPrice: currency.optional().nullable(),
+  isGiftWrapped: z.boolean().optional(),
   sessionCartId: z.string().min(1, 'Session cart id is required'),
   userId: z.string().optional().nullable(),
 });
 
-// Schema for shipping address
+// Schema for shipping address (SPAM PROTECTED)
 export const shippingAddressSchema = z.object({
-  fullName: z.string().min(3, 'Full name must be at least 3 characters'),
-  streetAddress: z.string().min(3, 'Address must be at least 3 characters'),
-  city: z.string().min(3, 'City must be at least 3 characters'),
-  postalCode: z.string().min(3, 'Postal code must be of 6 digits'),
-  country: z.string().min(3, 'Country must be at least 3 characters'),
+  fullName: z.string()
+    .min(3, 'Full name must be at least 3 characters')
+    .max(50, 'Name is too long')
+    .regex(/^[a-zA-Z\s]+$/, 'Name can only contain alphabets and spaces'),
+  streetAddress: z.string()
+    .min(5, 'Address must be at least 5 characters')
+    .max(255, 'Address is too long')
+    .regex(/^[^<>{}]+$/, 'Address contains invalid characters (no HTML tags)'),
+  city: z.string()
+    .min(3, 'City must be at least 3 characters')
+    .max(50, 'City name is too long')
+    .regex(/^[a-zA-Z\s]+$/, 'City can only contain alphabets'),
+  state: z.string()
+    .min(2, 'State must be at least 2 characters')
+    .max(50, 'State name is too long')
+    .regex(/^[a-zA-Z\s]+$/, 'State can only contain alphabets'),
+  postalCode: z.string()
+    .length(6, 'Postal code must be exactly 6 digits')
+    .regex(/^\d+$/, 'Postal code can only contain numbers'),
+  contactNumber: z.string()
+    .length(10, 'Contact number must be exactly 10 digits')
+    .regex(/^[6-9]\d{9}$/, 'Must be a valid Indian mobile number'),
+  country: z.string()
+    .min(2, 'Country must be at least 2 characters')
+    .max(50, 'Country name is too long')
+    .regex(/^[a-zA-Z\s]+$/, 'Country can only contain alphabets'),
   lat: z.number().optional().nullable(),
   lng: z.number().optional().nullable(),
+  guestEmail: z.string().email('Invalid email address').optional().nullable(),
 })
 
 // Schema for payment method
@@ -95,10 +125,14 @@ export const paymentMethodSchema = z.object({
 
 // Schema for inserting order
 export const insertOrderSchema = z.object({
-  userId: z.string().min(1, 'User is required'),
+  userId: z.string().optional().nullable(),
+  guestEmail: z.string().optional().nullable(),
   itemsPrice: currency,
   shippingPrice: currency,
   taxPrice: currency,
+  couponCode: z.string().optional().nullable(),
+  discountPrice: currency.optional().nullable(),
+  isGiftWrapped: z.boolean().optional(),
   totalPrice: currency,
   paymentMethod: z.string().refine((data) => PAYMENT_METHODS.includes(data), {
     message: 'Invalid payment method',
@@ -147,4 +181,10 @@ export const insertReviewSchema = z.object({
     .int()
     .min(1, 'Rating must be at least 1')
     .max(5, 'Rating must be at most 5'),
+});
+
+// Schema for generating a Gift Card
+export const insertGiftCardSchema = z.object({
+  initialValue: currency,
+  expiresAt: z.date().optional().nullable(),
 });

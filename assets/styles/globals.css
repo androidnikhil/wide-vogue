@@ -39,10 +39,6 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 28 90% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
     --accent: 210 40% 96.1%;
@@ -57,6 +53,56 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+  /* Custom Palette Light */
+    --on-secondary-fixed: #291800;
+    --primary-fixed: #beedd4;
+    --surface-container-low: #f7f3ea;
+    --inverse-surface: #31312b;
+    --on-secondary-container: #724a00;
+    --error: #ba1a1a;
+    --primary-fixed-dim: #a3d1b9;
+    --inverse-primary: #a3d1b9;
+    --secondary-fixed-dim: #ffb94e;
+    --secondary-container: #ffb94e;
+    --on-tertiary-fixed: #002022;
+    --tertiary-fixed-dim: #84d3d9;
+    --surface-container-high: #ece8df;
+    --on-primary-fixed: #002115;
+    --on-primary-fixed-variant: #244f3d;
+    --secondary: #825500;
+    --surface-container-highest: #e6e2d9;
+    --outline: #717973;
+    --on-tertiary-fixed-variant: #004f53;
+    --surface-dim: #dddad1;
+    --surface: #fdf9f0;
+    --on-primary: #ffffff;
+    --on-surface-variant: #414944;
+    --on-tertiary-container: #4c9da2;
+    --tertiary: #00191a;
+    --on-primary-container: #6e9a84;
+    --surface-container: #f1eee5;
+    --outline-variant: #c0c8c2;
+    --secondary-fixed: #ffddb2;
+    --on-secondary-fixed-variant: #624000;
+    --tertiary-fixed: #a0f0f5;
+    --tertiary-container: #002f31;
+    --on-error-container: #93000a;
+    --on-secondary: #ffffff;
+    --primary: #00190f;
+    --on-background: #1c1c17;
+    --error-container: #ffdad6;
+    --primary-container: #003020;
+    --on-surface: #1c1c17;
+    --inverse-on-surface: #f4f0e7;
+    --surface-variant: #e6e2d9;
+    --surface-bright: #fdf9f0;
+    --surface-tint: #3c6753;
+    --on-tertiary: #ffffff;
+    --background: #fdf9f0;
+    --on-error: #ffffff;
+    --surface-container-lowest: #ffffff;
+
+    
     --radius: 0.5rem;
   }
   .dark {
@@ -66,10 +112,6 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 28 90% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
     --accent: 217.2 32.6% 17.5%;
@@ -84,6 +126,56 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+  /* Custom Palette Dark */
+    --on-secondary-fixed: hsl(35, 100%, 92%);
+    --primary-fixed: hsl(148, 57%, 16%);
+    --surface-container-low: hsl(42, 45%, 6%);
+    --inverse-surface: hsl(60, 7%, 82%);
+    --on-secondary-container: hsl(39, 100%, 78%);
+    --error: hsl(0, 75%, 58%);
+    --primary-fixed-dim: hsl(149, 33%, 27%);
+    --inverse-primary: hsl(149, 33%, 27%);
+    --secondary-fixed-dim: hsl(36, 100%, 35%);
+    --secondary-container: hsl(36, 100%, 35%);
+    --on-tertiary-fixed: hsl(184, 100%, 93%);
+    --tertiary-fixed-dim: hsl(184, 53%, 32%);
+    --surface-container-high: hsl(42, 25%, 10%);
+    --on-primary-fixed: hsl(158, 100%, 94%);
+    --on-primary-fixed-variant: hsl(155, 37%, 77%);
+    --secondary: hsl(39, 100%, 75%);
+    --surface-container-highest: hsl(42, 21%, 12%);
+    --outline: hsl(135, 3%, 54%);
+    --on-tertiary-fixed-variant: hsl(183, 100%, 84%);
+    --surface-dim: hsl(45, 15%, 16%);
+    --surface: hsl(42, 76%, 3%);
+    --on-primary: hsl(0, 0%, 0%);
+    --on-surface-variant: hsl(143, 6%, 73%);
+    --on-tertiary-container: hsl(183, 36%, 53%);
+    --tertiary: hsl(182, 100%, 95%);
+    --on-primary-container: hsl(150, 18%, 48%);
+    --surface-container: hsl(45, 30%, 8%);
+    --outline-variant: hsl(135, 7%, 23%);
+    --secondary-fixed: hsl(34, 100%, 15%);
+    --on-secondary-fixed-variant: hsl(39, 100%, 81%);
+    --tertiary-fixed: hsl(184, 81%, 21%);
+    --tertiary-container: hsl(182, 100%, 90%);
+    --on-error-container: hsl(356, 100%, 71%);
+    --on-secondary: hsl(0, 0%, 0%);
+    --primary: hsl(156, 100%, 95%);
+    --on-background: hsl(60, 10%, 90%);
+    --error-container: hsl(6, 100%, 8%);
+    --primary-container: hsl(160, 100%, 91%);
+    --on-surface: hsl(60, 10%, 90%);
+    --inverse-on-surface: hsl(42, 37%, 7%);
+    --surface-variant: hsl(42, 21%, 12%);
+    --surface-bright: hsl(42, 76%, 3%);
+    --surface-tint: hsl(152, 26%, 68%);
+    --on-tertiary: hsl(0, 0%, 0%);
+    --background: hsl(42, 76%, 3%);
+    --on-error: hsl(0, 0%, 0%);
+    --surface-container-lowest: hsl(0, 0%, 0%);
+
+    
   }
 }
 
@@ -102,11 +194,26 @@
   }
 }
 
-/* Uploadthing button text override */
-html.dark .upload-field .text-white {
-  color: #ffffff !important;
-}
-
-.upload-field .text-white {
-  color: #000 !important;
+@layer utilities {
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined' !important;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+  }
+  .gold-emboss {
+    text-shadow: 0 1px 2px rgba(200, 138, 32, 0.3);
+  }
+  .gold-gradient-btn {
+    background: linear-gradient(135deg, #E6C16A 0%, #C88A20 100%);
+  }
+  .custom-scroll::-webkit-scrollbar {
+    height: 4px;
+    width: 4px;
+  }
+  .custom-scroll::-webkit-scrollbar-thumb {
+    background-color: #c0c8c2;
+    border-radius: 9999px;
+  }
 }

@@ -81,7 +81,7 @@ export function formatNumber(number: number) {
 
 // Shorten UUID
 export function formatId(id: string) {
-  return `..${id.substring(id.length - 6)}`;
+  return `#${id.substring(0, 8).toUpperCase()}`;
 }
 
 // Format date and times

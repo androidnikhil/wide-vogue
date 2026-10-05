@@ -33,9 +33,9 @@ const AdminUserPage = async (props: {
   const users = await getAllUsers({ page: Number(page), query: searchText });
 
   return (
-    <div className='space-y-2'>
-      <div className='flex items-center gap-3'>
-        <h1 className='h2-bold'>Users</h1>
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h1 className='text-3xl font-display-lg text-primary font-bold'>Users</h1>
         {searchText && (
           <div>
             Filtered by <i>&quot;{searchText}&quot;</i>{' '}
@@ -47,9 +47,9 @@ const AdminUserPage = async (props: {
           </div>
         )}
       </div>
-      <div className='overflow-x-auto'>
+      <div className='bg-surface shadow-md rounded-2xl border border-secondary/10 overflow-hidden'>
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-surface-container/50">
             <TableRow>
               <TableHead>ID</TableHead>
               <TableHead>NAME</TableHead>
@@ -60,8 +60,8 @@ const AdminUserPage = async (props: {
           </TableHeader>
           <TableBody>
             {users.data.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{formatId(user.id)}</TableCell>
+              <TableRow key={user.id} className="hover:bg-surface-container-lowest">
+                <TableCell className="font-medium font-mono text-primary">{formatId(user.id)}</TableCell>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
@@ -81,10 +81,10 @@ const AdminUserPage = async (props: {
             ))}
           </TableBody>
         </Table>
+      </div>
         {users.totalPages > 1 && (
           <Pagination page={Number(page) || 1} totalPages={users?.totalPages} />
         )}
-      </div>
     </div>
   );
 };

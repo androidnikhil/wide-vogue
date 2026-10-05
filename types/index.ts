@@ -41,3 +41,16 @@ export type Review = z.infer<typeof insertReviewSchema> & {
   createdAt: Date;
   user?: { name: string };
 };
+
+export type GiftCard = {
+  id: string;
+  code: string;
+  balance: string | number;
+  initialValue: string | number;
+  isActive: boolean;
+  expiresAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string | null;
+  user?: { name: string; email: string } | null;
+};

@@ -25,10 +25,10 @@ import {
     const summary = await getOrderSummary();
   
     return (
-      <div className='space-y-2'>
-        <h1 className='h2-bold'>Dashboard</h1>
-        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-          <Card>
+      <div className='space-y-6'>
+        <h1 className='text-3xl font-display-lg text-primary font-bold'>Dashboard</h1>
+        <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
+          <Card className="shadow-sm border-secondary/10 rounded-2xl">
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Total Revenue</CardTitle>
               <BadgeIndianRupee />
@@ -41,7 +41,7 @@ import {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="shadow-sm border-secondary/10 rounded-2xl">
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Sales</CardTitle>
               <CreditCard />
@@ -52,7 +52,7 @@ import {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="shadow-sm border-secondary/10 rounded-2xl">
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Customers</CardTitle>
               <Users />
@@ -63,7 +63,7 @@ import {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="shadow-sm border-secondary/10 rounded-2xl">
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Products</CardTitle>
               <Barcode />
@@ -76,7 +76,7 @@ import {
           </Card>
         </div>
         <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-7'>
-          <Card className='col-span-4'>
+          <Card className='col-span-4 shadow-sm border-secondary/10 rounded-2xl'>
             <CardHeader>
               <CardTitle>Overview</CardTitle>
             </CardHeader>
@@ -88,7 +88,7 @@ import {
               />
             </CardContent>
           </Card>
-          <Card className='col-span-3'>
+          <Card className='col-span-3 shadow-sm border-secondary/10 rounded-2xl'>
             <CardHeader>
               <CardTitle>Recent Sales</CardTitle>
             </CardHeader>

@@ -1,0 +1,10 @@
+image: atlassian/default-image:4
+
+pipelines:
+  branches:
+    main:
+      - step:
+          name: Sync to GitHub
+          script:
+            - git remote add github https://x-access-token:${GITHUB_TOKEN}@github.com/androidnikhil/wide-vogue.git
+            - git push github HEAD:main

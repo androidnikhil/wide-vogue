@@ -23,7 +23,7 @@ export const sendPurchaseReceipt = async ({ order }: { order: Order }) => {
 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM || `${APP_NAME} <${SENDER_EMAIL}>`,
-    to: order.user.email,
+    to: order.user?.email || order.shippingAddress?.guestEmail || 'customer@example.com',
     subject: `Order Confirmation ${order.id}`,
     html: emailHtml,
   });

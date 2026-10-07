@@ -185,7 +185,7 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                   {Number(cart.pointsToRedeem) > 0 && (
                     <div className="flex justify-between text-orange-600 font-body-md py-2 font-medium">
                       <span>Bhakti Points ({cart.pointsToRedeem}):</span>
-                      <span>-{formatCurrency(LOYALTY_CONFIG.calculateDiscountForPoints(cart.pointsToRedeem).toString())}</span>
+                      <span>-{formatCurrency(LOYALTY_CONFIG.calculateDiscountForPoints(cart.pointsToRedeem || 0).toString())}</span>
                     </div>
                   )}
                   
@@ -203,7 +203,7 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                   </div>
 
                   <div className="pb-4 border-b border-secondary/20">
-                    <GiftWrapToggle isGiftWrapped={cart.isGiftWrapped} />
+                    <GiftWrapToggle isGiftWrapped={cart.isGiftWrapped || false} />
                   </div>
 
                   <div className="border border-secondary/20 rounded-lg overflow-hidden bg-surface-container/30">

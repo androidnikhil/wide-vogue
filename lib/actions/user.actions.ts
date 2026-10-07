@@ -173,7 +173,7 @@ export async function deleteUserAddress(index: number) {
     await prisma.user.update({
       where: { id: currentUser.id },
       data: {
-        addresses: newAddresses,
+        addresses: newAddresses as any,
       },
     });
 

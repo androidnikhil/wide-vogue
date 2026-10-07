@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
       where: {
         updatedAt: { lte: yesterday },
         userId: { not: null },
-      },
+      } as any,
       include: {
         user: true,
       }

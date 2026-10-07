@@ -66,7 +66,7 @@ import {
                   <TableCell>
                     {formatDateTime(order.createdAt).dateTime}
                   </TableCell>
-                  <TableCell>{order.user.name}</TableCell>
+                  <TableCell>{order.user?.name || "Guest"}</TableCell>
                   <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
                   <TableCell>
                     {order.isPaid && order.paidAt

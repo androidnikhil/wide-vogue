@@ -28,6 +28,15 @@ export async function createOrder() {
     const session = await auth();
     // Get cart
     const cart = await getMyCart();
+    // Check if cart and address exists
+    if (!cart || cart.items.length === 0) {
+      return {
+        success: false,
+        message: "Cart is empty",
+        redirectTo: "/cart",
+      };
+    }
+
     const userId = session?.user?.id;
 
     let userAddress = cart.shippingAddress as ShippingAddress | null;
@@ -37,15 +46,6 @@ export async function createOrder() {
       const user = await getUserById(userId);
       if (user.address) userAddress = user.address as ShippingAddress;
       if (user.paymentMethod) paymentMethod = user.paymentMethod;
-    }
-
-    // Check if cart and address exists
-    if (!cart || cart.items.length === 0) {
-      return {
-        success: false,
-        message: "Your cart is empty",
-        redirectTo: "/cart",
-      };
     }
 
     if (!userAddress) {
@@ -91,7 +91,7 @@ export async function createOrder() {
     // Create a transaction to create order and order items in database
     const insertedOrderId = await prisma.$transaction(async (tx) => {
       // Create order
-      const insertedOrder = await tx.order.create({ data: order });
+      const insertedOrder = await tx.order.create({ data: order as any });
       
       // Process order items securely
       for (const item of cart.items as CartItem[]) {
@@ -358,9 +358,15 @@ export async function updateOrderToPaid({
   sendPurchaseReceipt({
     order: {
       ...updatedOrder,
+      itemsPrice: updatedOrder.itemsPrice.toString(),
+      totalPrice: updatedOrder.totalPrice.toString(),
+      shippingPrice: updatedOrder.shippingPrice.toString(),
+      taxPrice: updatedOrder.taxPrice.toString(),
+      discountPrice: updatedOrder.discountPrice.toString(),
+      giftCardAmount: updatedOrder.giftCardAmount.toString(),
       shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
       paymentResult: updatedOrder.paymentResult as PaymentResult,
-    },
+    } as any,
   });
   
 }
@@ -622,6 +628,9 @@ export async function approveRazorpayOrder(orderId: string, paymentData: { razor
       where: {
         id: orderId,
       },
+      include: {
+        user: true,
+      }
     });
 
     if (!order) throw new Error('Order not found');

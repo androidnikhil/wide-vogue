@@ -70,7 +70,7 @@ export async function addItemToCart(data: CartItem) {
 
       // Add to database
       await prisma.cart.create({
-        data: newCart,
+        data: newCart as any,
       });
 
       // Revalidate product page

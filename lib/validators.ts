@@ -80,6 +80,7 @@ export const insertCartSchema = z.object({
   giftCardCode: z.string().optional().nullable(),
   giftCardAmount: currency.optional().nullable(),
   isGiftWrapped: z.boolean().optional(),
+  pointsToRedeem: z.number().int().min(0).optional().nullable(),
   sessionCartId: z.string().min(1, 'Session cart id is required'),
   userId: z.string().optional().nullable(),
 });

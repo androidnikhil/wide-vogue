@@ -7,4 +7,4 @@ pipelines:
           name: Sync to GitHub
           script:
             - git remote add github https://x-access-token:${GITHUB_TOKEN}@github.com/androidnikhil/wide-vogue.git
-            - git push github HEAD:main
+            - git push github HEAD:main --force

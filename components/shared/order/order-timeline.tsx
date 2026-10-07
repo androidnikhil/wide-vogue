@@ -71,8 +71,8 @@ const OrderTimeline = ({ order }: OrderTimelineProps) => {
                     {step.description}
                   </p>
                 )}
-                {step.title === 'Shipped' && order.trackingUrl && step.isCompleted && (
-                  <Link href={order.trackingUrl} target="_blank" className="text-primary text-sm mt-1 hover:underline">
+                {step.title === 'Shipped' && order.awbNumber && step.isCompleted && (
+                  <Link href={`https://www.google.com/search?q=track+${order.awbNumber}`} target="_blank" className="text-primary text-sm mt-1 hover:underline">
                     Click here to track your package
                   </Link>
                 )}

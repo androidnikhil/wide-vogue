@@ -7,6 +7,7 @@ import { getMyCart } from '@/lib/actions/cart.action';
 import { signOutUser } from '@/lib/actions/user.actions';
 import { getWishlist } from '@/lib/actions/wishlist.actions';
 import UserButton from './user-button';
+import MobileMenu from './mobile-menu';
 
 export default async function Header() {
   const session = await auth();
@@ -40,9 +41,7 @@ export default async function Header() {
 <div className="flex items-center justify-between gap-4">
 
 <div className="flex items-center gap-3">
-<button aria-label="Open Navigation" className="md:hidden p-2 text-primary hover:text-secondary rounded-lg active:scale-95" id="openMobileDrawer">
-<span className="material-symbols-outlined text-2xl">menu</span>
-</button>
+<MobileMenu />
 <a className="flex items-center gap-2" href="#">
 <img alt="Madhav Shringaar" className="h-14 md:h-20 w-auto object-contain scale-110 ml-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ"/>
 </a>

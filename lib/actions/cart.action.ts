@@ -9,15 +9,24 @@ import { cartItemSchema, insertCartSchema } from '../validators';
 import { revalidatePath } from 'next/cache';
 import { Prisma } from '@prisma/client';
 
+import { LOYALTY_CONFIG } from '../loyalty.config';
+
 // Calculate cart prices
-const calcPrice = (items: CartItem[], discountPrice: number = 0, isGiftWrapped: boolean = false) => {
+const calcPrice = (
+  items: CartItem[], 
+  discountPrice: number = 0, 
+  isGiftWrapped: boolean = false, 
+  giftCardAmount: number = 0,
+  pointsToRedeem: number = 0
+) => {
   const itemsPrice = round2(
       items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0)
     ),
     shippingPrice = round2(itemsPrice > 999 ? 0 : 50),
     taxPrice = 0,
     giftWrapFee = isGiftWrapped ? 50 : 0,
-    totalPrice = round2(itemsPrice + taxPrice + shippingPrice + giftWrapFee - discountPrice);
+    pointsDiscount = LOYALTY_CONFIG.calculateDiscountForPoints(pointsToRedeem),
+    totalPrice = round2(itemsPrice + taxPrice + shippingPrice + giftWrapFee - discountPrice - giftCardAmount - pointsDiscount);
 
   return {
     itemsPrice: itemsPrice.toFixed(2),
@@ -101,7 +110,7 @@ export async function addItemToCart(data: CartItem) {
         where: { id: cart.id },
         data: {
           items: cart.items as Prisma.CartUpdateitemsInput[],
-          ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), cart.isGiftWrapped),
+          ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), cart.isGiftWrapped, Number(cart.giftCardAmount || 0)),
         },
       });
 
@@ -147,6 +156,7 @@ export async function getMyCart() {
     shippingPrice: cart.shippingPrice.toString(),
     taxPrice: cart.taxPrice.toString(),
     discountPrice: cart.discountPrice?.toString() || "0",
+    giftCardAmount: cart.giftCardAmount?.toString() || "0",
   });
 }
 
@@ -189,7 +199,7 @@ export async function removeItemFromCart(productId: string, size?: string) {
       where: { id: cart.id },
       data: {
         items: cart.items as Prisma.CartUpdateitemsInput[],
-        ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), cart.isGiftWrapped),
+        ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), cart.isGiftWrapped, Number(cart.giftCardAmount || 0)),
       },
     });
 
@@ -216,7 +226,7 @@ export async function applyCoupon(code: string) {
         data: {
           couponCode: null,
           discountPrice: 0,
-          ...calcPrice(cart.items as CartItem[], 0, cart.isGiftWrapped),
+          ...calcPrice(cart.items as CartItem[], 0, cart.isGiftWrapped, Number(cart.giftCardAmount || 0)),
         },
       });
       revalidatePath('/cart');
@@ -260,7 +270,7 @@ export async function applyCoupon(code: string) {
       data: {
         couponCode: code,
         discountPrice: discountValue,
-        ...calcPrice(cart.items as CartItem[], discountValue, cart.isGiftWrapped),
+        ...calcPrice(cart.items as CartItem[], discountValue, cart.isGiftWrapped, Number(cart.giftCardAmount || 0)),
       },
     });
 
@@ -280,12 +290,116 @@ export async function toggleGiftWrap(isGiftWrapped: boolean) {
       where: { id: cart.id },
       data: {
         isGiftWrapped,
-        ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), isGiftWrapped),
+        ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), isGiftWrapped, Number(cart.giftCardAmount || 0)),
       },
     });
 
     revalidatePath('/cart');
     return { success: true, message: isGiftWrapped ? 'Gift wrap added' : 'Gift wrap removed' };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+export async function applyGiftCard(code: string) {
+  try {
+    const cart = await getMyCart();
+    if (!cart) throw new Error('Cart not found');
+
+    if (!code) {
+      // Remove gift card
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: {
+          giftCardCode: null,
+          giftCardAmount: 0,
+          ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), cart.isGiftWrapped, 0, Number(cart.pointsToRedeem || 0)),
+        },
+      });
+      revalidatePath('/cart');
+      return { success: true, message: 'Gift card removed' };
+    }
+
+    const giftCard = await prisma.giftCard.findUnique({
+      where: { code },
+    });
+
+    if (!giftCard || !giftCard.isActive) {
+      throw new Error('Invalid or inactive gift card');
+    }
+
+    if (giftCard.expiresAt && giftCard.expiresAt < new Date()) {
+      throw new Error('Gift card has expired');
+    }
+
+    if (Number(giftCard.balance) <= 0) {
+      throw new Error('Gift card has no remaining balance');
+    }
+
+    // Calculate maximum amount to apply
+    // Gift card cannot exceed the (itemsPrice + shipping + tax + giftWrap - discount)
+    const currentPrice = calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), cart.isGiftWrapped, 0);
+    const maxApplicableAmount = Number(currentPrice.totalPrice);
+    
+    // We apply either the full balance or the max applicable amount
+    const amountToApply = Math.min(Number(giftCard.balance), maxApplicableAmount);
+
+    await prisma.cart.update({
+      where: { id: cart.id },
+      data: {
+        giftCardCode: code,
+        giftCardAmount: amountToApply,
+        ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), cart.isGiftWrapped, amountToApply),
+      },
+    });
+
+    revalidatePath('/cart');
+    return { success: true, message: 'Gift card applied successfully' };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+export async function applyBhaktiPoints(points: number) {
+  try {
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) throw new Error('Must be logged in to use Bhakti Points');
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new Error('User not found');
+
+    if (points > user.bhaktiPoints) {
+      throw new Error(`You only have ${user.bhaktiPoints} points available.`);
+    }
+
+    const cart = await getMyCart();
+    if (!cart) throw new Error('Cart not found');
+
+    // If points is 0, remove points
+    if (points <= 0) {
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: {
+          pointsToRedeem: 0,
+          ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), cart.isGiftWrapped, Number(cart.giftCardAmount || 0), 0),
+        },
+      });
+      revalidatePath('/cart');
+      return { success: true, message: 'Bhakti Points removed' };
+    }
+
+    // Apply points
+    await prisma.cart.update({
+      where: { id: cart.id },
+      data: {
+        pointsToRedeem: points,
+        ...calcPrice(cart.items as CartItem[], Number(cart.discountPrice || 0), cart.isGiftWrapped, Number(cart.giftCardAmount || 0), points),
+      },
+    });
+
+    revalidatePath('/cart');
+    return { success: true, message: `${points} Bhakti Points applied successfully` };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }

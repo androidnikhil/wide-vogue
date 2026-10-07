@@ -1,89 +1,97 @@
-
 import React from 'react';
 import Link from 'next/link';
 import ProductCard from '@/components/shared/product/product-card';
 import SizeSelector from '@/components/shared/product/size-selector';
 import { getLatestProducts } from '@/lib/actions/product.action';
+import { prisma } from '@/db/prisma';
 
 export default async function Homepage() {
   const latestProducts = await getLatestProducts();
+  const activeBanners = await prisma.banner.findMany({
+    where: { isActive: true },
+    orderBy: { position: 'asc' },
+  });
+
+  const mainBanner = activeBanners.length > 0 ? activeBanners[0] : null;
+
   return (
     <div className="bg-background text-on-surface antialiased font-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed pb-20 md:pb-0">
       
-
-<section className="relative overflow-hidden bg-gradient-to-b from-surface-container-low via-surface to-background py-8 md:py-14 border-b border-outline-variant/30">
-
-<div className="absolute -top-24 -left-24 w-96 h-96 bg-secondary-fixed/30 rounded-full blur-3xl pointer-events-none"></div>
-<div className="absolute top-1/2 -right-24 w-96 h-96 bg-primary-fixed/20 rounded-full blur-3xl pointer-events-none"></div>
-<div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
-<div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-
-<div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-4 md:space-y-6">
-
-<div className="inline-flex items-center gap-2 px-4 py-1.5 bg-surface-container border border-secondary/30 rounded-full shadow-sm">
-<span className="material-symbols-outlined text-secondary text-base" style={{ fontVariationSettings: "'FILL' 1" }}>spa</span>
-<span className="font-headline-sm text-headline-sm text-secondary font-bold tracking-wide">॥ मेरा कान्हा सबसे प्यारा ॥</span>
-</div>
-
-<div className="space-y-2">
-<h1 className="font-headline-lg-mobile md:font-display-lg text-headline-lg-mobile md:text-display-lg text-primary tracking-tight font-extrabold leading-tight">
-                Adorn Your Laddu Gopal with Love
-              </h1>
-<p className="font-headline-md text-headline-md text-secondary font-semibold italic">
-                Madhav Shringaar Exclusive Collection
+      <section className="relative overflow-hidden bg-gradient-to-b from-surface-container-low via-surface to-background py-8 md:py-14 border-b border-outline-variant/30">
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-secondary-fixed/30 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute top-1/2 -right-24 w-96 h-96 bg-primary-fixed/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-4 md:space-y-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-surface-container border border-secondary/30 rounded-full shadow-sm">
+                <span className="material-symbols-outlined text-secondary text-base" style={{ fontVariationSettings: "'FILL' 1" }}>spa</span>
+                <span className="font-headline-sm text-headline-sm text-secondary font-bold tracking-wide">॥ मेरा कान्हा सबसे प्यारा ॥</span>
+              </div>
+              
+              <div className="space-y-2">
+                <h1 className="font-headline-lg-mobile md:font-display-lg text-headline-lg-mobile md:text-display-lg text-primary tracking-tight font-extrabold leading-tight">
+                  {mainBanner?.title || 'Adorn Your Laddu Gopal with Love'}
+                </h1>
+                <p className="font-headline-md text-headline-md text-secondary font-semibold italic">
+                  {mainBanner?.subtitle || 'Madhav Shringaar Exclusive Collection'}
+                </p>
+              </div>
+              
+              <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+                Divine Handcrafted Poshak, Mukut, Mala & Complete Shringar Collections created with reverent seva for Your Beloved Kanha Ji.
               </p>
-</div>
-<p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
-              Divine Handcrafted Poshak, Mukut, Mala &amp; Complete Shringar Collections created with reverent seva for Your Beloved Kanha Ji.
-            </p>
-
-<div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-xl py-2">
-<div className="flex items-center gap-2 p-2.5 bg-surface rounded-lg border border-outline-variant/30 shadow-xs">
-<span className="material-symbols-outlined text-secondary text-xl">palette</span>
-<span className="font-label-sm text-label-sm text-on-surface font-semibold">Traditional Designs</span>
-</div>
-<div className="flex items-center gap-2 p-2.5 bg-surface rounded-lg border border-outline-variant/30 shadow-xs">
-<span className="material-symbols-outlined text-secondary text-xl">verified</span>
-<span className="font-label-sm text-label-sm text-on-surface font-semibold">100% Pure Fabrics</span>
-</div>
-<div className="flex items-center gap-2 p-2.5 bg-surface rounded-lg border border-outline-variant/30 shadow-xs">
-<span className="material-symbols-outlined text-secondary text-xl">local_shipping</span>
-<span className="font-label-sm text-label-sm text-on-surface font-semibold">Pan India Delivery</span>
-</div>
-<div className="flex items-center gap-2 p-2.5 bg-surface rounded-lg border border-outline-variant/30 shadow-xs">
-<span className="material-symbols-outlined text-secondary text-xl">lock</span>
-<span className="font-label-sm text-label-sm text-on-surface font-semibold">Secure Payments</span>
-</div>
-</div>
-
-<div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
-<Link className="gold-gradient-btn text-primary-container px-7 py-3.5 rounded-lg font-title-md text-title-md font-bold shadow-md hover:shadow-lg hover:brightness-105 active:scale-95 transition-all flex items-center gap-2" href="/search?category=Poshak">
-<span>Shop New Festive Poshak</span>
-<span className="material-symbols-outlined text-lg">arrow_forward</span>
-</Link>
-<Link className="px-6 py-3.5 bg-primary-container text-surface hover:bg-primary border border-secondary/40 rounded-lg font-title-md text-title-md active:scale-95 transition-all flex items-center gap-2" href="/search?category=Festive%20Sets">
-<span className="material-symbols-outlined text-secondary-fixed text-lg">stars</span>
-<span>Explore Shringar Sets</span>
-</Link>
-</div>
-</div>
-
-<div className="lg:col-span-5 relative flex justify-center">
-<div className="relative w-full max-w-md lg:max-w-none">
-
-<div className="absolute inset-0 bg-gradient-to-tr from-secondary/20 to-secondary-fixed/40 rounded-2xl filter blur-xl transform rotate-1 scale-105"></div>
-<div className="relative rounded-2xl overflow-hidden border-2 border-secondary/30 shadow-2xl bg-surface-container-lowest">
-<img alt="Devotional lifestyle e-commerce hero banner of charming Laddu Gopal deity idol dressed in opulent royal yellow and emerald green silk poshak embroidery, adorned with ornate peacock feather mukut crown, golden moti haar pearl necklace, holding golden bansuri flute, surrounded by soft marigold and lotus flower petals in warm cream temple background, studio lighting, high resolution, sacred and festive e-commerce photography" className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700 aspect-[1.79/1]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb8NJe2azmYQficexwzxPZxTg-l1GWEjWohNlCQL2bVZtRdl979guQmuuEVm0XJWTmBa4yA3q0dhvmB4mEbjiJOpU8jpPZWZ5y8neRPXSIJPG9RRqgyhwtuH7i17kRZExVC318qfIJcxwDRvzP89foycAMXjyqz-X5G0oKJArJW-S7VJtDtAbNZIFLpbltLnerlg3GPMu0NhNVtitSAGIh3rTUctyjSBEUKOd4Ov5N_isBYyUcEPSa"/>
-<div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 flex justify-between items-end">
-<div>
-<span className="font-label-sm text-label-sm uppercase tracking-widest text-white/80 drop-shadow-md">Darshan of the Day</span>
-<p className="font-headline-sm text-headline-sm font-bold text-white drop-shadow-md">Shri Banke Bihari Swaroop</p>
-</div>
-<span className="px-3 py-1 bg-secondary text-on-secondary rounded-full font-label-sm text-label-sm shadow-md">Pure Silk &amp; Zari</span>
-</div>
-</div>
-</div>
-</div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-xl py-2">
+                <div className="flex items-center gap-2 p-2.5 bg-surface rounded-lg border border-outline-variant/30 shadow-xs">
+                  <span className="material-symbols-outlined text-secondary text-xl">palette</span>
+                  <span className="font-label-sm text-label-sm text-on-surface font-semibold">Traditional Designs</span>
+                </div>
+                <div className="flex items-center gap-2 p-2.5 bg-surface rounded-lg border border-outline-variant/30 shadow-xs">
+                  <span className="material-symbols-outlined text-secondary text-xl">verified</span>
+                  <span className="font-label-sm text-label-sm text-on-surface font-semibold">100% Pure Fabrics</span>
+                </div>
+                <div className="flex items-center gap-2 p-2.5 bg-surface rounded-lg border border-outline-variant/30 shadow-xs">
+                  <span className="material-symbols-outlined text-secondary text-xl">local_shipping</span>
+                  <span className="font-label-sm text-label-sm text-on-surface font-semibold">Pan India Delivery</span>
+                </div>
+                <div className="flex items-center gap-2 p-2.5 bg-surface rounded-lg border border-outline-variant/30 shadow-xs">
+                  <span className="material-symbols-outlined text-secondary text-xl">lock</span>
+                  <span className="font-label-sm text-label-sm text-on-surface font-semibold">Secure Payments</span>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+                <Link className="gold-gradient-btn text-primary-container px-7 py-3.5 rounded-lg font-title-md text-title-md font-bold shadow-md hover:shadow-lg hover:brightness-105 active:scale-95 transition-all flex items-center gap-2" href={mainBanner?.linkUrl || "/search?category=Poshak"}>
+                  <span>Shop Now</span>
+                  <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                </Link>
+                <Link className="px-6 py-3.5 bg-primary-container text-surface hover:bg-primary border border-secondary/40 rounded-lg font-title-md text-title-md active:scale-95 transition-all flex items-center gap-2" href="/search?category=Festive%20Sets">
+                  <span className="material-symbols-outlined text-secondary-fixed text-lg">stars</span>
+                  <span>Explore Shringar Sets</span>
+                </Link>
+              </div>
+            </div>
+            
+            <div className="lg:col-span-5 relative flex justify-center">
+              <div className="relative w-full max-w-md lg:max-w-none">
+                <div className="absolute inset-0 bg-gradient-to-tr from-secondary/20 to-secondary-fixed/40 rounded-2xl filter blur-xl transform rotate-1 scale-105"></div>
+                <div className="relative rounded-2xl overflow-hidden border-2 border-secondary/30 shadow-2xl bg-surface-container-lowest">
+                  <img 
+                    alt="Hero Banner" 
+                    className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700 aspect-[1.79/1]" 
+                    src={mainBanner?.imageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuCb8NJe2azmYQficexwzxPZxTg-l1GWEjWohNlCQL2bVZtRdl979guQmuuEVm0XJWTmBa4yA3q0dhvmB4mEbjiJOpU8jpPZWZ5y8neRPXSIJPG9RRqgyhwtuH7i17kRZExVC318qfIJcxwDRvzP89foycAMXjyqz-X5G0oKJArJW-S7VJtDtAbNZIFLpbltLnerlg3GPMu0NhNVtitSAGIh3rTUctyjSBEUKOd4Ov5N_isBYyUcEPSa"}
+                  />
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 flex justify-between items-end">
+                    <div>
+                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-white/80 drop-shadow-md">Darshan of the Day</span>
+                      <p className="font-headline-sm text-headline-sm font-bold text-white drop-shadow-md">Shri Banke Bihari Swaroop</p>
+                    </div>
+                    <span className="px-3 py-1 bg-secondary text-on-secondary rounded-full font-label-sm text-label-sm shadow-md">Pure Silk & Zari</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 </div>
 </div>
 </section>

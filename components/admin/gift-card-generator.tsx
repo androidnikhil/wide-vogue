@@ -12,14 +12,13 @@ import {
 import { generateGiftCard } from '@/lib/actions/giftcard.actions';
 import { insertGiftCardSchema } from '@/lib/validators';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-form-hooks'; // Wait, standard hook form
-import { useForm as useReactHookForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function GiftCardGenerator() {
-  const form = useReactHookForm<z.infer<typeof insertGiftCardSchema>>({
+  const form = useForm<z.infer<typeof insertGiftCardSchema>>({
     resolver: zodResolver(insertGiftCardSchema),
     defaultValues: {
       initialValue: '500',

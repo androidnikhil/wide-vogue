@@ -150,6 +150,42 @@ export async function updateUserAddress(data: ShippingAddress) {
   }
 }
 
+// Delete an address from the user's address book
+export async function deleteUserAddress(index: number) {
+  try {
+    const session = await auth();
+    if (!session || !session.user?.id) throw new Error('Not authenticated');
+
+    const currentUser = await prisma.user.findFirst({
+      where: { id: session.user.id },
+    });
+
+    if (!currentUser) throw new Error('User not found');
+
+    const currentAddresses = Array.isArray(currentUser.addresses) ? currentUser.addresses : [];
+    
+    if (index < 0 || index >= currentAddresses.length) {
+      throw new Error('Address not found');
+    }
+
+    const newAddresses = currentAddresses.filter((_, i) => i !== index);
+
+    await prisma.user.update({
+      where: { id: currentUser.id },
+      data: {
+        addresses: newAddresses,
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Address removed successfully',
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
 
 // Update the user profile
 export async function updateProfile(user: { name: string; email: string }) {
@@ -259,6 +295,8 @@ export async function getAllUsers({
 // Delete a user
 export async function deleteUser(id: string) {
   try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
     await prisma.user.delete({ where: { id } });
 
     revalidatePath('/admin/users');
@@ -278,6 +316,8 @@ export async function deleteUser(id: string) {
 // Update a user
 export async function updateUser(user: z.infer<typeof updateUserSchema>) {
   try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
     await prisma.user.update({
       where: { id: user.id },
       data: {

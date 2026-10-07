@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useTransition } from "react";
+import { useTransition, useState } from "react";
 import { addItemToCart, removeItemFromCart } from "@/lib/actions/cart.action";
 import { Cart } from "@/types";
 import { ArrowRight, Loader, Minus, Plus, ShoppingBag } from "lucide-react";
@@ -20,10 +20,14 @@ import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import CouponForm from "@/components/shared/cart/coupon-form";
 import GiftWrapToggle from "@/components/shared/cart/gift-wrap-toggle";
+import GiftCardForm from "@/components/shared/cart/gift-card-form";
+import BhaktiPointsForm from "@/components/shared/cart/bhakti-points-form";
+import { LOYALTY_CONFIG } from "@/lib/loyalty.config";
 
-const CartTable = ({ cart }: { cart?: Cart }) => {
+const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints?: number }) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [showDiscounts, setShowDiscounts] = useState(false);
 
   return (
     <div className="wrapper py-10">
@@ -170,17 +174,64 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                       <span>-{formatCurrency(cart.discountPrice || "0")}</span>
                     </div>
                   )}
+
+                  {Number(cart.giftCardAmount) > 0 && (
+                    <div className="flex justify-between text-emerald-600 font-body-md py-2 font-medium">
+                      <span>Gift Card ({cart.giftCardCode}):</span>
+                      <span>-{formatCurrency(cart.giftCardAmount || "0")}</span>
+                    </div>
+                  )}
+
+                  {Number(cart.pointsToRedeem) > 0 && (
+                    <div className="flex justify-between text-orange-600 font-body-md py-2 font-medium">
+                      <span>Bhakti Points ({cart.pointsToRedeem}):</span>
+                      <span>-{formatCurrency(LOYALTY_CONFIG.calculateDiscountForPoints(cart.pointsToRedeem).toString())}</span>
+                    </div>
+                  )}
                   
                   <div className="flex justify-between font-title-lg text-primary pt-2 pb-6 border-t border-secondary/20">
                     <span>Subtotal:</span>
-                    <span className="font-bold">{formatCurrency((Number(cart.itemsPrice) + (cart.isGiftWrapped ? 50 : 0) - Number(cart.discountPrice || 0)).toString())}</span>
+                    <span className="font-bold">{formatCurrency(
+                      (
+                        Number(cart.itemsPrice) + 
+                        (cart.isGiftWrapped ? 50 : 0) - 
+                        Number(cart.discountPrice || 0) - 
+                        Number(cart.giftCardAmount || 0) - 
+                        LOYALTY_CONFIG.calculateDiscountForPoints(Number(cart.pointsToRedeem || 0))
+                      ).toString()
+                    )}</span>
                   </div>
 
                   <div className="pb-4 border-b border-secondary/20">
                     <GiftWrapToggle isGiftWrapped={cart.isGiftWrapped} />
                   </div>
 
-                  <CouponForm initialCode={cart.couponCode} />
+                  <div className="border border-secondary/20 rounded-lg overflow-hidden bg-surface-container/30">
+                    <button 
+                      className="w-full p-4 flex items-center justify-between font-medium text-primary hover:bg-surface-container/50 transition-colors"
+                      onClick={() => setShowDiscounts(!showDiscounts)}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[20px]">sell</span>
+                        Apply Discounts or Gift Card
+                      </span>
+                      <span className={`material-symbols-outlined transition-transform duration-200 ${showDiscounts || cart.couponCode || cart.giftCardCode || Number(cart.pointsToRedeem) > 0 ? 'rotate-180' : ''}`}>
+                        keyboard_arrow_down
+                      </span>
+                    </button>
+                    {(showDiscounts || cart.couponCode || cart.giftCardCode || Number(cart.pointsToRedeem) > 0) && (
+                      <div className="p-4 bg-white border-t border-secondary/10 space-y-6">
+                        <BhaktiPointsForm 
+                          availablePoints={availablePoints} 
+                          appliedPoints={Number(cart.pointsToRedeem || 0)} 
+                        />
+                        <div className="h-px bg-secondary/10" />
+                        <CouponForm initialCode={cart.couponCode} />
+                        <div className="h-px bg-secondary/10" />
+                        <GiftCardForm initialCode={cart.giftCardCode} />
+                      </div>
+                    )}
+                  </div>
                   
                   <Button
                     className="w-full gold-gradient-btn text-white h-12 text-base shadow-md hover:shadow-lg transition-all"

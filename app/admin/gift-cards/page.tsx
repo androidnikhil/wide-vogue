@@ -15,6 +15,7 @@ import DeleteDialog from '@/components/shared/delete-dialog';
 import Pagination from '@/components/shared/pagination';
 import GiftCardGenerator from '@/components/admin/gift-card-generator';
 import ShareGiftCardModal from '@/components/admin/share-gift-card-modal';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Admin Gift Cards',
@@ -46,9 +47,9 @@ const AdminGiftCardsPage = async (props: {
           <TableHeader className="bg-surface-container/50">
             <TableRow>
               <TableHead>CODE</TableHead>
-              <TableHead>BALANCE</TableHead>
-              <TableHead>INITIAL</TableHead>
+              <TableHead>VALUE</TableHead>
               <TableHead>STATUS</TableHead>
+              <TableHead>USAGE / ORDER</TableHead>
               <TableHead>CREATED</TableHead>
               <TableHead>ACTIONS</TableHead>
             </TableRow>
@@ -57,13 +58,26 @@ const AdminGiftCardsPage = async (props: {
             {giftcards.data.map((gc: any) => (
               <TableRow key={gc.id} className="hover:bg-surface-container-lowest">
                 <TableCell className="font-medium font-mono text-primary">{gc.code}</TableCell>
-                <TableCell>{formatCurrency(gc.balance)}</TableCell>
-                <TableCell className="text-muted-foreground">{formatCurrency(gc.initialValue)}</TableCell>
+                <TableCell className="font-bold">{formatCurrency(gc.initialValue)}</TableCell>
                 <TableCell>
-                  {gc.isActive && Number(gc.balance) > 0 ? (
-                    <Badge variant='secondary'>Active</Badge>
+                  {gc.usedOrderId ? (
+                    <Badge variant='outline' className="bg-surface-variant text-on-surface-variant border-none">Used</Badge>
+                  ) : gc.isActive ? (
+                    <Badge variant='default' className="bg-primary text-on-primary border-none">Active</Badge>
                   ) : (
-                    <Badge variant='destructive'>Empty/Inactive</Badge>
+                    <Badge variant='destructive'>Inactive</Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {gc.usedOrderId ? (
+                    <div className="flex flex-col">
+                      <span className="text-xs text-muted-foreground mb-1">Redeemed</span>
+                      <Link href={`/admin/orders/${gc.usedOrderId}`} className="text-xs font-semibold text-primary hover:underline flex items-center">
+                         View Order <span className="material-symbols-outlined text-[14px] ml-1">arrow_forward</span>
+                      </Link>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted-foreground italic">Unused (One-time use)</span>
                   )}
                 </TableCell>
                 <TableCell>{formatDateTime(gc.createdAt).dateOnly}</TableCell>

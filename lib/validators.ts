@@ -58,12 +58,12 @@ export const signUpFormSchema = z
     path: ['confirmPassword'],
   });
 
-  // Cart Schemas
+// Cart Schemas
 export const cartItemSchema = z.object({
   productId: z.string().min(1, 'Product is required'),
   name: z.string().min(1, 'Name is required'),
   slug: z.string().min(1, 'Slug is required'),
-  qty: z.number().int().nonnegative('Quantity must be a positive number'),
+  qty: z.number().int().positive('Quantity must be at least 1'),
   image: z.string().min(1, 'Image is required'),
   price: currency,
   size: z.string().optional(),
@@ -77,6 +77,8 @@ export const insertCartSchema = z.object({
   taxPrice: currency,
   couponCode: z.string().optional().nullable(),
   discountPrice: currency.optional().nullable(),
+  giftCardCode: z.string().optional().nullable(),
+  giftCardAmount: currency.optional().nullable(),
   isGiftWrapped: z.boolean().optional(),
   sessionCartId: z.string().min(1, 'Session cart id is required'),
   userId: z.string().optional().nullable(),
@@ -132,6 +134,10 @@ export const insertOrderSchema = z.object({
   taxPrice: currency,
   couponCode: z.string().optional().nullable(),
   discountPrice: currency.optional().nullable(),
+  giftCardCode: z.string().optional().nullable(),
+  giftCardAmount: currency.optional().nullable(),
+  pointsEarned: z.number().int().min(0).default(0),
+  pointsRedeemed: z.number().int().min(0).default(0),
   isGiftWrapped: z.boolean().optional(),
   totalPrice: currency,
   paymentMethod: z.string().refine((data) => PAYMENT_METHODS.includes(data), {

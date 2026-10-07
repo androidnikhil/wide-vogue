@@ -15,7 +15,7 @@ import { Order } from '@/types';
 import Link from 'next/link';
 import Image from 'next/image';
 import {toast} from 'sonner'
-import { useTransition } from 'react';
+import { useTransition, useState } from 'react';
 import {
   PayPalButtons,
   PayPalScriptProvider,
@@ -30,6 +30,7 @@ import {
 import StripePayment from './stripe-payment';
 import RazorpayPayment from './razorpay-payment';
 import OrderTimeline from '@/components/shared/order/order-timeline';
+import { LOYALTY_CONFIG } from '@/lib/loyalty.config';
 
 const OrderDetailsTable = ({
   order,
@@ -51,6 +52,8 @@ const OrderDetailsTable = ({
     taxPrice,
     couponCode,
     discountPrice,
+    giftCardCode,
+    giftCardAmount,
     isGiftWrapped,
     totalPrice,
     paymentMethod,
@@ -58,6 +61,8 @@ const OrderDetailsTable = ({
     isPaid,
     paidAt,
     deliveredAt,
+    pointsEarned,
+    pointsRedeemed,
   } = order;
 
   const PrintLoadingState = () => {
@@ -124,28 +129,44 @@ const OrderDetailsTable = ({
   };
 
   // Button to update order status
-  const UpdateStatusButton = ({ statusLabel, statusValue }: { statusLabel: string, statusValue: string }) => {
+  const UpdateStatusButton = ({ statusLabel, statusValue, requiresAwb = false }: { statusLabel: string, statusValue: string, requiresAwb?: boolean }) => {
     const [isPending, startTransition] = useTransition();
+    const [awb, setAwb] = useState(order.awbNumber || '');
 
     return (
-      <Button
-        type='button'
-        variant={order.status === statusValue ? 'default' : 'outline'}
-        disabled={isPending || order.status === statusValue}
-        onClick={() =>
-          startTransition(async () => {
-            const res = await updateOrderStatus(order.id, statusValue);
-            toast(res.message, {
-              style: {
-                backgroundColor: res.success ? 'green' : 'red',
-                color: 'white',
-              },
+      <div className='flex flex-col gap-2'>
+        <Button
+          type='button'
+          variant={order.status === statusValue ? 'default' : 'outline'}
+          disabled={isPending || order.status === statusValue}
+          onClick={() => {
+            if (requiresAwb && !awb) {
+              toast.error('Please enter an AWB Tracking number');
+              return;
+            }
+            startTransition(async () => {
+              const res = await updateOrderStatus(order.id, statusValue, awb);
+              toast(res.message, {
+                style: {
+                  backgroundColor: res.success ? 'green' : 'red',
+                  color: 'white',
+                },
+              });
             });
-          })
-        }
-      >
-        {isPending ? '...' : statusLabel}
-      </Button>
+          }}
+        >
+          {isPending ? '...' : statusLabel}
+        </Button>
+        {requiresAwb && order.status !== statusValue && (
+          <input 
+            type="text" 
+            placeholder="Enter AWB Number" 
+            value={awb}
+            onChange={(e) => setAwb(e.target.value)}
+            className="text-sm px-2 py-1 border rounded-md border-secondary/30 bg-surface-container"
+          />
+        )}
+      </div>
     );
   };
 
@@ -288,12 +309,33 @@ const OrderDetailsTable = ({
                   <span>-{formatCurrency(discountPrice || "0")}</span>
                 </div>
               )}
+              {Number(giftCardAmount) > 0 && (
+                <div className='flex justify-between items-center text-emerald-600 font-medium pt-2 pb-2'>
+                  <span>Gift Card ({giftCardCode})</span>
+                  <span>-{formatCurrency(giftCardAmount || "0")}</span>
+                </div>
+              )}
+              {pointsRedeemed > 0 && (
+                <div className='flex justify-between items-center text-orange-600 font-medium pt-2 pb-2'>
+                  <span>Bhakti Points ({pointsRedeemed})</span>
+                  <span>-{formatCurrency(LOYALTY_CONFIG.calculateDiscountForPoints(pointsRedeemed).toString())}</span>
+                </div>
+              )}
               
               <div className='flex justify-between font-title-lg text-primary pt-2 pb-2'>
                 <span>Total</span>
                 <span className="font-bold">{formatCurrency(totalPrice)}</span>
               </div>
 
+              {pointsEarned > 0 && (
+                <div className="bg-orange-50 border border-orange-100 rounded-md p-3 flex items-center justify-between text-orange-800">
+                  <span className="text-sm font-medium flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[18px]">stars</span>
+                    Points Earned
+                  </span>
+                  <span className="font-bold">+{pointsEarned}</span>
+                </div>
+              )}
               {/* PayPal Payment */}
               {!isPaid && paymentMethod === 'PayPal' && (
                 <div>
@@ -331,9 +373,9 @@ const OrderDetailsTable = ({
               {isAdmin && (
                 <div className='flex flex-col gap-3 mt-6 border-t pt-4'>
                   <h3 className='font-bold text-sm text-secondary uppercase tracking-wider'>Admin Actions: Update Status</h3>
-                  <div className='flex flex-wrap gap-2'>
+                  <div className='flex flex-wrap gap-4 items-start'>
                     <UpdateStatusButton statusLabel='Processing' statusValue='PROCESSING' />
-                    <UpdateStatusButton statusLabel='Shipped' statusValue='SHIPPED' />
+                    <UpdateStatusButton statusLabel='Shipped' statusValue='SHIPPED' requiresAwb={true} />
                     <UpdateStatusButton statusLabel='Out for Delivery' statusValue='OUT_FOR_DELIVERY' />
                     <UpdateStatusButton statusLabel='Delivered' statusValue='DELIVERED' />
                   </div>

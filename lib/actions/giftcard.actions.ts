@@ -6,6 +6,8 @@ import { insertGiftCardSchema } from '../validators';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 
+import { auth } from '@/auth';
+
 // Helper function to generate unique code
 function generateGiftCardCode() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -23,6 +25,8 @@ function generateGiftCardCode() {
 // Generate a new gift card
 export async function generateGiftCard(data: z.infer<typeof insertGiftCardSchema>) {
   try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
     const giftCard = insertGiftCardSchema.parse(data);
     let code = generateGiftCardCode();
     
@@ -77,6 +81,30 @@ export async function getAllGiftCards({
     }
   });
 
+  const codes = data.map((gc) => gc.code);
+  
+  // Find which orders used these gift cards
+  const usedOrders = await prisma.order.findMany({
+    where: {
+      giftCardCode: { in: codes }
+    },
+    select: {
+      id: true,
+      giftCardCode: true,
+      createdAt: true
+    }
+  });
+
+  const dataWithOrders = data.map((gc) => {
+    // If a gift card is one time use, it should only have 1 order
+    const order = usedOrders.find((o) => o.giftCardCode === gc.code);
+    return {
+      ...gc,
+      usedOrderId: order?.id,
+      usedAt: order?.createdAt,
+    };
+  });
+
   const dataCount = await prisma.giftCard.count({
     where: {
       OR: [
@@ -86,7 +114,7 @@ export async function getAllGiftCards({
   });
 
   return {
-    data: convertToPlainObject(data),
+    data: convertToPlainObject(dataWithOrders),
     totalPages: Math.ceil(dataCount / limit),
     totalCount: dataCount,
   };
@@ -95,6 +123,8 @@ export async function getAllGiftCards({
 // Delete gift card
 export async function deleteGiftCard(id: string) {
   try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
     const giftCard = await prisma.giftCard.findUnique({ where: { id } });
     if (!giftCard) throw new Error('Gift card not found');
     await prisma.giftCard.delete({ where: { id } });

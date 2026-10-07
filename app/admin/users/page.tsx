@@ -55,6 +55,7 @@ const AdminUserPage = async (props: {
               <TableHead>NAME</TableHead>
               <TableHead>EMAIL</TableHead>
               <TableHead>ROLE</TableHead>
+              <TableHead>BHAKTI POINTS</TableHead>
               <TableHead>ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
@@ -70,6 +71,12 @@ const AdminUserPage = async (props: {
                   ) : (
                     <Badge variant='default'>Admin</Badge>
                   )}
+                </TableCell>
+                <TableCell className="font-medium text-orange-600">
+                  <div className="flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[16px]">stars</span>
+                    {user.bhaktiPoints || 0}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Button asChild variant='outline' size='sm'>

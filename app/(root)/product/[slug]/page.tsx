@@ -11,6 +11,9 @@ import WishlistButton from '@/components/shared/product/wishlist-button';
 import { auth } from '@/auth';
 import Rating from '@/components/shared/product/rating';
 import ProductTrustBadges from '@/components/shared/product/product-trust-badges';
+import PincodeChecker from '@/components/shared/product/pincode-checker';
+import { getRecommendedProducts } from '@/lib/actions/recommendations.actions';
+import ProductCard from '@/components/shared/product/product-card';
 
 const ProductDetailsPage = async (props: {
   params: Promise<{ slug: string }>;
@@ -22,6 +25,8 @@ const ProductDetailsPage = async (props: {
 
   const session = await auth();
   const userId = session?.user?.id;
+  
+  const recommendedProducts = await getRecommendedProducts(product.id, product.category);
 
   const cart = await getMyCart();
 
@@ -93,10 +98,13 @@ const ProductDetailsPage = async (props: {
 
             {/* Trust Badges & Pincode Checker */}
             <div className="py-2">
-              <ProductTrustBadges 
-                isReturnable={product.isReturnable} 
-                returnWindowDays={product.returnWindowDays} 
-              />
+              <PincodeChecker />
+              <div className="mt-4">
+                <ProductTrustBadges 
+                  isReturnable={product.isReturnable} 
+                  returnWindowDays={product.returnWindowDays} 
+                />
+              </div>
             </div>
 
             {/* Description */}
@@ -111,6 +119,33 @@ const ProductDetailsPage = async (props: {
           </div>
         </div>
       </section>
+
+      {/* AI Recommendations */}
+      {recommendedProducts.length > 0 && (
+        <section className='py-12 bg-surface-container-lowest border-y border-outline-variant/30'>
+          <div className='max-w-7xl mx-auto px-4 md:px-8'>
+            <div className='text-center max-w-xl mx-auto mb-10 space-y-2'>
+              <div className='flex items-center justify-center gap-3 text-secondary'>
+                <span className='h-px w-12 bg-secondary/40'></span>
+                <span className='material-symbols-outlined text-xl' style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                <span className='h-px w-12 bg-secondary/40'></span>
+              </div>
+              <h2 className='font-headline-md text-headline-md text-primary font-bold'>
+                Divine Match Suggestions
+              </h2>
+              <p className='font-body-sm text-body-sm text-on-surface-variant'>
+                Products frequently brought together for complete shringaar
+              </p>
+            </div>
+            
+            <div className='grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6'>
+              {recommendedProducts.map((p) => (
+                <ProductCard key={p.id} product={p as any} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
       <section className='mt-10 max-w-7xl mx-auto px-4 md:px-8'>
         <h2 className='h2-bold mb-5'>Customer Reviews</h2>
         <ReviewList

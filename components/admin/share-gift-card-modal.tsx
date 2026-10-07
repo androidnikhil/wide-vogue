@@ -62,39 +62,46 @@ export default function ShareGiftCardModal({ giftCard }: ShareGiftCardModalProps
           {/* The Actual Shareable Card - We give it a fixed width and high contrast for image generation */}
           <div 
             ref={cardRef} 
-            className='relative w-[400px] h-[220px] rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between p-6 border border-[#825500]/20'
+            className='relative w-[400px] h-[220px] rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between p-6 border border-[#b8860b]/30'
             style={{
-                background: 'linear-gradient(135deg, #fdf9f0 0%, #e6e2d9 100%)',
-                color: '#00190f'
+                background: 'linear-gradient(135deg, #004d33 0%, #00190f 100%)', // Rich green background
+                color: '#ffffff'
             }}
           >
             {/* Background Decoration */}
-            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 rounded-full bg-[#825500] opacity-10 blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-[#003020] opacity-10 blur-3xl"></div>
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-[#b8860b] opacity-20 blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-[#2a6d51] opacity-30 blur-2xl pointer-events-none"></div>
+            
+            {/* Subtle elegant pattern overlay (optional) */}
+            <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
 
             {/* Header: Logo and Value */}
             <div className='relative z-10 flex justify-between items-start'>
               <div>
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ" alt={APP_NAME} className="h-10 w-auto object-contain drop-shadow-sm" />
-                <p className='text-xs mt-1 text-[#414944]'>info@madhavshringaar.com</p>
+                <img 
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ" 
+                  alt={APP_NAME} 
+                  className="h-16 w-auto object-contain drop-shadow-md bg-white/90 p-1.5 rounded-lg" // Larger logo, added white backdrop so it pops on dark green
+                />
+                <p className='text-xs mt-2 text-[#e6e2d9]/80 font-medium'>info@madhavshringaar.com</p>
               </div>
               <div className='text-right'>
-                <p className='text-xs font-semibold text-[#825500] uppercase tracking-wider mb-1'>Gift Card</p>
-                <p className='text-3xl font-bold text-[#00190f]'>{formatCurrency(giftCard.initialValue)}</p>
+                <p className='text-xs font-bold text-[#f5d061] uppercase tracking-widest mb-1 drop-shadow-sm'>Gift Card</p>
+                <p className='text-3xl font-bold text-white drop-shadow-md'>{formatCurrency(giftCard.initialValue)}</p>
               </div>
             </div>
 
             {/* Footer: Code and Website */}
             <div className='relative z-10 flex justify-between items-end mt-6'>
               <div>
-                <p className='text-[10px] text-[#825500] uppercase tracking-widest mb-1'>Redeem Code</p>
-                <div className='bg-[#00190f]/5 px-3 py-1.5 rounded-lg border border-[#00190f]/10 backdrop-blur-sm'>
-                  <p className='font-mono font-bold text-lg tracking-wider text-[#00190f]'>{giftCard.code}</p>
+                <p className='text-[10px] text-[#f5d061]/90 uppercase tracking-widest mb-1.5'>Redeem Code</p>
+                <div className='bg-white/10 px-4 py-2 rounded-lg border border-white/20 backdrop-blur-md shadow-inner'>
+                  <p className='font-mono font-bold text-xl tracking-wider text-white drop-shadow-sm'>{giftCard.code}</p>
                 </div>
               </div>
               <div className='text-right'>
-                 <p className='text-[10px] text-[#414944]'>Redeem at</p>
-                 <p className='text-xs font-semibold text-[#00190f]'>madhavshringaar.com</p>
+                 <p className='text-[10px] text-[#e6e2d9]/70'>Redeem at</p>
+                 <p className='text-sm font-semibold text-[#f5d061] tracking-wide'>madhavshringaar.com</p>
               </div>
             </div>
           </div>

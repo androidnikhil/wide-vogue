@@ -16,6 +16,8 @@ import { Prisma } from "@prisma/client";
 import { sendPurchaseReceipt } from "@/email";
 import crypto from "crypto";
 
+import { LOYALTY_CONFIG } from '../loyalty.config';
+
 export async function createOrder() {
   try {
     // Check for cart cookie
@@ -62,6 +64,11 @@ export async function createOrder() {
       };
     }
 
+    // Calculate Bhakti Points
+    const pointsToRedeem = Number(cart.pointsToRedeem || 0);
+    // You only earn points on the subtotal minus discounts, but let's keep it simple: based on itemsPrice or totalPrice
+    const pointsEarned = LOYALTY_CONFIG.calculatePointsEarned(Number(cart.totalPrice));
+
     // Create order object
     const order = insertOrderSchema.parse({
       userId: userId || null,
@@ -73,6 +80,10 @@ export async function createOrder() {
       taxPrice: cart.taxPrice,
       couponCode: cart.couponCode || null,
       discountPrice: cart.discountPrice || 0,
+      giftCardCode: cart.giftCardCode || null,
+      giftCardAmount: cart.giftCardAmount || 0,
+      pointsEarned: pointsEarned,
+      pointsRedeemed: pointsToRedeem,
       isGiftWrapped: cart.isGiftWrapped,
       totalPrice: cart.totalPrice,
     });
@@ -81,8 +92,20 @@ export async function createOrder() {
     const insertedOrderId = await prisma.$transaction(async (tx) => {
       // Create order
       const insertedOrder = await tx.order.create({ data: order });
-      // Create order items from the cart items
+      
+      // Process order items securely
       for (const item of cart.items as CartItem[]) {
+        // 1. Verify and deduct stock atomically
+        const product = await tx.product.findUnique({ where: { id: item.productId } });
+        if (!product) throw new Error(`Product ${item.name} not found`);
+        if (product.stock < item.qty) throw new Error(`Not enough stock for ${item.name}`);
+
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: product.stock - item.qty }
+        });
+
+        // 2. Create Order Item
         await tx.orderItem.create({
           data: {
             ...item,
@@ -91,6 +114,7 @@ export async function createOrder() {
           },
         });
       }
+      
       // Clear cart
       await tx.cart.update({
         where: { id: cart.id },
@@ -102,8 +126,62 @@ export async function createOrder() {
           itemsPrice: 0,
           couponCode: null,
           discountPrice: 0,
+          giftCardCode: null,
+          giftCardAmount: 0,
+          pointsToRedeem: 0,
         },
       });
+
+      // Secure Gift Card Validation
+      if (cart.giftCardCode) {
+        const giftCard = await tx.giftCard.findUnique({ where: { code: cart.giftCardCode } });
+        if (!giftCard || !giftCard.isActive || Number(giftCard.balance) === 0) {
+          throw new Error("Gift card is invalid or already used");
+        }
+        await tx.giftCard.update({
+          where: { code: cart.giftCardCode },
+          data: {
+            balance: 0,
+            isActive: false, // Mark as fully used
+          }
+        });
+      }
+
+      // Secure Coupon Validation
+      if (cart.couponCode) {
+        const coupon = await tx.coupon.findUnique({ where: { code: cart.couponCode } });
+        if (!coupon || !coupon.isActive) throw new Error("Coupon is inactive");
+        if (coupon.maxUses !== null && coupon.currentUses >= coupon.maxUses) throw new Error("Coupon usage limit reached");
+
+        await tx.coupon.update({
+          where: { code: cart.couponCode },
+          data: {
+            currentUses: {
+              increment: 1
+            }
+          }
+        });
+      }
+
+      // Secure Bhakti Points Validation & Updating
+      if (userId) {
+        const user = await tx.user.findUnique({ where: { id: userId } });
+        if (!user) throw new Error("User not found");
+        if (user.bhaktiPoints < pointsToRedeem) throw new Error("Insufficient Bhakti points for this transaction");
+
+        const pointDifference = pointsEarned - pointsToRedeem;
+        await tx.user.update({
+          where: { id: userId },
+          data: {
+            bhaktiPoints: {
+              increment: pointDifference
+            },
+            lifetimePoints: {
+              increment: pointsEarned
+            }
+          }
+        });
+      }
 
       return insertedOrder.id;
     });
@@ -404,6 +482,8 @@ export async function getAllOrders({
 // Delete an order
 export async function deleteOrder(id: string) {
   try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
     await prisma.order.delete({ where: { id } });
 
     revalidatePath('/admin/orders');
@@ -420,6 +500,8 @@ export async function deleteOrder(id: string) {
 // Update COD order to paid
 export async function updateOrderToPaidCOD(orderId: string) {
   try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
     await updateOrderToPaid({ orderId });
 
     revalidatePath(`/order/${orderId}`);
@@ -433,6 +515,8 @@ export async function updateOrderToPaidCOD(orderId: string) {
 // Update COD order to delivered
 export async function deliverOrder(orderId: string) {
   try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
     const order = await prisma.order.findFirst({
       where: {
         id: orderId,
@@ -465,6 +549,8 @@ export async function deliverOrder(orderId: string) {
 // Update order status (Admin)
 export async function updateOrderStatus(orderId: string, status: string, awbNumber?: string) {
   try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
     const order = await prisma.order.findFirst({
       where: { id: orderId },
     });

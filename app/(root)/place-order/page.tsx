@@ -168,6 +168,12 @@ const PlaceOrderPage = async () => {
                       <span>-{formatCurrency(cart.discountPrice || "0")}</span>
                     </div>
                   )}
+                  {Number(cart.giftCardAmount) > 0 && (
+                    <div className='flex justify-between items-center text-emerald-600 font-medium'>
+                      <span>Gift Card ({cart.giftCardCode})</span>
+                      <span>-{formatCurrency(cart.giftCardAmount || "0")}</span>
+                    </div>
+                  )}
                   <div className='flex justify-between items-center text-on-surface-variant'>
                     <span>Taxes (Inclusive)</span>
                     <span className="font-medium text-on-surface">{formatCurrency(cart.taxPrice)}</span>

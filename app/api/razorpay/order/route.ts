@@ -3,14 +3,14 @@ import Razorpay from 'razorpay';
 import { auth } from '@/auth'; // Adjust this import based on your NextAuth configuration
 import { prisma } from '@/db/prisma'; // Adjust based on Prisma client location
 
-// Initialize Razorpay instance securely using environment variables
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID as string,
-  key_secret: process.env.RAZORPAY_KEY_SECRET as string,
-});
-
 export async function POST(req: Request) {
   try {
+    // Initialize Razorpay instance securely using environment variables
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID || 'dummy_key',
+      key_secret: process.env.RAZORPAY_KEY_SECRET || 'dummy_secret',
+    });
+
     // 1. Authenticate the user securely
     const session = await auth();
     if (!session || !session.user) {

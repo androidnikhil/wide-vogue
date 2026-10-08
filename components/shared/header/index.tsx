@@ -42,9 +42,9 @@ export default async function Header() {
 
 <div className="flex items-center gap-3">
 <MobileMenu />
-<a className="flex items-center gap-2" href="#">
+<Link className="flex items-center gap-2" href="/">
 <img alt="Madhav Shringaar" className="h-14 md:h-20 w-auto object-contain scale-110 ml-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ"/>
-</a>
+</Link>
 </div>
 
 <div className="hidden md:flex flex-1 max-w-2xl flex-col gap-1 mx-6">

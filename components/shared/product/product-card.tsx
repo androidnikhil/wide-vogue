@@ -43,7 +43,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                         <ProductPrice value={product.price.toString()} className="text-primary text-base md:text-lg" />
                         {discount > 0 && (
                             <>
-                                <span className="font-body-sm text-body-sm text-on-surface-variant line-through text-xs font-serif opacity-70">₹{originalPrice}</span>
+                                <span className="font-body-sm text-body-sm text-on-surface-variant line-through text-xs opacity-70">₹{originalPrice}</span>
                                 <span className="font-label-sm text-label-sm text-emerald-800 text-[10px] font-bold bg-emerald-50 px-1.5 py-0.5 rounded-sm">{discount}% OFF</span>
                             </>
                         )}

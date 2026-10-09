@@ -267,7 +267,7 @@ const OrderDetailsTable = ({
                       <TableCell className="text-center">
                         <span className='font-medium text-on-surface-variant bg-surface-container px-3 py-1 rounded-full'>{item.qty}</span>
                       </TableCell>
-                      <TableCell className='text-right font-title-lg text-primary'>
+                      <TableCell className='text-right font-bold text-lg text-primary'>
                         {formatCurrency(item.price)}
                       </TableCell>
                     </TableRow>
@@ -322,7 +322,7 @@ const OrderDetailsTable = ({
                 </div>
               )}
               
-              <div className='flex justify-between font-title-lg text-primary pt-2 pb-2'>
+              <div className='flex justify-between font-bold text-lg text-primary pt-2 pb-2'>
                 <span>Total</span>
                 <span className="font-bold">{formatCurrency(totalPrice)}</span>
               </div>

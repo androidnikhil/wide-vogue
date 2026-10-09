@@ -136,7 +136,7 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                         </div>
                       </TableCell>
                       
-                      <TableCell className="text-right font-title-lg text-primary">
+                      <TableCell className="text-right font-bold text-lg text-primary">
                         {formatCurrency(Number(item.price) * item.qty)}
                       </TableCell>
                     </TableRow>
@@ -189,7 +189,7 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                     </div>
                   )}
                   
-                  <div className="flex justify-between font-title-lg text-primary pt-2 pb-6 border-t border-secondary/20">
+                  <div className="flex justify-between font-bold text-lg text-primary pt-2 pb-6 border-t border-secondary/20">
                     <span>Subtotal:</span>
                     <span className="font-bold">{formatCurrency(
                       (

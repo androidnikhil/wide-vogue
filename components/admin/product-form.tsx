@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { productDefaultValues } from '@/lib/constants';
 import { insertProductSchema, updateProductSchema } from '@/lib/validators';
 import { Product } from '@/types';
@@ -90,6 +92,18 @@ const ProductForm = ({
   const images = form.watch('images');
   const isFeatured = form.watch('isFeatured');
   const banner = form.watch('banner');
+  
+  const originalPrice = form.watch('originalPrice');
+  const discountPercent = form.watch('discountPercent');
+
+  useEffect(() => {
+    if (originalPrice && discountPercent !== undefined) {
+      const orig = Number(originalPrice) || 0;
+      const dist = Number(discountPercent) || 0;
+      const finalPrice = orig * (1 - dist / 100);
+      form.setValue('price', finalPrice.toFixed(2), { shouldValidate: true });
+    }
+  }, [originalPrice, discountPercent, form]);
 
   return (
     <Form {...form}>
@@ -208,27 +222,56 @@ const ProductForm = ({
           />
         </div>
         <div className='flex flex-col md:flex-row gap-5'>
-          {/* Price */}
+          {/* Original Price */}
           <FormField
             control={form.control}
-            name='price'
-            render={({
-              field,
-            }: {
-              field: ControllerRenderProps<
-                z.infer<typeof insertProductSchema>,
-                'price'
-              >;
-            }) => (
+            name='originalPrice'
+            render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Price</FormLabel>
+                <FormLabel>Original Price (MRP)</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter product price' {...field} />
+                  <Input placeholder='Enter actual price' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+          {/* Discount Percent */}
+          <FormField
+            control={form.control}
+            name='discountPercent'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>Discount Offer (%)</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number"
+                    min="0"
+                    max="100"
+                    placeholder='Enter % off' 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Final Selling Price (Calculated) */}
+          <FormField
+            control={form.control}
+            name='price'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>Selling Price (Auto-calculated)</FormLabel>
+                <FormControl>
+                  <Input placeholder='Calculated selling price' readOnly className="bg-gray-100" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className='flex flex-col md:flex-row gap-5'>
           {/* Stock */}
           <FormField
             control={form.control}

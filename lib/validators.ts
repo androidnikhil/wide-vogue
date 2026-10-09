@@ -28,6 +28,8 @@ export const insertProductSchema = z.object({
   isFeatured: z.boolean(),
   banner: z.string().nullable(),
   price: currency,
+  originalPrice: currency,
+  discountPercent: z.coerce.number().int().min(0).max(100).default(0),
   isReturnable: z.boolean().default(false),
   returnWindowDays: z.coerce.number().int().min(0).default(0),
   returnPolicyText: z.string().nullable().optional(),

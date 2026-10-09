@@ -39,6 +39,8 @@ export const signUpDefaultValues = {
     brand: '',
     description: '',
     price: '0',
+    originalPrice: '0',
+    discountPercent: 0,
     stock: 0,
     rating: '0',
     numReviews: '0',

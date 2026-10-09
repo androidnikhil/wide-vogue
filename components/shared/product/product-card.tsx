@@ -6,10 +6,8 @@ import WishlistButton from "./wishlist-button";
 import ProductPrice from "./product-price";
 
 const ProductCard = ({ product }: { product: Product }) => {
-    // Generate an arbitrary "fake" original price 30% higher for UI purposes 
-    // since the database might not have an original price.
-    const originalPrice = (Number(product.price) * 1.3).toFixed(0);
-    const discount = 30;
+    const originalPrice = product.originalPrice ? product.originalPrice.toString() : product.price.toString();
+    const discount = product.discountPercent || 0;
 
     return (
         <div className="bg-white rounded-[1.5rem] border border-outline-variant/40 hover:border-secondary/50 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 group-hover:rotate-1 flex flex-col justify-between overflow-hidden group">

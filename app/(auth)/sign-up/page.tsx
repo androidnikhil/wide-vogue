@@ -12,6 +12,7 @@ import { APP_NAME } from '@/lib/constants';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import SignUpForm from './sign-up-form';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Sign Up',
@@ -47,7 +48,9 @@ const SignUpPage = async (props: {
           </CardDescription>
         </CardHeader>
         <CardContent className='space-y-4'>
-          <SignUpForm />
+          <Suspense fallback={<div>Loading...</div>}>
+            <SignUpForm />
+          </Suspense>
         </CardContent>
       </Card>
     </div>

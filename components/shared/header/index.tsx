@@ -1,5 +1,7 @@
 
 import React from 'react';
+import ScrollHandler from './scroll-handler';
+import CartTrigger from './cart-trigger';
 import Link from 'next/link';
 
 import { auth } from '@/auth';
@@ -36,7 +38,7 @@ export default async function Header() {
 </div>
 </div>
 
-<header className="bg-surface/95 dark:bg-surface-container/95 backdrop-blur-md text-primary docked full-width top-0 sticky z-40 shadow-sm border-b border-outline-variant/30">
+<header id="main-header" className="fixed top-0 w-full z-50 border-b border-outline-variant/10 py-2 bg-[#FBF7EE]/95 shadow-sm backdrop-blur-lg">
 <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-3 flex flex-col gap-2">
 <div className="flex items-center justify-between gap-4">
 
@@ -58,18 +60,7 @@ export default async function Header() {
             </button>
 </form>
 
-<div className="flex items-center gap-2 text-xs text-on-surface-variant font-label-sm text-label-sm">
-<span className="font-bold text-secondary">Trending:</span>
-<a className="hover:text-secondary transition-colors underline decoration-outline-variant" href="#featured">Poshak</a>
-<span>•</span>
-<a className="hover:text-secondary transition-colors underline decoration-outline-variant" href="#featured">Peacock Mukut</a>
-<span>•</span>
-<a className="hover:text-secondary transition-colors underline decoration-outline-variant" href="#featured">Bansuri</a>
-<span>•</span>
-<a className="hover:text-secondary transition-colors underline decoration-outline-variant" href="#featured">Singhasan</a>
-<span>•</span>
-<a className="hover:text-secondary transition-colors underline decoration-outline-variant" href="#combos">Combo Sets</a>
-</div>
+
 </div>
 
 <div className="flex items-center gap-2 md:gap-5">
@@ -95,20 +86,7 @@ export default async function Header() {
 )}
 </Link>
 
-<Link href="/cart" className="flex items-center gap-2 p-2 bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/50 rounded-lg text-primary transition-colors active:scale-95" id="cartDrawerBtn">
-<div className="relative">
-<span className="material-symbols-outlined text-2xl text-secondary">shopping_bag</span>
-{cart && cart.items.length > 0 && (
-<span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-primary-container text-primary-fixed rounded-full font-label-sm text-label-sm flex items-center justify-center text-[10px] font-bold">
-  {cart.items.reduce((a, c) => a + c.qty, 0)}
-</span>
-)}
-</div>
-<div className="hidden sm:flex flex-col text-left pr-1">
-<span className="font-label-sm text-label-sm leading-tight text-on-surface-variant">Seva Cart</span>
-<span className="font-label-md text-label-md font-bold text-secondary leading-tight">₹{cart ? cart.itemsPrice : '0'}</span>
-</div>
-</Link>
+<CartTrigger cartItemCount={cart ? cart.items.reduce((a, c) => a + c.qty, 0) : 0} cartPrice={cart ? cart.itemsPrice : '0'} />
 </div>
 </div>
 
@@ -169,6 +147,7 @@ export default async function Header() {
 </ul>
 </div>
 </nav>
+  
 </header>
 
     </>

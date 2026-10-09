@@ -114,21 +114,21 @@ module.exports = {
             "gutter-lg": "2rem"
         },
         fontFamily: {
-            "body-lg": ["Plus Jakarta Sans", "sans-serif"],
-            "title-md": ["Plus Jakarta Sans", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "title-md": ["Inter", "sans-serif"],
             "price-lg": ["Playfair Display", "serif"],
             "headline-lg-mobile": ["Playfair Display", "serif"],
-            "body-sm": ["Plus Jakarta Sans", "sans-serif"],
-            "label-sm": ["Plus Jakarta Sans", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"],
             "headline-md": ["Playfair Display", "serif"],
             "title-lg": ["Playfair Display", "serif"],
             "headline-sm": ["Playfair Display", "serif"],
-            "label-lg": ["Plus Jakarta Sans", "sans-serif"],
-            "body-md": ["Plus Jakarta Sans", "sans-serif"],
+            "label-lg": ["Inter", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
             "display-lg": ["Playfair Display", "serif"],
             "headline-lg": ["Playfair Display", "serif"],
             "display-lg-mobile": ["Playfair Display", "serif"],
-            "label-md": ["Plus Jakarta Sans", "sans-serif"]
+            "label-md": ["Inter", "sans-serif"]
         },
         fontSize: {
             "body-lg": ["16px", { "lineHeight": "26px", "fontWeight": "400" }],

@@ -11,7 +11,7 @@ const ProductCard = ({ product }: { product: Product }) => {
     const discount = 30;
 
     return (
-        <div className="bg-surface rounded-lg border border-outline-variant/40 hover:border-secondary/50 shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group">
+        <div className="bg-white rounded-[1.5rem] border border-outline-variant/40 hover:border-secondary/50 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 group-hover:rotate-1 flex flex-col justify-between overflow-hidden group">
             <div className="relative bg-surface-container p-2 aspect-square overflow-hidden flex items-center justify-center">
                 <span className="absolute top-2 left-2 z-10 px-2 py-0.5 bg-primary-container text-surface font-label-sm text-label-sm rounded text-[10px]">
                     {product.category || "Featured"}
@@ -20,7 +20,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                 <Link href={`/product/${product.slug}`} className="w-full h-full">
                     <img
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
                         src={product.images[0] || "https://placehold.co/400x400/png"}
                     />
                 </Link>

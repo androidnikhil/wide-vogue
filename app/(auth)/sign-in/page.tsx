@@ -12,6 +12,7 @@ import { APP_NAME } from '@/lib/constants';
 import CredentialsSignInForm from './credentials-signin-form';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Sign In',
@@ -47,7 +48,9 @@ const SignInPage = async (props: {
           </CardDescription>
         </CardHeader>
         <CardContent className='space-y-4'>
-          <CredentialsSignInForm />
+          <Suspense fallback={<div>Loading...</div>}>
+            <CredentialsSignInForm />
+          </Suspense>
         </CardContent>
       </Card>
     </div>

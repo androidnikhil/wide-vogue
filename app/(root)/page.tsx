@@ -1,335 +1,451 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import ProductCard from '@/components/shared/product/product-card';
 import SizeSelector from '@/components/shared/product/size-selector';
 import { getLatestProducts } from '@/lib/actions/product.action';
-import { prisma } from '@/db/prisma';
 
 export default async function Homepage() {
-  const latestProducts = await getLatestProducts();
-  const activeBanners = await prisma.banner.findMany({
-    where: { isActive: true },
-    orderBy: { position: 'asc' },
+  let latestProducts = await getLatestProducts();
+  
+  // Intercept dummy image data
+  latestProducts = latestProducts.map(p => {
+    let images = p.images || [];
+    let hasSample = images.some(img => img && img.includes('sample-products'));
+    
+    if (hasSample) {
+      let newImg = '/images/devotional/complete_shringar.jpg';
+      const nameLower = p.name ? p.name.toLowerCase() : '';
+      if (nameLower.includes('poshak') || p.category === 'Poshak') newImg = '/images/devotional/poshak.jpg';
+      else if (nameLower.includes('mukut') || p.category === 'Mukut') newImg = '/images/devotional/mukut.jpg';
+      else if (nameLower.includes('bansuri') || p.category === 'Bansuri') newImg = '/images/devotional/bansuri.jpg';
+      else if (nameLower.includes('mala') || p.category === 'Mala') newImg = '/images/devotional/mala.jpg';
+      else if (nameLower.includes('jewel') || p.category === 'Jewellery') newImg = '/images/devotional/jewellery.jpg';
+      else if (nameLower.includes('aasan') || p.category === 'Aasan') newImg = '/images/devotional/aasan.jpg';
+      
+      return { ...p, images: [newImg] };
+    }
+    return p;
   });
 
-  const mainBanner = activeBanners.length > 0 ? activeBanners[0] : null;
-
   return (
-    <div className="bg-background text-on-surface antialiased font-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed pb-20 md:pb-0">
+    <div className="bg-[#FBF7EE] text-on-surface antialiased font-body-md overflow-x-hidden">
       
-      <section className="relative overflow-hidden bg-gradient-to-b from-surface-container-low via-surface to-background py-8 md:py-14 border-b border-outline-variant/30">
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-secondary-fixed/30 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute top-1/2 -right-24 w-96 h-96 bg-primary-fixed/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            
-            <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-4 md:space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-surface-container border border-secondary/30 rounded-full shadow-sm">
-                <span className="material-symbols-outlined text-secondary text-base" style={{ fontVariationSettings: "'FILL' 1" }}>spa</span>
-                <span className="font-headline-sm text-headline-sm text-secondary font-bold tracking-wide">॥ मेरा कान्हा सबसे प्यारा ॥</span>
-              </div>
-              
-              <div className="space-y-2">
-                <h1 className="font-headline-lg-mobile md:font-display-lg text-headline-lg-mobile md:text-display-lg text-primary tracking-tight font-extrabold leading-tight">
-                  {mainBanner?.title || 'Adorn Your Laddu Gopal with Love'}
-                </h1>
-                <p className="font-headline-md text-headline-md text-secondary font-semibold italic">
-                  {mainBanner?.subtitle || 'Madhav Shringaar Exclusive Collection'}
-                </p>
-              </div>
-              
-              <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
-                Divine Handcrafted Poshak, Mukut, Mala & Complete Shringar Collections created with reverent seva for Your Beloved Kanha Ji.
-              </p>
-              
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-xl py-2">
-                <div className="flex items-center gap-2 p-2.5 bg-surface rounded-lg border border-outline-variant/30 shadow-xs">
-                  <span className="material-symbols-outlined text-secondary text-xl">palette</span>
-                  <span className="font-label-sm text-label-sm text-on-surface font-semibold">Traditional Designs</span>
-                </div>
-                <div className="flex items-center gap-2 p-2.5 bg-surface rounded-lg border border-outline-variant/30 shadow-xs">
-                  <span className="material-symbols-outlined text-secondary text-xl">verified</span>
-                  <span className="font-label-sm text-label-sm text-on-surface font-semibold">100% Pure Fabrics</span>
-                </div>
-                <div className="flex items-center gap-2 p-2.5 bg-surface rounded-lg border border-outline-variant/30 shadow-xs">
-                  <span className="material-symbols-outlined text-secondary text-xl">local_shipping</span>
-                  <span className="font-label-sm text-label-sm text-on-surface font-semibold">Pan India Delivery</span>
-                </div>
-                <div className="flex items-center gap-2 p-2.5 bg-surface rounded-lg border border-outline-variant/30 shadow-xs">
-                  <span className="material-symbols-outlined text-secondary text-xl">lock</span>
-                  <span className="font-label-sm text-label-sm text-on-surface font-semibold">Secure Payments</span>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
-                <Link className="gold-gradient-btn text-primary-container px-7 py-3.5 rounded-lg font-title-md text-title-md font-bold shadow-md hover:shadow-lg hover:brightness-105 active:scale-95 transition-all flex items-center gap-2" href={mainBanner?.linkUrl || "/search?category=Poshak"}>
-                  <span>Shop Now</span>
-                  <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                </Link>
-                <Link className="px-6 py-3.5 bg-primary-container text-surface hover:bg-primary border border-secondary/40 rounded-lg font-title-md text-title-md active:scale-95 transition-all flex items-center gap-2" href="/search?category=Festive%20Sets">
-                  <span className="material-symbols-outlined text-secondary-fixed text-lg">stars</span>
-                  <span>Explore Shringar Sets</span>
-                </Link>
-              </div>
+      {/* 1. HERO — ORGANIC, LAYERED, EXPRESSIVE */}
+      <section className="relative min-h-[90vh] bg-gradient-to-br from-[#E8F3EE] via-[#FDFBF7] to-[#FDE8DF] overflow-hidden pt-24 pb-12 px-6 md:px-12 rounded-b-[4rem] md:rounded-b-[10rem] border-b-8 border-white/50 shadow-sm z-10">
+        
+        {/* Abstract Background Shapes */}
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#0F6F74]/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#C88A20]/10 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/3"></div>
+        <div className="absolute top-1/3 left-1/2 w-[400px] h-[400px] bg-[#F7C9B6]/20 rounded-full blur-[80px] -translate-x-1/2"></div>
+        
+        {/* Floating Decorative Elements */}
+        <span className="material-symbols-outlined absolute top-32 left-[10%] text-5xl text-[#C88A20]/40 rotate-12 animate-pulse" style={{ fontVariationSettings: "'FILL' 1" }}>local_florist</span>
+        <span className="material-symbols-outlined absolute bottom-40 left-[40%] text-4xl text-[#0F6F74]/30 -rotate-12" style={{ fontVariationSettings: "'FILL' 1" }}>spa</span>
+        <span className="material-symbols-outlined absolute top-40 right-[15%] text-6xl text-rose-300/40 rotate-45" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_nature</span>
+        
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-20">
+          
+          {/* LEFT: Expressive Typography */}
+          <div className="lg:col-span-5 flex flex-col items-start text-left z-30 pt-10">
+            <div className="inline-flex items-center gap-3 bg-white/70 backdrop-blur-md px-6 py-2 rounded-full border border-white/40 shadow-sm mb-8 transform -rotate-2">
+              <span className="w-2 h-2 rounded-full bg-[#C88A20] animate-ping"></span>
+              <span className="font-bold text-xs uppercase tracking-[0.2em] text-[#003020]">Divine Essentials</span>
             </div>
             
-            <div className="lg:col-span-5 relative flex justify-center">
-              <div className="relative w-full max-w-md lg:max-w-none">
-                <div className="absolute inset-0 bg-gradient-to-tr from-secondary/20 to-secondary-fixed/40 rounded-2xl filter blur-xl transform rotate-1 scale-105"></div>
-                <div className="relative rounded-2xl overflow-hidden border-2 border-secondary/30 shadow-2xl bg-surface-container-lowest">
-                  <img 
-                    alt="Hero Banner" 
-                    className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700 aspect-[1.79/1]" 
-                    src={mainBanner?.imageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuCb8NJe2azmYQficexwzxPZxTg-l1GWEjWohNlCQL2bVZtRdl979guQmuuEVm0XJWTmBa4yA3q0dhvmB4mEbjiJOpU8jpPZWZ5y8neRPXSIJPG9RRqgyhwtuH7i17kRZExVC318qfIJcxwDRvzP89foycAMXjyqz-X5G0oKJArJW-S7VJtDtAbNZIFLpbltLnerlg3GPMu0NhNVtitSAGIh3rTUctyjSBEUKOd4Ov5N_isBYyUcEPSa"}
-                  />
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 flex justify-between items-end">
-                    <div>
-                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-white/80 drop-shadow-md">Darshan of the Day</span>
-                      <p className="font-headline-sm text-headline-sm font-bold text-white drop-shadow-md">Shri Banke Bihari Swaroop</p>
-                    </div>
-                    <span className="px-3 py-1 bg-secondary text-on-secondary rounded-full font-label-sm text-label-sm shadow-md">Pure Silk & Zari</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-</div>
-</div>
-</section>
-
-<section className="py-12 md:py-16 max-w-7xl mx-auto px-4 md:px-8" id="categories">
-
-<div className="text-center max-w-xl mx-auto mb-10 space-y-2">
-<div className="flex items-center justify-center gap-3 text-secondary">
-<span className="h-px w-12 bg-secondary/40"></span>
-<span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>spa</span>
-<span className="h-px w-12 bg-secondary/40"></span>
-</div>
-<h2 className="font-headline-lg md:font-headline-lg text-headline-lg md:text-headline-lg text-primary font-bold">
-          Shop by Category
-        </h2>
-<p className="font-body-md text-body-md text-on-surface-variant">
-          Explore sacred attire and divine adornments curated for every daily seva and utsav
-        </p>
-</div>
-
-<div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-4 md:gap-6">
-
-<Link className="group flex flex-col items-center text-center p-3 bg-surface-container-low hover:bg-surface border border-outline-variant/30 hover:border-secondary/50 rounded-xl transition-all shadow-xs hover:shadow-md" href="/search?category=Poshak">
-<div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-secondary/40 to-primary-container/20 group-hover:scale-105 transition-transform duration-300">
-<div className="w-full h-full rounded-full overflow-hidden border-2 border-surface bg-surface">
-<img alt="Traditional yellow and royal peacock blue silk embroidered Laddu Gopal Poshak dress" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDG4X49SFnMyOr2DOG5bhrJyOP57tsP8_e8zdsXaYXuQQPD2Mr7QarBU82O_3BpsoWuwx5JaJikNHwce_YKeQoKG21W1lai2KjYCUd_PCy-bAMKV5giYBl2VovN4ga3wfhi9qmZ9Lo-myS7Ixi3-rgxum0tw8MzVlhoYIcdc47XSLtvu9vSaoVp8sfonuS7x0sl2OgVAULCJmbaeX03f2fRPbwSFhcNwPxnU5aV0xYGviQ5y5rG2r4"/>
-</div>
-</div>
-<h3 className="mt-3 font-title-lg text-title-lg text-primary group-hover:text-secondary transition-colors font-bold text-sm md:text-base">
-            Kanha Ji Poshak
-          </h3>
-<span className="font-body-sm text-body-sm text-on-surface-variant">(All Sizes 0-6)</span>
-</Link>
-
-<Link className="group flex flex-col items-center text-center p-3 bg-surface-container-low hover:bg-surface border border-outline-variant/30 hover:border-secondary/50 rounded-xl transition-all shadow-xs hover:shadow-md" href="/search?category=Mukut%20%26%20Pagdi">
-<div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-secondary/40 to-primary-container/20 group-hover:scale-105 transition-transform duration-300">
-<div className="w-full h-full rounded-full overflow-hidden border-2 border-surface bg-surface">
-<img alt="Traditional golden Mukut crown for Laddu Gopal with genuine peacock feather" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCbtu7i93CmSGSy7eoanowiOsY8kwUGuham5weT6tchWQ7SQ6nSrxbIxXTNIzJxWrHvC_NIarJ24kGzKjoI9auXZXZN_Oo48MFC34Wq5LlA7onftvF-gGcRrqXq47WUc-5UWz3XiWfZl-GNs6XjaTUkqtCQ1roj14NhUy11sAGmSsOuGr3lc_YOKhr0dvoHEopUpEK0zp0_uBaiikpE9qNVbWji8Dl_l-frMMFcQ8tZizAAxJsckOY"/>
-</div>
-</div>
-<h3 className="mt-3 font-title-lg text-title-lg text-primary group-hover:text-secondary transition-colors font-bold text-sm md:text-base">
-            Mukut &amp; Pagdi
-          </h3>
-<span className="font-body-sm text-body-sm text-on-surface-variant">(Crown / Mor Pankh)</span>
-</Link>
-
-<Link className="group flex flex-col items-center text-center p-3 bg-surface-container-low hover:bg-surface border border-outline-variant/30 hover:border-secondary/50 rounded-xl transition-all shadow-xs hover:shadow-md" href="/search?category=Moti%20Mala%20%26%20Haar">
-<div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-secondary/40 to-primary-container/20 group-hover:scale-105 transition-transform duration-300">
-<div className="w-full h-full rounded-full overflow-hidden border-2 border-surface bg-surface">
-<img alt="Handcrafted pearl and golden beads moti mala necklace set for Laddu Gopal idol" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWZJ43yxJTqRk2U4o3XhQT7P0ifzCHSdrtjv4KpV9H0-mnVdZgoW6eyysmT_73MLN-Rrry2wMDQ4Ij-zuoSLm6ZoZT_8AYzxGm8p0jSMj1qAFLALL3WczugPhz27CicmNtHIzJMqA-R-uYnSIom56dqm1HhSW15dBzPI9KAgIkcERzSjVARbCghH9B1s_YaMfP9xQmpZ0ePvs12uL39vzqiqMP8PuCtVSIVFkCYkNRNT_CKgIU4wlb"/>
-</div>
-</div>
-<h3 className="mt-3 font-title-lg text-title-lg text-primary group-hover:text-secondary transition-colors font-bold text-sm md:text-base">
-            Moti Mala &amp; Haar
-          </h3>
-<span className="font-body-sm text-body-sm text-on-surface-variant">(Tulsi / Pearl)</span>
-</Link>
-
-<Link className="group flex flex-col items-center text-center p-3 bg-surface-container-low hover:bg-surface border border-outline-variant/30 hover:border-secondary/50 rounded-xl transition-all shadow-xs hover:shadow-md" href="/search?category=Divine%20Jewellery">
-<div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-secondary/40 to-primary-container/20 group-hover:scale-105 transition-transform duration-300">
-<div className="w-full h-full rounded-full overflow-hidden border-2 border-surface bg-surface">
-<img alt="Divine Jewellery Kundal Haar Baju Band" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWZJ43yxJTqRk2U4o3XhQT7P0ifzCHSdrtjv4KpV9H0-mnVdZgoW6eyysmT_73MLN-Rrry2wMDQ4Ij-zuoSLm6ZoZT_8AYzxGm8p0jSMj1qAFLALL3WczugPhz27CicmNtHIzJMqA-R-uYnSIom56dqm1HhSW15dBzPI9KAgIkcERzSjVARbCghH9B1s_YaMfP9xQmpZ0ePvs12uL39vzqiqMP8PuCtVSIVFkCYkNRNT_CKgIU4wlb"/>
-</div>
-</div>
-<h3 className="mt-3 font-title-lg text-title-lg text-primary group-hover:text-secondary transition-colors font-bold text-sm md:text-base">
-            Divine Jewellery
-          </h3>
-<span className="font-body-sm text-body-sm text-on-surface-variant">(Kundal / Payal)</span>
-</Link>
-
-<Link className="group flex flex-col items-center text-center p-3 bg-surface-container-low hover:bg-surface border border-outline-variant/30 hover:border-secondary/50 rounded-xl transition-all shadow-xs hover:shadow-md" href="/search?category=Bansuri%20%26%20Latkan">
-<div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-secondary/40 to-primary-container/20 group-hover:scale-105 transition-transform duration-300">
-<div className="w-full h-full rounded-full overflow-hidden border-2 border-surface bg-surface">
-<img alt="Ornate handcrafted golden bansuri flute for Kanha Ji with peacock feather accent" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZvL8LtQL4wG2sFkHRjiojnegg_sE_ne6X9mYFEq87nv6MaluNj-d_57Oidcl3DKca7Wd1_JR_uQNkGr44uXCWxfZo6xL5EE1xGkGxk9o90obHrFa3o9o1n7HzjoNez7TWVCOcdtvMs2ZNNsRIsLMKLgCejVDUNbRBCQFwa9Lp76pIIPE27LuoIUggrxWmqlTYmTofPlcl7tIG6tekkkM2bfcjrup9i4klzx4PiME3eLZDt0MW0X2C"/>
-</div>
-</div>
-<h3 className="mt-3 font-title-lg text-title-lg text-primary group-hover:text-secondary transition-colors font-bold text-sm md:text-base">
-            Bansuri &amp; Latkan
-          </h3>
-<span className="font-body-sm text-body-sm text-on-surface-variant">(Golden Flutes)</span>
-</Link>
-
-<Link className="group flex flex-col items-center text-center p-3 bg-surface-container-low hover:bg-surface border border-outline-variant/30 hover:border-secondary/50 rounded-xl transition-all shadow-xs hover:shadow-md" href="/search?category=Royal%20Singhasan">
-<div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-secondary/40 to-primary-container/20 group-hover:scale-105 transition-transform duration-300">
-<div className="w-full h-full rounded-full overflow-hidden border-2 border-surface bg-surface">
-<img alt="Royal carved wooden Singhasan throne with red velvet cushion and gold leaf detailing" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOJyCy6ORHQ0ego3x1ciS37TMvPYEAS3MbVBo3YaAw_zGPtSeHTGHTLd0CgQT6fhvDuI7H2t1C5R53yc7IekVPngfQHAnsdg29UWqLxpxN5SN5nHepvuXB5cwYOGUt1ggmlGKqe9wW7oyL0o3U7sxlpcFBnUSNt2J0qr8Y6-lNplFyIEm3jbmoAPv3b0KmaJbCGpZr8Kq4P8oz9ecb_p4yiaqT_M-U4a_VlMFEr5UG9JLteazsfkLs"/>
-</div>
-</div>
-<h3 className="mt-3 font-title-lg text-title-lg text-primary group-hover:text-secondary transition-colors font-bold text-sm md:text-base">
-            Royal Singhasan
-          </h3>
-<span className="font-body-sm text-body-sm text-on-surface-variant">(Thrones &amp; Beds)</span>
-</Link>
-</div>
-</section>
-
-<section className="py-12 bg-surface-container-low/60 border-y border-outline-variant/30" id="featured">
-<div className="max-w-7xl mx-auto px-4 md:px-8">
-
-<div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-<div>
-<div className="flex items-center gap-2 text-secondary">
-<span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>spa</span>
-<span className="font-label-sm text-label-sm uppercase tracking-wider">Divine Artisan Creations</span>
-</div>
-<h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary font-bold">
-              Featured Devotional Products
-            </h2>
-</div>
-
-<div className="flex items-center gap-1.5 p-1 bg-surface rounded-lg border border-outline-variant/40 overflow-x-auto custom-scroll">
-<button className="px-4 py-1.5 bg-primary-container text-surface font-label-md text-label-md rounded-md shadow-xs whitespace-nowrap">
-              Trending Now
-            </button>
-<button className="px-4 py-1.5 text-on-surface-variant hover:text-primary font-label-md text-label-md rounded-md whitespace-nowrap transition-colors">
-              Poshak Specials
-            </button>
-<button className="px-4 py-1.5 text-on-surface-variant hover:text-primary font-label-md text-label-md rounded-md whitespace-nowrap transition-colors">
-              Daily Shringar
-            </button>
-</div>
-</div>
-
-
-<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-    {latestProducts.length > 0 ? (
-        latestProducts.map((product: any) => (
-            <ProductCard key={product.id} product={product} />
-        ))
-    ) : (
-        <div className="col-span-full py-10 text-center text-on-surface-variant">
-            No products found in the database. Add some from the admin panel!
-        </div>
-    )}
-</div>
-        </div>
-</section>
-
-<section className="py-12 max-w-7xl mx-auto px-4 md:px-8" id="size-guide">
-<div className="bg-surface-container-low border border-secondary/30 rounded-2xl p-6 md:p-10 shadow-sm relative overflow-hidden">
-<div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-<div className="space-y-2 text-center md:text-left">
-<span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold">Accurate Seva Measurement</span>
-<h2 className="font-headline-lg-mobile md:font-headline-md text-headline-lg-mobile md:text-headline-md text-primary font-bold">
-              Shop by Laddu Gopal Ji Size
-            </h2>
-<p className="font-body-md text-body-md text-on-surface-variant max-w-lg">
-              Every deity has a divine stature. Choose the exact number (0 to 7+) to view tailor-made poshaks, crowns, and matching accessories.
+            <h1 className="text-6xl md:text-[6.5rem] text-[#003020] font-bold tracking-tight leading-[0.95] font-serif mb-6 relative z-10 drop-shadow-sm">
+              Adorn Your <br />
+              <span className="inline-block transform -rotate-3 text-[#0F6F74] italic font-medium bg-[#E6C16A]/20 px-4 rounded-3xl mt-2">Beloved</span> Kanha
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-[#003020]/70 max-w-md font-serif mb-10 pl-6 border-l-4 border-[#C88A20] rounded-sm">
+              Beautiful Poshak & Shringar, Chosen With Love.
             </p>
-</div>
-<button className="px-5 py-2.5 bg-surface border border-secondary/50 text-secondary hover:bg-secondary-fixed/20 rounded-lg font-label-lg text-label-lg font-bold flex items-center gap-2 shadow-xs transition-all active:scale-95" >
-<span className="material-symbols-outlined text-lg">straighten</span>
-<span>View Full Size Chart Guide</span>
-</button>
-</div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <Link href="/search?category=Poshak" className="bg-[#003020] px-10 py-5 rounded-[2rem] text-white font-bold shadow-xl shadow-[#003020]/20 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 text-center uppercase tracking-widest text-sm border-2 border-[#003020]">
+                Shop Poshak
+              </Link>
+              <Link href="/search?category=Mukut" className="bg-white px-10 py-5 rounded-[2rem] text-[#003020] font-bold shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300 text-center uppercase tracking-widest text-sm border-2 border-[#E6C16A]/30">
+                Explore Shringar
+              </Link>
+            </div>
+          </div>
 
-<SizeSelector />
-</div>
-</section>
+          {/* RIGHT: Floating Artwork & Organic Layout */}
+          <div className="lg:col-span-7 relative h-[550px] lg:h-[750px] w-full flex justify-center lg:justify-end items-center mt-10 lg:mt-0">
+            {/* Organic Blob Background for Image */}
+            <div className="absolute w-[90%] h-[90%] bg-gradient-to-tr from-[#E6C16A] to-[#FDE8DF] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] animate-[spin_30s_linear_infinite] opacity-50 blur-xl"></div>
+            <div className="absolute w-[80%] h-[80%] bg-[#0F6F74] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] animate-[spin_25s_linear_infinite_reverse] opacity-20 blur-2xl"></div>
 
-<section className="py-12 bg-surface" id="combos">
-<div className="max-w-7xl mx-auto px-4 md:px-8">
-<div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-primary-container via-primary-container to-[#081f18] text-surface p-8 md:p-12 border border-secondary/40 shadow-xl">
+            {/* The Main Artwork - Breaking out slightly */}
+            <div className="relative w-full lg:w-[110%] h-[110%] ml-auto z-20 flex items-center justify-center transform lg:translate-x-12">
+              <div className="w-[85%] h-[85%] relative rounded-[3rem] lg:rounded-[6rem] overflow-visible shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-700 bg-white p-3 border-4 border-white/60">
+                <img 
+                  src="/images/devotional/hero_krishna.jpg" 
+                  alt="Divine Kanha Artwork" 
+                  className="w-full h-full object-cover rounded-[2.5rem] lg:rounded-[5.5rem]"
+                />
+                
+                {/* Floating Detail Elements bursting from the frame */}
+                <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white rounded-full flex items-center justify-center p-2 shadow-xl border-4 border-[#FBF7EE] transform -rotate-12 z-30">
+                   <img src="/images/devotional/mukut.jpg" className="w-full h-full object-cover rounded-full" alt="Mukut Detail" />
+                </div>
+                
+                <div className="absolute -top-10 -right-10 w-28 h-28 bg-[#FDFBF7] rounded-[2rem] flex items-center justify-center p-2 shadow-lg border-2 border-[#E6C16A]/50 transform rotate-12 z-30">
+                   <img src="/images/devotional/bansuri.jpg" className="w-full h-full object-cover rounded-[1.5rem]" alt="Bansuri Detail" />
+                </div>
+              </div>
+            </div>
+          </div>
 
-<div className="absolute -right-20 -bottom-20 w-80 h-80 bg-secondary/30 rounded-full blur-3xl pointer-events-none"></div>
-<div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-<div className="lg:col-span-7 space-y-4 text-center lg:text-left">
-<div className="inline-flex items-center gap-2 px-3 py-1 bg-secondary/30 border border-secondary-fixed/30 rounded-full text-secondary-fixed text-xs font-semibold">
-<span className="material-symbols-outlined text-sm">auto_awesome</span>
-<span>Exclusive Divine Festive Edition</span>
-</div>
-<h2 className="font-headline-lg-mobile md:font-display-lg text-headline-lg-mobile md:text-display-lg text-surface font-bold leading-tight">
-                Make Every Moment Special — Bring Home Divine Happiness
+        </div>
+      </section>
+
+      {/* 2. DISCOVER KANHA — PLAYFUL ASYMMETRIC CATEGORY COMPOSITION */}
+      <section className="py-24 max-w-7xl mx-auto px-6 md:px-12 relative z-20 -mt-10">
+        <div className="text-center mb-16">
+          <span className="text-[#C88A20] font-bold tracking-[0.2em] uppercase text-xs">Curated Seva</span>
+          <h2 className="text-5xl md:text-6xl font-bold text-[#003020] font-serif mt-2">Discover <span className="italic text-[#0F6F74] font-light">Shringar</span></h2>
+        </div>
+        
+        <div className="relative h-[800px] md:h-[600px] w-full flex flex-col md:flex-row items-center justify-center gap-6">
+           
+           {/* Center Piece - Poshak */}
+           <Link href="/search?category=Poshak" className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[85%] md:w-[45%] h-[400px] md:h-[500px] bg-white rounded-[3rem] shadow-xl z-20 group border-8 border-white p-2 hover:scale-105 transition-all duration-500">
+             <div className="w-full h-full relative overflow-hidden rounded-[2.5rem]">
+               <img src="/images/devotional/poshak.jpg" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2s]" alt="Poshak" />
+               <div className="absolute inset-0 bg-gradient-to-t from-[#003020]/90 via-transparent to-transparent"></div>
+               <div className="absolute bottom-8 left-8 text-white">
+                 <h3 className="text-4xl font-serif font-bold">Poshak</h3>
+                 <span className="bg-[#E6C16A] text-[#003020] text-xs font-bold px-3 py-1 rounded-full mt-2 inline-block">Bestsellers</span>
+               </div>
+             </div>
+           </Link>
+
+           {/* Top Left - Mukut */}
+           <Link href="/search?category=Mukut" className="absolute top-0 left-0 md:left-10 w-[60%] md:w-[30%] h-[250px] bg-[#E8F3EE] rounded-[2rem] md:rounded-[4rem_1rem_4rem_1rem] shadow-lg z-10 group overflow-hidden border-4 border-white hover:z-30 hover:-translate-y-2 transition-all duration-300">
+             <img src="/images/devotional/mukut.jpg" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" alt="Mukut" />
+             <div className="absolute inset-0 bg-gradient-to-br from-[#0F6F74]/80 to-transparent"></div>
+             <div className="absolute top-6 left-6 text-white">
+               <h3 className="text-2xl font-serif font-bold">Mukut</h3>
+             </div>
+           </Link>
+
+           {/* Bottom Right - Bansuri */}
+           <Link href="/search?category=Bansuri" className="absolute bottom-0 right-0 md:right-10 w-[65%] md:w-[35%] h-[280px] bg-[#FDE8DF] rounded-[1rem_4rem_1rem_4rem] shadow-lg z-30 group overflow-hidden border-4 border-white hover:-translate-y-2 transition-all duration-300">
+             <img src="/images/devotional/bansuri.jpg" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" alt="Bansuri" />
+             <div className="absolute inset-0 bg-gradient-to-t from-[#003020]/80 to-transparent"></div>
+             <div className="absolute bottom-6 right-8 text-white text-right">
+               <h3 className="text-3xl font-serif font-bold">Bansuri</h3>
+             </div>
+           </Link>
+           
+           {/* Bottom Left - Jewellery */}
+           <Link href="/search?category=Jewellery" className="absolute bottom-[20%] md:bottom-10 left-[5%] md:left-0 w-[45%] md:w-[25%] h-[200px] bg-[#FBF7EE] rounded-full shadow-md z-30 group border-4 border-white hover:scale-110 transition-all duration-300 overflow-hidden flex items-center justify-center">
+             <img src="/images/devotional/jewellery.jpg" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" alt="Jewellery" />
+             <div className="absolute inset-0 bg-[#C88A20]/20 group-hover:bg-transparent transition-colors"></div>
+             <h3 className="absolute text-xl font-serif font-bold text-white bg-[#003020]/60 px-4 py-2 rounded-full backdrop-blur-sm">Jewels</h3>
+           </Link>
+        </div>
+      </section>
+
+      {/* 3. EDITORIAL PRODUCT CAMPAIGN - SIGNATURE POSHAK */}
+      <section className="py-24 my-10 bg-[#003020] text-white relative overflow-hidden rounded-[3rem] mx-4 md:mx-12 shadow-2xl">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#0F6F74] rounded-full blur-[100px] opacity-40 translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#C88A20] rounded-full blur-[100px] opacity-30 -translate-x-1/2 translate-y-1/2"></div>
+        
+        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 items-center relative z-10">
+           <div className="relative group">
+              <div className="w-full h-[400px] md:h-[600px] bg-white p-3 rounded-t-[10rem] rounded-b-[2rem] transform -rotate-3 transition-transform group-hover:rotate-0 duration-500 shadow-2xl">
+                <img src="/images/devotional/poshak.jpg" className="w-full h-full object-cover rounded-t-[9.5rem] rounded-b-[1.5rem]" alt="Signature Poshak" />
+              </div>
+              <div className="absolute -right-6 top-1/4 bg-[#E6C16A] text-[#003020] w-24 h-24 rounded-full flex items-center justify-center font-bold text-lg rotate-12 shadow-lg border-4 border-[#003020]">
+                 New!
+              </div>
+           </div>
+           
+           <div className="flex flex-col items-start justify-center">
+              <span className="material-symbols-outlined text-[#E6C16A] text-5xl mb-6">workspace_premium</span>
+              <h2 className="text-5xl md:text-7xl font-serif font-bold leading-tight mb-6">
+                Signature <br /><span className="text-[#E6C16A] italic font-light">Poshak</span>
               </h2>
-<p className="font-body-lg text-body-lg text-primary-fixed-dim max-w-xl">
-                Complete coordinated sets matching Poshak, Mukut, Bansuri, Mala and Payal — hassle-free reverent seva for your Beloved Kanha.
+              <p className="text-lg md:text-xl text-white/80 font-light mb-10 border-l-4 border-[#0F6F74] pl-6">
+                Handcrafted by master artisans. Every stitch is infused with pure devotion. Designed perfectly for your beloved Laddu Gopal.
               </p>
-<div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-4">
-<a className="gold-gradient-btn text-primary-container px-6 py-3 rounded-lg font-title-md text-title-md font-bold shadow-md hover:brightness-105 active:scale-95 transition-all" href="#featured">
-                  Shop Coordinated Combos (From ₹1,599)
-                </a>
-<a className="px-5 py-3 border border-secondary text-secondary-fixed hover:bg-secondary/20 rounded-lg font-title-md text-title-md font-semibold transition-colors flex items-center gap-2" href="https://wa.me/919876543210" target="_blank">
-<span className="material-symbols-outlined text-green-400 text-lg">chat</span>
-<span>Customise On WhatsApp</span>
-</a>
-</div>
-</div>
-<div className="lg:col-span-5 flex justify-center">
-<div className="relative w-full max-w-sm rounded-xl overflow-hidden border-2 border-secondary/50 shadow-2xl group bg-surface">
-<img alt="Complete Laddu Gopal Shringar combo set including matching yellow silk poshak dress, ornate golden peacock mukut crown, moti haar necklace, tiny bansuri flute, and payal anklets displayed neatly on silk fabric, luxury e-commerce catalog shot" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 aspect-square" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB76ugUiHPdf4MNR36s9r7QSmMKuCCttkzZ2qQdHggWVDB7KwYakn2R5eON1YhUNuBCgFhNPEHxCN15bXUXS0-r0ZcMGnoLkFkG78kNf18JIS9fMfaB4yeaX3j_8_hKgzDgaGWCNKT9CfKZR8c2VhZ0EoD61fpr4eiGYJubBvRyis01gWOewyu_DPo-qSCUom1QffoIzjHk4lEp8I7AlOIWyfrdjUE8YRCsIfvYvGZaPjleg9tFDcpb"/>
-<div className="p-3 bg-surface-container text-on-surface flex justify-between items-center">
-<div>
-<p className="font-title-md text-title-md font-bold text-primary">Maha Shringar 5-Piece Gift Set</p>
-<p className="font-body-sm text-body-sm text-secondary font-semibold">Includes Blessed Tulsi Touch</p>
-</div>
-<span className="font-price-lg text-price-lg text-primary font-bold">₹1,599</span>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
+              <Link href="/search?category=Poshak" className="bg-[#E6C16A] text-[#003020] px-10 py-4 rounded-full font-bold shadow-lg hover:bg-white transition-colors uppercase tracking-widest text-sm">
+                Explore The Collection
+              </Link>
+           </div>
+        </div>
+      </section>
 
-<section className="py-10 bg-surface-container-low border-y border-outline-variant/30" id="trust-strip">
-<div className="max-w-7xl mx-auto px-4 md:px-8">
-<div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-<div className="flex flex-col items-center p-3">
-<div className="w-12 h-12 rounded-full bg-secondary-fixed/30 flex items-center justify-center text-secondary mb-3">
-<span className="material-symbols-outlined text-2xl">local_shipping</span>
-</div>
-<h4 className="font-title-lg text-title-lg text-primary font-bold text-sm md:text-base">Fast &amp; Secure Shipping</h4>
-<p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Pan-India express delivery with transit insurance</p>
-</div>
-<div className="flex flex-col items-center p-3">
-<div className="w-12 h-12 rounded-full bg-secondary-fixed/30 flex items-center justify-center text-secondary mb-3">
-<span className="material-symbols-outlined text-2xl">verified</span>
-</div>
-<h4 className="font-title-lg text-title-lg text-primary font-bold text-sm md:text-base">100% Authentic Quality</h4>
-<p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Pristine silk, non-tarnish brass &amp; genuine peacock feathers</p>
-</div>
-<div className="flex flex-col items-center p-3">
-<div className="w-12 h-12 rounded-full bg-secondary-fixed/30 flex items-center justify-center text-secondary mb-3">
-<span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
-</div>
-<h4 className="font-title-lg text-title-lg text-primary font-bold text-sm md:text-base">Trusted by 50,000+ Devotees</h4>
-<p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Spreading sacred devotion into households nationwide</p>
-</div>
-<div className="flex flex-col items-center p-3">
-<div className="w-12 h-12 rounded-full bg-secondary-fixed/30 flex items-center justify-center text-secondary mb-3">
-<span className="material-symbols-outlined text-2xl">support_agent</span>
-</div>
-<h4 className="font-title-lg text-title-lg text-primary font-bold text-sm md:text-base">Dedicated Devotee Care</h4>
-<p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Immediate guidance on sizing and seva queries</p>
-</div>
-</div>
-</div>
-</section>
+      {/* 4. KANHA'S LITTLE WORLD — IMMERSIVE ILLUSTRATED COMPOSITION */}
+      <section className="py-32 relative overflow-hidden bg-[#FBF7EE]">
+        {/* Playful Wavy Top Border */}
+        <div className="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180">
+            <svg className="relative block w-[calc(100%+1.3px)] h-[80px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#003020"></path>
+            </svg>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center pt-10">
+          
+          <div className="order-2 lg:order-1 relative h-[500px] lg:h-[700px] w-full flex items-center justify-center">
+             <div className="absolute w-[100%] h-[100%] bg-[#FDE8DF] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-80 blur-lg"></div>
+             
+             <div className="relative z-10 w-[90%] h-[90%] p-4 bg-white rounded-full shadow-2xl border-8 border-[#0F6F74]/20 hover:border-[#0F6F74]/50 transition-colors duration-500">
+               <img src="/images/devotional/kanhas_world.jpg" className="w-full h-full object-cover rounded-full" alt="Kanha's World Art" />
+             </div>
+             
+             <div className="absolute bottom-10 -right-4 w-40 h-40 bg-[#E8F3EE] rounded-full p-2 shadow-xl border-4 border-white z-20">
+               <img src="/images/devotional/mala.jpg" className="w-full h-full object-cover rounded-full" alt="Detail" />
+             </div>
+          </div>
+          
+          <div className="order-1 lg:order-2 space-y-6 text-center lg:text-left">
+            <span className="text-[#0F6F74] font-bold tracking-[0.2em] uppercase text-sm border-b-2 border-[#0F6F74] pb-1">The Divine Details</span>
+            <h2 className="text-6xl md:text-7xl font-serif leading-none text-[#003020] font-bold mb-4">
+              Kanha's <br/> <span className="text-[#C88A20] italic">Little World</span>
+            </h2>
+            <p className="text-2xl font-serif italic text-[#003020]/70">“Where every little detail is chosen with love.”</p>
+            <p className="text-lg leading-relaxed text-[#003020]/80 mt-6 max-w-lg mx-auto lg:mx-0">
+              Enter a world where devotion takes physical form. The gentle curve of His bansuri, the vibrant feathers of His mukut, the delicate embroidery of His poshak—everything is curated to resonate with the purest love.
+            </p>
+            <button className="mt-8 bg-[#0F6F74] text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-sm shadow-xl hover:-translate-y-1 transition-transform">
+              Read Our Story
+            </button>
+          </div>
+          
+        </div>
+      </section>
+
+      {/* 5. PRODUCT GRID — ECOMMERCE FOCUS */}
+      <section className="py-24 max-w-7xl mx-auto px-6 md:px-12 bg-white rounded-[3rem] shadow-sm my-12 border border-[#003020]/5">
+        <div className="flex flex-col items-center text-center mb-16">
+          <span className="material-symbols-outlined text-[#C88A20] text-4xl mb-4">shopping_bag</span>
+          <h2 className="text-4xl md:text-5xl font-serif text-[#003020] font-bold mb-4">Featured Collection</h2>
+          <p className="text-[#003020]/60 max-w-2xl text-lg">Real Madhav Shringaar products, ready for your beloved Kanha.</p>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          {latestProducts && latestProducts.length > 0 ? (
+            latestProducts.slice(0, 4).map((product: any) => (
+                <div key={product.id} className="w-full transform hover:-translate-y-2 transition-transform duration-300">
+                  <ProductCard product={product} />
+                </div>
+            ))
+          ) : (
+            <div className="col-span-full py-20 text-center text-on-surface-variant bg-[#FBF7EE] rounded-2xl">
+               <span className="material-symbols-outlined text-4xl mb-2 opacity-50">inventory_2</span>
+               <p>No featured products available.</p>
+            </div>
+          )}
+        </div>
+        
+        <div className="mt-16 text-center">
+           <Link href="/search" className="inline-block border-2 border-[#003020] text-[#003020] px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-[#003020] hover:text-white transition-colors shadow-sm">
+              View Entire Collection
+           </Link>
+        </div>
+      </section>
+
+      {/* 6. COMPLETE SHRINGAR — ORGANIC/WAVY CAMPAIGN */}
+      <section className="py-32 relative bg-[#FDE8DF] overflow-hidden">
+        {/* Abstract shapes */}
+        <div className="absolute top-0 right-0 w-full h-full overflow-hidden">
+           <div className="absolute -top-20 -right-20 w-[600px] h-[600px] bg-[#E6C16A]/20 rounded-full blur-[80px]"></div>
+           <div className="absolute bottom-10 -left-20 w-[500px] h-[500px] bg-[#0F6F74]/10 rounded-full blur-[80px]"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+           <div className="order-2 lg:order-1 text-center lg:text-left space-y-6">
+              <h2 className="text-6xl md:text-8xl font-serif font-bold text-[#003020] leading-none mb-6">
+                Complete <br/>
+                <span className="italic text-[#C88A20] font-light">Shringar</span>
+              </h2>
+              <p className="text-xl text-[#003020]/80 font-serif italic mb-10 bg-white/50 inline-block px-6 py-2 rounded-full border border-white">
+                “Everything your beloved Kanha needs, thoughtfully brought together.”
+              </p>
+              
+              <div className="flex flex-wrap gap-3 justify-center lg:justify-start mb-10">
+                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">Poshak</span>
+                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">Mukut</span>
+                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">Mala</span>
+                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">Bansuri</span>
+                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">Kangan</span>
+              </div>
+              
+              <Link href="/search?category=Complete Shringar" className="inline-block bg-[#003020] text-white px-12 py-5 rounded-full font-bold shadow-xl hover:-translate-y-1 transition-transform uppercase tracking-widest text-sm">
+                Explore Combos
+              </Link>
+           </div>
+           
+           <div className="order-1 lg:order-2">
+              <div className="relative w-[100%] aspect-[4/3] bg-white rounded-[4rem_1rem_4rem_1rem] shadow-2xl p-4 transform rotate-3 hover:rotate-0 transition-transform duration-500 border-8 border-white/60">
+                 <img src="/images/devotional/complete_shringar.jpg" className="w-full h-full object-cover rounded-[3rem_0.5rem_3rem_0.5rem]" alt="Complete Shringar Arrangement" />
+                 
+                 {/* Floating price badge */}
+                 <div className="absolute -bottom-6 -left-6 bg-[#0F6F74] text-white p-6 rounded-full shadow-xl rotate-[-15deg] font-serif font-bold text-xl border-4 border-white">
+                    Matching<br/>Sets!
+                 </div>
+              </div>
+           </div>
+        </div>
+      </section>
+
+      {/* 7. SHOP BY SIZE — ELEGANT INTERACTIVE */}
+      <section className="py-24 bg-[#E8F3EE] relative overflow-hidden">
+        <div className="max-w-5xl mx-auto px-6 relative z-10 flex flex-col md:flex-row items-center gap-12 bg-white rounded-[3rem] p-10 shadow-lg border border-[#0F6F74]/10">
+          
+          <div className="w-full md:w-1/3 flex justify-center">
+            <div className="w-48 h-48 bg-[#FBF7EE] rounded-full p-2 border-4 border-[#E6C16A]/50 shadow-inner flex items-center justify-center overflow-hidden">
+               <img src="/images/devotional/aasan.jpg" className="w-full h-full object-cover rounded-full" alt="Size reference" />
+            </div>
+          </div>
+          
+          <div className="w-full md:w-2/3 text-center md:text-left">
+            <span className="material-symbols-outlined text-4xl text-[#0F6F74] mb-2">straighten</span>
+            <h2 className="text-4xl md:text-5xl font-serif text-[#003020] font-bold mb-4">Find the Perfect Fit</h2>
+            <p className="text-[#003020]/70 mb-8 text-lg">Select your Laddu Gopal Ji's size number to view tailor-made Shringaar.</p>
+            <div className="p-4 bg-[#FBF7EE] rounded-2xl">
+               <SizeSelector />
+            </div>
+          </div>
+          
+        </div>
+      </section>
+      
+      {/* 8. FESTIVAL / OCCASION CAMPAIGN */}
+      <section className="py-24 bg-[#0F6F74] text-white">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <h2 className="text-5xl md:text-6xl font-serif font-bold mb-12">Seva For Every Occasion</h2>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { name: 'Daily Seva', img: '/images/devotional/poshak.jpg', color: 'bg-[#003020]' }, 
+              { name: 'Janmashtami', img: '/images/devotional/hero_krishna.jpg', color: 'bg-[#C88A20]' }, 
+              { name: 'Festivals', img: '/images/devotional/mukut.jpg', color: 'bg-[#E6C16A]' }, 
+              { name: 'Special Darshan', img: '/images/devotional/complete_shringar.jpg', color: 'bg-[#FDE8DF]' }
+            ].map((occ, i) => (
+              <Link key={occ.name} href={`/search?q=${occ.name}`} className="group block relative h-64 md:h-80 rounded-[2rem] overflow-hidden shadow-lg hover:-translate-y-3 transition-all duration-300">
+                <img src={occ.img} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" alt={occ.name} />
+                <div className={`absolute inset-0 bg-gradient-to-t ${occ.color}/90 via-transparent to-transparent`}></div>
+                <div className="absolute bottom-6 left-0 w-full text-center px-4">
+                   <h3 className="text-white font-bold font-serif text-2xl drop-shadow-md">{occ.name}</h3>
+                   <span className="text-white/80 text-sm mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Explore </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 9. WHY YOU'LL LOVE US — PLAYFUL BENEFITS */}
+      <section className="py-24 bg-[#FBF7EE]">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow text-center border-b-4 border-[#0F6F74]">
+            <div className="w-20 h-20 mx-auto bg-[#E8F3EE] rounded-full flex items-center justify-center text-[#0F6F74] mb-6 shadow-inner">
+               <span className="material-symbols-outlined text-4xl">local_shipping</span>
+            </div>
+            <h4 className="font-bold text-[#003020] font-serif text-2xl mb-2">Fast & Secure</h4>
+            <p className="text-[#003020]/70 font-light">Safe delivery right to your doorstep</p>
+          </div>
+          
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow text-center border-b-4 border-[#C88A20]">
+            <div className="w-20 h-20 mx-auto bg-[#FDFBF7] rounded-full flex items-center justify-center text-[#C88A20] mb-6 shadow-inner">
+               <span className="material-symbols-outlined text-4xl">workspace_premium</span>
+            </div>
+            <h4 className="font-bold text-[#003020] font-serif text-2xl mb-2">Authentic Quality</h4>
+            <p className="text-[#003020]/70 font-light">Premium craftsmanship you can trust</p>
+          </div>
+          
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow text-center border-b-4 border-[#E6C16A]">
+            <div className="w-20 h-20 mx-auto bg-[#FDE8DF] rounded-full flex items-center justify-center text-[#E6C16A] mb-6 shadow-inner">
+               <span className="material-symbols-outlined text-4xl">favorite</span>
+            </div>
+            <h4 className="font-bold text-[#003020] font-serif text-2xl mb-2">Made With Love</h4>
+            <p className="text-[#003020]/70 font-light">Created with devotion for Kanha</p>
+          </div>
+          
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow text-center border-b-4 border-[#003020]">
+            <div className="w-20 h-20 mx-auto bg-gray-50 rounded-full flex items-center justify-center text-[#003020] mb-6 shadow-inner">
+               <span className="material-symbols-outlined text-4xl">support_agent</span>
+            </div>
+            <h4 className="font-bold text-[#003020] font-serif text-2xl mb-2">Devotee Care</h4>
+            <p className="text-[#003020]/70 font-light">We are always here to help you</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 10. MOMENTS OF SEVA — ASYMMETRIC GALLERY */}
+      <section className="py-24 max-w-7xl mx-auto px-6 md:px-12 bg-white rounded-[4rem] my-12 shadow-sm border border-[#003020]/5">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-6xl font-serif text-[#003020] font-bold mb-4">Moments of Seva</h2>
+          <p className="text-[#003020]/60 text-lg">Glimpses of devotion from our artisans and devotees.</p>
+        </div>
+        
+        {/* Asymmetric Gallery Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 auto-rows-[250px]">
+           {/* Big Image */}
+           <div className="md:col-span-8 row-span-2 relative overflow-hidden bg-[#FBF7EE] rounded-[3rem] group">
+             <img src="/images/devotional/kanhas_world.jpg" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Gallery" />
+           </div>
+           {/* Top Right Small */}
+           <div className="md:col-span-4 row-span-1 relative overflow-hidden bg-[#E8F3EE] rounded-full group flex items-center justify-center p-4">
+             <img src="/images/devotional/bansuri.jpg" className="w-[120%] h-[120%] object-cover rounded-full group-hover:rotate-6 transition-transform duration-1000 opacity-80" alt="Gallery" />
+           </div>
+           {/* Bottom Right Small */}
+           <div className="md:col-span-4 row-span-1 relative overflow-hidden bg-[#FDE8DF] rounded-[2rem] group">
+             <img src="/images/devotional/mala.jpg" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 mix-blend-multiply opacity-90" alt="Gallery" />
+           </div>
+        </div>
+      </section>
+
+      {/* 11. TESTIMONIALS */}
+      <section className="py-24 bg-[#E8F3EE]">
+         <div className="max-w-6xl mx-auto px-6">
+            <h2 className="text-center text-4xl md:text-5xl font-serif text-[#003020] font-bold mb-16">Loved by Devotees</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+               {[
+                 { name: 'Radhika S.', text: 'The poshak is absolutely stunning. The embroidery work is so detailed. My Kanha looks divine!' },
+                 { name: 'Meera V.', text: 'I ordered the complete shringar set for Janmashtami. The packaging was beautiful and the quality is premium.' },
+                 { name: 'Ananya D.', text: 'Beautiful mukut and bansuri. Exactly what I was looking for. Will definitely shop again for daily seva items.' }
+               ].map((review, i) => (
+                 <div key={i} className="bg-white p-8 rounded-[2rem] shadow-sm relative pt-12">
+                   <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-[#E6C16A] rounded-full flex items-center justify-center text-white text-2xl font-serif">"</div>
+                   <div className="flex gap-1 text-[#C88A20] mb-4 justify-center">
+                     <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                     <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                     <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                     <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                     <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                   </div>
+                   <p className="text-center text-[#003020]/80 italic mb-6">"{review.text}"</p>
+                   <p className="text-center font-bold text-[#003020] font-serif">— {review.name}</p>
+                 </div>
+               ))}
+            </div>
+         </div>
+      </section>
+
+      {/* 12. FINAL CTA — VISUALLY MEMORABLE */}
+      <section className="py-32 bg-[#003020] text-white relative overflow-hidden rounded-t-[4rem]">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-10"></div>
+        <img src="/images/devotional/hero_krishna.jpg" className="absolute inset-0 w-full h-full object-cover object-top opacity-30 blur-sm" alt="Background" />
+        
+        <div className="relative z-20 max-w-4xl mx-auto px-6 text-center flex flex-col items-center">
+          <span className="material-symbols-outlined text-[#E6C16A] text-6xl mb-6">favorite</span>
+          <h2 className="text-5xl md:text-7xl font-serif font-bold mb-8 leading-tight">
+            Bring Home <br/> <span className="text-[#E6C16A] italic font-light">Divine Happiness</span>
+          </h2>
+          <p className="text-xl md:text-2xl text-white/80 font-serif italic mb-12">Make every moment of seva special.</p>
+          <Link href="/search" className="bg-[#E6C16A] text-[#003020] px-12 py-5 rounded-full font-bold uppercase tracking-widest text-sm shadow-2xl hover:bg-white hover:-translate-y-1 transition-all duration-300">
+            Shop Madhav Shringaar
+          </Link>
+        </div>
+      </section>
 
     </div>
   );

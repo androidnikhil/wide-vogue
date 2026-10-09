@@ -33,6 +33,27 @@
 
 @layer base {
   :root {
+
+    /* New Custom Palette based on requirements */
+    --primary: #003020;
+    --primary-container: #176B55;
+    --secondary: #0F6F74;
+    --secondary-fixed: #C88A20;
+    --secondary-fixed-dim: #E6C16A;
+    --background: #FBF7EE;
+    --surface: #F3EBDD;
+    --surface-container-low: #FBF7EE;
+    --surface-container: #F3EBDD;
+    --on-surface: #18221F;
+    --on-background: #18221F;
+    --outline: #64716C;
+    --outline-variant: #64716C;
+    --error: #B97878;
+    --tertiary: #5B3A52;
+    --on-primary: #FBF7EE;
+    --on-secondary: #FBF7EE;
+
+
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -216,4 +237,20 @@
     background-color: #c0c8c2;
     border-radius: 9999px;
   }
+}
+/* --refined-typography */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+p {
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+.btn-hover-effect {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.btn-hover-effect:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -10px rgba(0,0,0,0.15);
 }

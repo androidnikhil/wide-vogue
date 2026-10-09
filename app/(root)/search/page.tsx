@@ -97,6 +97,7 @@ const SearchPage = async (props: {
     s,
     r,
     pg,
+    sz,
   }: {
     c?: string;
     p?: string;

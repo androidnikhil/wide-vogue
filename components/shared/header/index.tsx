@@ -38,7 +38,7 @@ export default async function Header() {
 </div>
 </div>
 
-<header id="main-header" className="fixed top-0 w-full z-50 border-b border-outline-variant/10 py-2 bg-[#FBF7EE]/95 shadow-sm backdrop-blur-lg">
+<header id="main-header" className="sticky top-0 w-full z-50 border-b border-outline-variant/10 py-2 bg-[#FBF7EE]/95 shadow-sm backdrop-blur-lg">
 <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-3 flex flex-col gap-2">
 <div className="flex items-center justify-between gap-4">
 

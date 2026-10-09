@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { insertProductSchema, updateProductSchema } from '../validators';
 import { z } from 'zod';
+import { Product } from '@/types';
 
 // Get latest products
 export async function getLatestProducts() {
@@ -15,7 +16,7 @@ export async function getLatestProducts() {
     orderBy: { createdAt: 'desc' },
   });
 
-  return convertToPlainObject(data) as any;
+  return convertToPlainObject(data) as Product[];
 }
 // Get  single product by it's slug
 
@@ -25,7 +26,7 @@ export async function getProductBySlug(slug: string) {
             slug
         }
     });
-    return convertToPlainObject(data) as any;
+    return convertToPlainObject(data) as Product;
 }
 
 // Get single product by it's ID
@@ -34,7 +35,7 @@ export async function getProductById(productId: string) {
       where: { id: productId },
     });
   
-    return convertToPlainObject(data) as any;
+    return convertToPlainObject(data) as Product;
   }
   
   // Get all products
@@ -129,7 +130,7 @@ export async function getProductById(productId: string) {
     });
   
     return {
-      data: data as any,
+      data: data as any as Product[],
       totalPages: Math.ceil(dataCount / limit),
     };
   }

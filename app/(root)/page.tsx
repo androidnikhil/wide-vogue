@@ -9,9 +9,9 @@ export default async function Homepage() {
   let latestProducts = await getLatestProducts();
   
   // Intercept dummy image data
-  latestProducts = latestProducts.map(p => {
+  latestProducts = latestProducts.map((p: any) => {
     let images = p.images || [];
-    let hasSample = images.some(img => img && img.includes('sample-products'));
+    let hasSample = images.some((img: any) => img && img.includes('sample-products'));
     
     if (hasSample) {
       let newImg = '/images/devotional/complete_shringar.jpg';

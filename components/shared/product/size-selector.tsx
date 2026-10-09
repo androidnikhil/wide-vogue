@@ -20,10 +20,10 @@ export default function SizeSelector() {
                 const isActive = size.isPopular;
                 
                 // Base styles
-                let containerClass = "relative px-2 py-5 rounded-[2rem] transition-all duration-300 text-center cursor-pointer group block border-2 ";
-                let titleClass = "font-serif text-3xl md:text-4xl font-bold block mb-1 transition-colors ";
-                let subtitleClass = "text-[11px] md:text-xs font-medium block opacity-80 mb-3 ";
-                let badgeClass = "inline-block px-3 py-1 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-wider transition-colors shadow-sm ";
+                let containerClass = "relative px-1 py-3 rounded-2xl transition-all duration-300 flex flex-col items-center justify-between text-center cursor-pointer group border-2 h-full ";
+                let titleClass = "font-serif text-lg lg:text-xl font-bold block mb-1 transition-colors whitespace-nowrap ";
+                let subtitleClass = "text-[10px] leading-tight font-medium block opacity-80 mb-2 ";
+                let badgeClass = "inline-block px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-colors shadow-sm whitespace-nowrap mt-auto ";
 
                 if (isActive) {
                     // Active Styles

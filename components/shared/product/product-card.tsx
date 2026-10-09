@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Product } from "@/types";
 import AddToCart from "./add-to-cart";
 import WishlistButton from "./wishlist-button";
+import ProductPrice from "./product-price";
 
 const ProductCard = ({ product }: { product: Product }) => {
     // Generate an arbitrary "fake" original price 30% higher for UI purposes 
@@ -40,12 +41,12 @@ const ProductCard = ({ product }: { product: Product }) => {
                     </div>
                 </div>
                 <div>
-                    <div className="flex items-baseline gap-1.5 my-1">
-                        <span className="font-price-lg text-price-lg text-primary text-base font-bold">₹{product.price.toString()}</span>
+                    <div className="flex items-baseline gap-2 my-1">
+                        <ProductPrice value={product.price.toString()} className="text-primary text-base md:text-lg" />
                         {discount > 0 && (
                             <>
-                                <span className="font-body-sm text-body-sm text-on-surface-variant line-through text-xs">₹{originalPrice}</span>
-                                <span className="font-label-sm text-label-sm text-emerald-800 text-[10px] font-bold">{discount}% OFF</span>
+                                <span className="font-body-sm text-body-sm text-on-surface-variant line-through text-xs font-serif opacity-70">₹{originalPrice}</span>
+                                <span className="font-label-sm text-label-sm text-emerald-800 text-[10px] font-bold bg-emerald-50 px-1.5 py-0.5 rounded-sm">{discount}% OFF</span>
                             </>
                         )}
                     </div>

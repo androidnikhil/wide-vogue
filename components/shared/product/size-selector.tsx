@@ -20,23 +20,23 @@ export default function SizeSelector() {
                 const isActive = size.isPopular;
                 
                 // Base styles
-                let containerClass = "p-3 rounded-xl transition-all text-center cursor-pointer group shadow-sm block ";
-                let titleClass = "font-headline-sm text-headline-sm font-bold block transition-colors ";
-                let subtitleClass = "font-body-sm text-body-sm block text-xs mt-0.5 ";
-                let badgeClass = "mt-2 inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ";
+                let containerClass = "relative px-2 py-5 rounded-[2rem] transition-all duration-300 text-center cursor-pointer group block border-2 ";
+                let titleClass = "font-serif text-3xl md:text-4xl font-bold block mb-1 transition-colors ";
+                let subtitleClass = "text-[11px] md:text-xs font-medium block opacity-80 mb-3 ";
+                let badgeClass = "inline-block px-3 py-1 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-wider transition-colors shadow-sm ";
 
                 if (isActive) {
                     // Active Styles
-                    containerClass += "bg-primary-container border-2 border-secondary shadow-md hover:scale-105";
-                    titleClass += "text-surface";
-                    subtitleClass += "text-primary-fixed";
-                    badgeClass += "bg-secondary text-on-secondary";
+                    containerClass += "bg-[#0F6F74] border-[#0F6F74] shadow-xl transform -translate-y-2";
+                    titleClass += "text-white";
+                    subtitleClass += "text-white/80";
+                    badgeClass += "bg-[#E6C16A] text-[#003020]";
                 } else {
                     // Inactive Styles
-                    containerClass += "bg-surface border border-outline-variant/50 hover:border-secondary hover:bg-secondary-fixed/10 hover:scale-105";
-                    titleClass += "text-primary group-hover:text-secondary";
-                    subtitleClass += "text-on-surface-variant";
-                    badgeClass += "bg-surface-container text-secondary";
+                    containerClass += "bg-white border-[#E6C16A]/30 hover:border-[#E6C16A] hover:bg-[#FBF7EE] shadow-sm hover:shadow-md hover:-translate-y-1";
+                    titleClass += "text-[#003020] group-hover:text-[#0F6F74]";
+                    subtitleClass += "text-[#003020]";
+                    badgeClass += "bg-[#0F6F74]/10 text-[#0F6F74]";
                 }
 
                 return (

@@ -1,16 +1,21 @@
 import { cn } from "@/lib/utils";
 
-const productprice = ({value, className}: {value: number; className?: string}) => {
-    const stringValue = value.toFixed(2);
-    const [intValue, floatValue] = stringValue.split(".");
+const ProductPrice = ({value, className}: {value: number | string; className?: string}) => {
+    const numericValue = typeof value === 'string' ? parseFloat(value) : value;
+    
+    // Format to Indian currency style
+    const formattedValue = new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    }).format(numericValue);
 
     return ( 
-        <p className={cn("text-2xl", className)}>
-            <span className="text-xs align-super">₹</span>
-            {intValue}
-            <span className="text-xs align-super">.{floatValue}</span>
-        </p>
+        <span className={cn("font-bold tracking-tight", className)}>
+            {formattedValue}
+        </span>
      );
 }
  
-export default productprice;
+export default ProductPrice;

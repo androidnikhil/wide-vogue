@@ -46,6 +46,7 @@ export async function getProductById(productId: string) {
     price,
     rating,
     sort,
+    size,
   }: {
     query: string;
     limit?: number;
@@ -54,6 +55,7 @@ export async function getProductById(productId: string) {
     price?: string;
     rating?: string;
     sort?: string;
+    size?: string;
   }) {
     // Split query into words to allow partial matches (e.g., "laddu gopal" matching "Laadu Gopal" because "Gopal" matches)
     const queryWords = query && query !== 'all' ? query.split(' ').filter(w => w.length > 1) : [];
@@ -92,6 +94,9 @@ export async function getProductById(productId: string) {
             },
           }
         : {};
+        
+    // Size filter
+    const sizeFilter = size && size !== 'all' ? { sizes: { has: size } } : {};
   
     const data = await prisma.product.findMany({
       where: {
@@ -99,6 +104,7 @@ export async function getProductById(productId: string) {
         ...categoryFilter,
         ...priceFilter,
         ...ratingFilter,
+        ...sizeFilter,
       },
       orderBy:
         sort === 'lowest'

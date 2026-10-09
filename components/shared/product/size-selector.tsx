@@ -3,14 +3,14 @@
 import Link from 'next/link';
 
 const sizes = [
-    { label: '0 No.', inch: '1.5 - 2 inches', items: '45+ Items', isPopular: false },
-    { label: '1 No.', inch: '2 - 2.5 inches', items: '60+ Items', isPopular: false },
+    { label: '0 No.', inch: '1.5 - 2 inches', items: 'Explore', isPopular: false },
+    { label: '1 No.', inch: '2 - 2.5 inches', items: 'Explore', isPopular: false },
     { label: '2 No.', inch: '2.5 - 3 inches', items: 'Popular', isPopular: true },
-    { label: '3 No.', inch: '3 - 3.5 inches', items: '90+ Items', isPopular: false },
-    { label: '4 No.', inch: '3.5 - 4 inches', items: '110+ Items', isPopular: false },
-    { label: '5 No.', inch: '4 - 5 inches', items: '75+ Items', isPopular: false },
-    { label: '6 No.', inch: '5 - 6 inches', items: '50+ Items', isPopular: false },
-    { label: '7+ No.', inch: '6+ inches', items: 'Custom', isPopular: false },
+    { label: '3 No.', inch: '3 - 3.5 inches', items: 'Explore', isPopular: false },
+    { label: '4 No.', inch: '3.5 - 4 inches', items: 'Explore', isPopular: false },
+    { label: '5 No.', inch: '4 - 5 inches', items: 'Explore', isPopular: false },
+    { label: '6 No.', inch: '5 - 6 inches', items: 'Explore', isPopular: false },
+    { label: '7+ No.', inch: '6+ inches', items: 'Explore', isPopular: false },
 ];
 
 export default function SizeSelector() {

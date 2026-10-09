@@ -77,6 +77,7 @@ const SearchPage = async (props: {
     rating?: string;
     sort?: string;
     page?: string;
+    size?: string;
   }>;
 }) => {
   const {
@@ -86,6 +87,7 @@ const SearchPage = async (props: {
     rating = 'all',
     sort = 'newest',
     page = '1',
+    size = 'all',
   } = await props.searchParams;
 
   // Construct filter url
@@ -101,14 +103,16 @@ const SearchPage = async (props: {
     s?: string;
     r?: string;
     pg?: string;
+    sz?: string;
   }) => {
-    const params = { q, category, price, rating, sort, page };
+    const params = { q, category, price, rating, sort, page, size };
 
     if (c) params.category = c;
     if (p) params.price = p;
     if (s) params.sort = s;
     if (r) params.rating = r;
     if (pg) params.page = pg;
+    if (sz) params.size = sz;
 
     return `/search?${new URLSearchParams(params).toString()}`;
   };
@@ -120,6 +124,7 @@ const SearchPage = async (props: {
     rating,
     sort,
     page: Number(page),
+    size,
   });
 
   const categories = await getAllCategories();

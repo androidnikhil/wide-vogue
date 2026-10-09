@@ -128,25 +128,36 @@ const SearchPage = async (props: {
     <div className='container mx-auto px-4 lg:px-8 grid md:grid-cols-5 md:gap-8 my-10'>
       <div className='md:col-span-1 bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/30 h-fit sticky top-24'>
         {/* Category Links */}
-        <div className='font-title-lg text-primary mb-3 border-b border-outline-variant/30 pb-2'>Department</div>
+        <div className='font-title-lg text-primary mb-4 border-b border-outline-variant/30 pb-2 flex items-center gap-2'>
+          <span className="material-symbols-outlined text-secondary text-xl">category</span>
+          Department
+        </div>
         <div>
-          <ul className='space-y-2'>
+          <ul className='space-y-1'>
             <li>
               <Link
-                className={`block text-on-surface-variant hover:text-primary transition-colors ${
-                  (category === 'all' || category === '') && 'font-semibold text-primary'
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
+                  (category === 'all' || category === '') 
+                    ? 'bg-secondary/10 text-secondary font-bold border border-secondary/20 shadow-sm' 
+                    : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'
                 }`}
                 href={getFilterUrl({ c: 'all' })}
               >
+                {(category === 'all' || category === '') && <span className="material-symbols-outlined text-[16px]">check_circle</span>}
                 Any
               </Link>
             </li>
             {categories.map((x) => (
               <li key={x.category}>
                 <Link
-                  className={`block text-on-surface-variant hover:text-primary transition-colors ${category === x.category && 'font-semibold text-primary'}`}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
+                    category === x.category 
+                      ? 'bg-secondary/10 text-secondary font-bold border border-secondary/20 shadow-sm' 
+                      : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'
+                  }`}
                   href={getFilterUrl({ c: x.category })}
                 >
+                  {category === x.category && <span className="material-symbols-outlined text-[16px]">check_circle</span>}
                   {x.category}
                 </Link>
               </li>
@@ -154,23 +165,36 @@ const SearchPage = async (props: {
           </ul>
         </div>
         {/* Price Links */}
-        <div className='font-title-lg text-primary mb-3 mt-8 border-b border-outline-variant/30 pb-2'>Price</div>
+        <div className='font-title-lg text-primary mb-4 mt-8 border-b border-outline-variant/30 pb-2 flex items-center gap-2'>
+          <span className="material-symbols-outlined text-secondary text-xl">payments</span>
+          Price
+        </div>
         <div>
-          <ul className='space-y-2'>
+          <ul className='space-y-1'>
             <li>
               <Link
-                className={`block text-on-surface-variant hover:text-primary transition-colors ${price === 'all' && 'font-semibold text-primary'}`}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
+                  price === 'all' 
+                    ? 'bg-secondary/10 text-secondary font-bold border border-secondary/20 shadow-sm' 
+                    : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'
+                }`}
                 href={getFilterUrl({ p: 'all' })}
               >
+                {price === 'all' && <span className="material-symbols-outlined text-[16px]">check_circle</span>}
                 Any
               </Link>
             </li>
             {prices.map((p) => (
               <li key={p.value}>
                 <Link
-                  className={`block text-on-surface-variant hover:text-primary transition-colors ${price === p.value && 'font-semibold text-primary'}`}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
+                    price === p.value 
+                      ? 'bg-secondary/10 text-secondary font-bold border border-secondary/20 shadow-sm' 
+                      : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'
+                  }`}
                   href={getFilterUrl({ p: p.value })}
                 >
+                  {price === p.value && <span className="material-symbols-outlined text-[16px]">check_circle</span>}
                   {p.name}
                 </Link>
               </li>
@@ -178,23 +202,36 @@ const SearchPage = async (props: {
           </ul>
         </div>
         {/* Rating Links */}
-        <div className='font-title-lg text-primary mb-3 mt-8 border-b border-outline-variant/30 pb-2'>Customer Ratings</div>
+        <div className='font-title-lg text-primary mb-4 mt-8 border-b border-outline-variant/30 pb-2 flex items-center gap-2'>
+          <span className="material-symbols-outlined text-secondary text-xl">hotel_class</span>
+          Customer Ratings
+        </div>
         <div>
-          <ul className='space-y-2'>
+          <ul className='space-y-1'>
             <li>
               <Link
-                className={`block text-on-surface-variant hover:text-primary transition-colors ${rating === 'all' && 'font-semibold text-primary'}`}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
+                  rating === 'all' 
+                    ? 'bg-secondary/10 text-secondary font-bold border border-secondary/20 shadow-sm' 
+                    : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'
+                }`}
                 href={getFilterUrl({ r: 'all' })}
               >
+                {rating === 'all' && <span className="material-symbols-outlined text-[16px]">check_circle</span>}
                 Any
               </Link>
             </li>
             {ratings.map((r) => (
               <li key={r}>
                 <Link
-                  className={`block text-on-surface-variant hover:text-primary transition-colors ${rating === r.toString() && 'font-semibold text-primary'}`}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
+                    rating === r.toString() 
+                      ? 'bg-secondary/10 text-secondary font-bold border border-secondary/20 shadow-sm' 
+                      : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'
+                  }`}
                   href={getFilterUrl({ r: `${r}` })}
                 >
+                  {rating === r.toString() && <span className="material-symbols-outlined text-[16px] text-amber-500">star</span>}
                   {`${r} stars & up`}
                 </Link>
               </li>

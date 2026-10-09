@@ -15,7 +15,7 @@ export async function getLatestProducts() {
     orderBy: { createdAt: 'desc' },
   });
 
-  return convertToPlainObject(data);
+  return convertToPlainObject(data) as any;
 }
 // Get  single product by it's slug
 
@@ -25,7 +25,7 @@ export async function getProductBySlug(slug: string) {
             slug
         }
     });
-    return convertToPlainObject(data);
+    return convertToPlainObject(data) as any;
 }
 
 // Get single product by it's ID
@@ -34,7 +34,7 @@ export async function getProductById(productId: string) {
       where: { id: productId },
     });
   
-    return convertToPlainObject(data);
+    return convertToPlainObject(data) as any;
   }
   
   // Get all products
@@ -118,10 +118,18 @@ export async function getProductById(productId: string) {
       take: limit,
     });
   
-    const dataCount = await prisma.product.count();
+    const dataCount = await prisma.product.count({
+      where: {
+        ...queryFilter,
+        ...categoryFilter,
+        ...priceFilter,
+        ...ratingFilter,
+        ...sizeFilter,
+      }
+    });
   
     return {
-      data,
+      data: data as any,
       totalPages: Math.ceil(dataCount / limit),
     };
   }

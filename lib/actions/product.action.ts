@@ -16,7 +16,7 @@ export async function getLatestProducts() {
     orderBy: { createdAt: 'desc' },
   });
 
-  return convertToPlainObject(data) as Product[];
+  return convertToPlainObject(data) as unknown as Product[];
 }
 // Get  single product by it's slug
 
@@ -26,7 +26,7 @@ export async function getProductBySlug(slug: string) {
             slug
         }
     });
-    return convertToPlainObject(data) as Product;
+    return convertToPlainObject(data) as unknown as Product;
 }
 
 // Get single product by it's ID
@@ -35,7 +35,7 @@ export async function getProductById(productId: string) {
       where: { id: productId },
     });
   
-    return convertToPlainObject(data) as Product;
+    return convertToPlainObject(data) as unknown as Product;
   }
   
   // Get all products

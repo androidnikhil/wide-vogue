@@ -1,54 +1,67 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const sizes = [
-    { label: '0 No.', inch: '1.5 - 2 inches', items: 'Explore', isPopular: false },
-    { label: '1 No.', inch: '2 - 2.5 inches', items: 'Explore', isPopular: false },
-    { label: '2 No.', inch: '2.5 - 3 inches', items: 'Popular', isPopular: true },
-    { label: '3 No.', inch: '3 - 3.5 inches', items: 'Explore', isPopular: false },
-    { label: '4 No.', inch: '3.5 - 4 inches', items: 'Explore', isPopular: false },
-    { label: '5 No.', inch: '4 - 5 inches', items: 'Explore', isPopular: false },
-    { label: '6 No.', inch: '5 - 6 inches', items: 'Explore', isPopular: false },
-    { label: '7+ No.', inch: '6+ inches', items: 'Explore', isPopular: false },
+    { value: '0', label: '0 No.', inch: '1.5 - 2 inches', items: 'Explore' },
+    { value: '1', label: '1 No.', inch: '2 - 2.5 inches', items: 'Explore' },
+    { value: '2', label: '2 No.', inch: '2.5 - 3 inches', items: 'Popular' },
+    { value: '3', label: '3 No.', inch: '3 - 3.5 inches', items: 'Explore' },
+    { value: '4', label: '4 No.', inch: '3.5 - 4 inches', items: 'Explore' },
+    { value: '5', label: '5 No.', inch: '4 - 5 inches', items: 'Explore' },
+    { value: '6', label: '6 No.', inch: '5 - 6 inches', items: 'Explore' },
+    { value: '7', label: '7+ No.', inch: '6+ inches', items: 'Explore' },
 ];
 
-export default function SizeSelector() {
-    return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3 mt-8">
-            {sizes.map((size) => {
-                const isActive = size.isPopular;
-                
-                // Base styles
-                let containerClass = "relative px-1 py-3 rounded-2xl transition-all duration-300 flex flex-col items-center justify-between text-center cursor-pointer group border-2 h-full ";
-                let titleClass = "font-serif text-lg lg:text-xl font-bold block mb-1 transition-colors whitespace-nowrap ";
-                let subtitleClass = "text-[10px] leading-tight font-medium block opacity-80 mb-2 ";
-                let badgeClass = "inline-block px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-colors shadow-sm whitespace-nowrap mt-auto ";
+export default function SizeSelector({ selectedSize }: { selectedSize?: string }) {
+    const router = useRouter();
 
-                if (isActive) {
-                    // Active Styles
-                    containerClass += "bg-[#0F6F74] border-[#0F6F74] shadow-xl transform -translate-y-2";
-                    titleClass += "text-white";
-                    subtitleClass += "text-white/80";
-                    badgeClass += "bg-[#E6C16A] text-[#003020]";
-                } else {
-                    // Inactive Styles
-                    containerClass += "bg-white border-[#E6C16A]/30 hover:border-[#E6C16A] hover:bg-[#FBF7EE] shadow-sm hover:shadow-md hover:-translate-y-1";
-                    titleClass += "text-[#003020] group-hover:text-[#0F6F74]";
-                    subtitleClass += "text-[#003020]";
-                    badgeClass += "bg-[#0F6F74]/10 text-[#0F6F74]";
-                }
+    return (
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 items-stretch gap-2 sm:gap-3 mt-8">
+            {sizes.map((size) => {
+                const isActive = selectedSize === size.value;
 
                 return (
-                    <Link 
-                        href={`/search?size=${size.label.split(' ')[0]}`}
-                        key={size.label} 
-                        className={containerClass}
+                    <button
+                        type="button"
+                        key={size.label}
+                        aria-pressed={isActive}
+                        onClick={() => {
+                            const nextSize = isActive ? undefined : size.value;
+                            router.push(nextSize ? `/?size=${nextSize}` : '/', {
+                                scroll: false,
+                            });
+                        }}
+                        className={`flex min-h-[136px] w-full min-w-0 flex-col items-center justify-between rounded-2xl border-2 px-1.5 py-3 text-center transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F6F74] focus-visible:ring-offset-2 ${
+                            isActive
+                                ? 'border-[#0F6F74] bg-[#0F6F74] shadow-md'
+                                : 'border-[#E6C16A]/30 bg-white shadow-sm hover:border-[#E6C16A]'
+                        }`}
                     >
-                        <span className={titleClass}>{size.label}</span>
-                        <span className={subtitleClass}>{size.inch}</span>
-                        <span className={badgeClass}>{size.items}</span>
-                    </Link>
+                        <span
+                            className={`block whitespace-nowrap font-serif text-base font-bold leading-6 tabular-nums sm:text-lg ${
+                                isActive ? 'text-white' : 'text-[#003020]'
+                            }`}
+                        >
+                            {size.label}
+                        </span>
+                        <span
+                            className={`flex min-h-8 items-center text-[10px] font-medium leading-4 ${
+                                isActive ? 'text-white/80' : 'text-[#003020]'
+                            }`}
+                        >
+                            {size.inch}
+                        </span>
+                        <span
+                            className={`inline-flex min-h-5 items-center justify-center whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider shadow-sm ${
+                                isActive
+                                    ? 'bg-[#E6C16A] text-[#003020]'
+                                    : 'bg-[#0F6F74]/10 text-[#0F6F74]'
+                            }`}
+                        >
+                            {size.items}
+                        </span>
+                    </button>
                 );
             })}
         </div>

@@ -1,6 +1,7 @@
 import Footer from "@/components/footer";
 import Header from "@/components/shared/header";
 import Link from "next/link";
+import Image from "next/image";
 import { getMyCart } from "@/lib/actions/cart.action";
 import { formatCurrency } from "@/lib/utils";
 import CartDrawerWrapper from "@/components/shared/cart/cart-drawer-wrapper";
@@ -26,12 +27,12 @@ export default async function RootLayout({
                  <span className="material-symbols-outlined group-hover:scale-110 transition-transform text-2xl">checkroom</span>
                  <span className="text-[10px] font-bold uppercase tracking-wider">Poshak</span>
               </Link>
-              <Link href="/search?category=Mukut" className="hover:text-secondary transition-colors flex flex-col items-center gap-1 group w-full py-2">
-                 <span className="material-symbols-outlined group-hover:scale-110 transition-transform text-2xl">diamond</span>
+              <Link href="/search?category=Mukut%20%26%20Pagdi" className="hover:text-secondary transition-colors flex flex-col items-center gap-1 group w-full py-2">
+                 <Image src="/images/icons/Mukut.png" alt="" aria-hidden="true" width={24} height={24} className="h-6 w-6 object-contain transition-transform group-hover:scale-110" />
                  <span className="text-[10px] font-bold uppercase tracking-wider">Mukut</span>
               </Link>
               <Link href="/search?category=Bansuri" className="hover:text-secondary transition-colors flex flex-col items-center gap-1 group w-full py-2">
-                 <span className="material-symbols-outlined group-hover:scale-110 transition-transform text-2xl">music_note</span>
+                 <Image src="/images/icons/Basuri.png" alt="" aria-hidden="true" width={24} height={24} className="h-6 w-6 object-contain transition-transform group-hover:scale-110" />
                  <span className="text-[10px] font-bold uppercase tracking-wider">Bansuri</span>
               </Link>
               <Link href="/cart" className="hover:text-secondary transition-colors flex flex-col items-center gap-1 group relative w-full py-2">

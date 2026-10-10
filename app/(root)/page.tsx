@@ -299,20 +299,29 @@ export default async function Homepage({
       </section>
 
       {/* 7. SHOP BY SIZE — ELEGANT INTERACTIVE */}
-      <section className="py-24 bg-[#E8F3EE] relative overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6 relative z-10 flex flex-col md:flex-row items-center gap-12 bg-white rounded-[3rem] p-10 shadow-lg border border-[#0F6F74]/10">
-          
-          <div className="w-full md:w-1/3 flex justify-center">
-            <div className="w-48 h-48 bg-[#FBF7EE] rounded-full p-2 border-4 border-[#E6C16A]/50 shadow-inner flex items-center justify-center overflow-hidden">
-               <img src="/images/devotional/aasan.jpg" className="w-full h-full object-cover rounded-full" alt="Size reference" />
+      <section className="relative overflow-hidden bg-[#E8F3EE] py-12 sm:py-16">
+        <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center gap-6 rounded-[2rem] border border-[#E6C16A]/30 bg-[#FDFBF7] p-4 shadow-[0_18px_45px_-30px_rgba(0,48,32,0.4)] sm:p-6 lg:flex-row lg:gap-8 lg:p-7">
+
+          <div className="w-full lg:w-[27%] lg:shrink-0">
+            <div className="group relative mx-auto aspect-[16/9] w-full max-w-sm overflow-hidden rounded-[1.5rem] border-2 border-white bg-[#FBF7EE] shadow-md ring-1 ring-[#E6C16A]/50 lg:aspect-[4/5] lg:max-w-none">
+               <img src="/images/devotional/aasan.jpg" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Laddu Gopal seated on an aasan" />
+               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#003020]/85 via-[#003020]/30 to-transparent px-4 pb-4 pt-10">
+                 <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#F3D98F]">A thoughtful guide</span>
+                 <p className="mt-1 font-serif text-base font-semibold text-white">Find his perfect fit</p>
+               </div>
             </div>
           </div>
           
-          <div className="w-full md:w-2/3 text-center md:text-left">
-            <span className="material-symbols-outlined text-4xl text-[#0F6F74] mb-2">straighten</span>
-            <h2 className="text-4xl md:text-5xl font-serif text-[#003020] font-bold mb-4">Find the Perfect Fit</h2>
-            <p className="text-[#003020]/70 mb-8 text-lg">Select your Laddu Gopal Ji's size number to view tailor-made Shringaar.</p>
-            <div className="p-4 bg-[#FBF7EE] rounded-2xl">
+          <div className="w-full min-w-0 lg:flex-1">
+            <div className="mb-4 text-center lg:text-left">
+              <span className="mb-1 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C88A20]">
+                <span className="material-symbols-outlined text-lg text-[#0F6F74]">straighten</span>
+                The perfect fit
+              </span>
+              <h2 className="font-serif text-2xl font-bold text-[#003020] sm:text-3xl">Find the Perfect Fit</h2>
+              <p className="mx-auto mt-1 max-w-2xl text-xs leading-relaxed text-[#003020]/70 sm:text-sm lg:mx-0">Select your Laddu Gopal Ji&apos;s size number to view tailor-made Shringaar.</p>
+            </div>
+            <div className="rounded-[1.5rem] border border-[#E6C16A]/30 bg-[#FBF7EE] p-2.5 sm:p-3">
                <SizeSelector selectedSize={selectedSize} />
             </div>
           </div>

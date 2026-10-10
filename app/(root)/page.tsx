@@ -3,10 +3,26 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/shared/product/product-card';
 import SizeSelector from '@/components/shared/product/size-selector';
-import { getLatestProducts } from '@/lib/actions/product.action';
+import { getAllProducts, getLatestProducts } from '@/lib/actions/product.action';
 
-export default async function Homepage() {
-  let latestProducts = await getLatestProducts();
+const productSizes = new Set(['0', '1', '2', '3', '4', '5', '6', '7']);
+
+export default async function Homepage({
+  searchParams,
+}: {
+  searchParams: Promise<{ size?: string }>;
+}) {
+  const { size } = await searchParams;
+  const selectedSize = size && productSizes.has(size) ? size : undefined;
+  let latestProducts = selectedSize
+    ? (
+        await getAllProducts({
+          query: 'all',
+          page: 1,
+          size: selectedSize,
+        })
+      ).data
+    : await getLatestProducts();
   
   // Intercept dummy image data
   latestProducts = latestProducts.map((p: any) => {
@@ -109,44 +125,39 @@ export default async function Homepage() {
           <h2 className="text-5xl md:text-6xl font-bold text-[#003020] font-serif mt-2">Discover <span className="italic text-[#0F6F74] font-light">Shringar</span></h2>
         </div>
         
-        <div className="relative h-[800px] md:h-[600px] w-full flex flex-col md:flex-row items-center justify-center gap-6">
-           
-           {/* Center Piece - Poshak */}
-           <Link href="/search?category=Poshak" className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[85%] md:w-[45%] h-[400px] md:h-[500px] bg-white rounded-[3rem] shadow-xl z-20 group border-8 border-white p-2 hover:scale-105 transition-all duration-500">
-             <div className="w-full h-full relative overflow-hidden rounded-[2.5rem]">
-               <img src="/images/devotional/poshak.jpg" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2s]" alt="Poshak" />
-               <div className="absolute inset-0 bg-gradient-to-t from-[#003020]/90 via-transparent to-transparent"></div>
-               <div className="absolute bottom-8 left-8 text-white">
-                 <h3 className="text-4xl font-serif font-bold">Poshak</h3>
-                 <span className="bg-[#E6C16A] text-[#003020] text-xs font-bold px-3 py-1 rounded-full mt-2 inline-block">Bestsellers</span>
+        <div className="grid grid-cols-2 gap-4 md:h-[560px] md:grid-cols-12 md:grid-rows-3 md:gap-5">
+           <Link href="/search?category=Poshak" className="group relative col-span-2 h-[360px] overflow-hidden rounded-[2rem] border-4 border-white bg-white shadow-xl md:col-span-8 md:row-span-3 md:h-full md:rounded-[2.5rem]">
+             <img src="/images/devotional/poshak.jpg" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Poshak" />
+             <div className="absolute inset-0 bg-gradient-to-t from-[#003020]/80 via-transparent to-transparent"></div>
+             <div className="absolute bottom-6 left-6 text-white sm:bottom-8 sm:left-8">
+               <h3 className="text-3xl font-serif font-bold sm:text-4xl">Poshak</h3>
+               <span className="mt-2 inline-block rounded-full bg-[#E6C16A] px-3 py-1 text-xs font-bold text-[#003020]">Bestsellers</span>
+             </div>
+           </Link>
+
+           <div className="col-span-2 grid grid-cols-3 gap-3 md:col-span-4 md:row-span-3 md:grid-cols-1 md:grid-rows-3 md:gap-5">
+             <Link href="/search?category=Mukut" className="group relative aspect-square overflow-hidden rounded-[1.5rem] border-4 border-white bg-[#E8F3EE] shadow-lg transition-transform duration-300 hover:-translate-y-1 md:aspect-auto md:min-h-0 md:rounded-[1.75rem]">
+               <img src="/images/devotional/mukut.jpg" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Mukut" />
+               <div className="absolute inset-0 bg-gradient-to-br from-[#0F6F74]/70 to-transparent"></div>
+               <div className="absolute left-5 top-5 text-white sm:left-6 sm:top-6">
+                 <h3 className="text-xl font-serif font-bold sm:text-2xl">Mukut</h3>
                </div>
-             </div>
-           </Link>
+             </Link>
 
-           {/* Top Left - Mukut */}
-           <Link href="/search?category=Mukut" className="absolute top-0 left-0 md:left-10 w-[60%] md:w-[30%] h-[250px] bg-[#E8F3EE] rounded-[2rem] md:rounded-[4rem_1rem_4rem_1rem] shadow-lg z-10 group overflow-hidden border-4 border-white hover:z-30 hover:-translate-y-2 transition-all duration-300">
-             <img src="/images/devotional/mukut.jpg" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" alt="Mukut" />
-             <div className="absolute inset-0 bg-gradient-to-br from-[#0F6F74]/80 to-transparent"></div>
-             <div className="absolute top-6 left-6 text-white">
-               <h3 className="text-2xl font-serif font-bold">Mukut</h3>
-             </div>
-           </Link>
+             <Link href="/search?category=Bansuri" className="group relative aspect-square overflow-hidden rounded-[1.5rem] border-4 border-white bg-[#FDE8DF] shadow-lg transition-transform duration-300 hover:-translate-y-1 md:aspect-auto md:min-h-0 md:rounded-[1.75rem]">
+               <img src="/images/devotional/bansuri.jpg" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Bansuri" />
+               <div className="absolute inset-0 bg-gradient-to-t from-[#003020]/75 to-transparent"></div>
+               <div className="absolute bottom-4 right-4 text-right text-white sm:bottom-6 sm:right-6">
+                 <h3 className="text-xl font-serif font-bold sm:text-2xl">Bansuri</h3>
+               </div>
+             </Link>
 
-           {/* Bottom Right - Bansuri */}
-           <Link href="/search?category=Bansuri" className="absolute bottom-0 right-0 md:right-10 w-[65%] md:w-[35%] h-[280px] bg-[#FDE8DF] rounded-[1rem_4rem_1rem_4rem] shadow-lg z-30 group overflow-hidden border-4 border-white hover:-translate-y-2 transition-all duration-300">
-             <img src="/images/devotional/bansuri.jpg" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" alt="Bansuri" />
-             <div className="absolute inset-0 bg-gradient-to-t from-[#003020]/80 to-transparent"></div>
-             <div className="absolute bottom-6 right-8 text-white text-right">
-               <h3 className="text-3xl font-serif font-bold">Bansuri</h3>
-             </div>
-           </Link>
-           
-           {/* Bottom Left - Jewellery */}
-           <Link href="/search?category=Jewellery" className="absolute bottom-[20%] md:bottom-10 left-[5%] md:left-0 w-[45%] md:w-[25%] h-[200px] bg-[#FBF7EE] rounded-full shadow-md z-30 group border-4 border-white hover:scale-110 transition-all duration-300 overflow-hidden flex items-center justify-center">
-             <img src="/images/devotional/jewellery.jpg" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" alt="Jewellery" />
-             <div className="absolute inset-0 bg-[#C88A20]/20 group-hover:bg-transparent transition-colors"></div>
-             <h3 className="absolute text-xl font-serif font-bold text-white bg-[#003020]/60 px-4 py-2 rounded-full backdrop-blur-sm">Jewels</h3>
-           </Link>
+             <Link href="/search?category=Jewellery" className="group relative flex aspect-square items-center justify-center overflow-hidden rounded-[1.5rem] border-4 border-white bg-[#FBF7EE] shadow-lg transition-transform duration-300 hover:-translate-y-1 md:aspect-auto md:min-h-0 md:rounded-[1.75rem]">
+               <img src="/images/devotional/jewellery.jpg" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Jewellery" />
+               <div className="absolute inset-0 bg-[#C88A20]/20 transition-colors group-hover:bg-transparent"></div>
+               <h3 className="absolute rounded-full bg-[#003020]/60 px-3 py-2 text-center font-serif text-base font-bold text-white backdrop-blur-sm sm:px-4 sm:text-xl">Jewels</h3>
+             </Link>
+           </div>
         </div>
       </section>
 
@@ -182,13 +193,6 @@ export default async function Homepage() {
 
       {/* 4. KANHA'S LITTLE WORLD — IMMERSIVE ILLUSTRATED COMPOSITION */}
       <section className="py-32 relative overflow-hidden bg-[#FBF7EE]">
-        {/* Playful Wavy Top Border */}
-        <div className="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180">
-            <svg className="relative block w-[calc(100%+1.3px)] h-[80px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#003020"></path>
-            </svg>
-        </div>
-        
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center pt-10">
           
           <div className="order-2 lg:order-1 relative h-[500px] lg:h-[700px] w-full flex items-center justify-center">
@@ -295,21 +299,30 @@ export default async function Homepage() {
       </section>
 
       {/* 7. SHOP BY SIZE — ELEGANT INTERACTIVE */}
-      <section className="py-24 bg-[#E8F3EE] relative overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6 relative z-10 flex flex-col md:flex-row items-center gap-12 bg-white rounded-[3rem] p-10 shadow-lg border border-[#0F6F74]/10">
-          
-          <div className="w-full md:w-1/3 flex justify-center">
-            <div className="w-48 h-48 bg-[#FBF7EE] rounded-full p-2 border-4 border-[#E6C16A]/50 shadow-inner flex items-center justify-center overflow-hidden">
-               <img src="/images/devotional/aasan.jpg" className="w-full h-full object-cover rounded-full" alt="Size reference" />
+      <section className="relative overflow-hidden bg-[#E8F3EE] py-12 sm:py-16">
+        <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center gap-6 rounded-[2rem] border border-[#E6C16A]/30 bg-[#FDFBF7] p-4 shadow-[0_18px_45px_-30px_rgba(0,48,32,0.4)] sm:p-6 lg:flex-row lg:gap-8 lg:p-7">
+
+          <div className="w-full lg:w-[27%] lg:shrink-0">
+            <div className="group relative mx-auto aspect-[16/9] w-full max-w-sm overflow-hidden rounded-[1.5rem] border-2 border-white bg-[#FBF7EE] shadow-md ring-1 ring-[#E6C16A]/50 lg:aspect-[4/5] lg:max-w-none">
+               <img src="/images/devotional/aasan.jpg" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Laddu Gopal seated on an aasan" />
+               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#003020]/85 via-[#003020]/30 to-transparent px-4 pb-4 pt-10">
+                 <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#F3D98F]">A thoughtful guide</span>
+                 <p className="mt-1 font-serif text-base font-semibold text-white">Find his perfect fit</p>
+               </div>
             </div>
           </div>
           
-          <div className="w-full md:w-2/3 text-center md:text-left">
-            <span className="material-symbols-outlined text-4xl text-[#0F6F74] mb-2">straighten</span>
-            <h2 className="text-4xl md:text-5xl font-serif text-[#003020] font-bold mb-4">Find the Perfect Fit</h2>
-            <p className="text-[#003020]/70 mb-8 text-lg">Select your Laddu Gopal Ji's size number to view tailor-made Shringaar.</p>
-            <div className="p-4 bg-[#FBF7EE] rounded-2xl">
-               <SizeSelector />
+          <div className="w-full min-w-0 lg:flex-1">
+            <div className="mb-4 text-center lg:text-left">
+              <span className="mb-1 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C88A20]">
+                <span className="material-symbols-outlined text-lg text-[#0F6F74]">straighten</span>
+                The perfect fit
+              </span>
+              <h2 className="font-serif text-2xl font-bold text-[#003020] sm:text-3xl">Find the Perfect Fit</h2>
+              <p className="mx-auto mt-1 max-w-2xl text-xs leading-relaxed text-[#003020]/70 sm:text-sm lg:mx-0">Select your Laddu Gopal Ji&apos;s size number to view tailor-made Shringaar.</p>
+            </div>
+            <div className="rounded-[1.5rem] border border-[#E6C16A]/30 bg-[#FBF7EE] p-2.5 sm:p-3">
+               <SizeSelector selectedSize={selectedSize} />
             </div>
           </div>
           
@@ -378,26 +391,22 @@ export default async function Homepage() {
         </div>
       </section>
 
-      {/* 10. MOMENTS OF SEVA — ASYMMETRIC GALLERY */}
+      {/* 10. MOMENTS OF SEVA */}
       <section className="py-24 max-w-7xl mx-auto px-6 md:px-12 bg-white rounded-[4rem] my-12 shadow-sm border border-[#003020]/5">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-6xl font-serif text-[#003020] font-bold mb-4">Moments of Seva</h2>
           <p className="text-[#003020]/60 text-lg">Glimpses of devotion from our artisans and devotees.</p>
         </div>
         
-        {/* Asymmetric Gallery Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 auto-rows-[250px]">
-           {/* Big Image */}
-           <div className="md:col-span-8 row-span-2 relative overflow-hidden bg-[#FBF7EE] rounded-[3rem] group">
-             <img src="/images/devotional/kanhas_world.jpg" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Gallery" />
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
+           <div className="group relative aspect-[4/3] overflow-hidden rounded-[1.75rem] border border-[#E6C16A]/20 bg-[#FBF7EE] shadow-md">
+             <img src="/images/devotional/kanhas_world.jpg" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Kanha's world of seva" />
            </div>
-           {/* Top Right Small */}
-           <div className="md:col-span-4 row-span-1 relative overflow-hidden bg-[#E8F3EE] rounded-full group flex items-center justify-center p-4">
-             <img src="/images/devotional/bansuri.jpg" className="w-[120%] h-[120%] object-cover rounded-full group-hover:rotate-6 transition-transform duration-1000 opacity-80" alt="Gallery" />
+           <div className="group relative aspect-[4/3] overflow-hidden rounded-[1.75rem] border border-[#E6C16A]/20 bg-[#E8F3EE] shadow-md">
+             <img src="/images/devotional/bansuri.jpg" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Decorative bansuri" />
            </div>
-           {/* Bottom Right Small */}
-           <div className="md:col-span-4 row-span-1 relative overflow-hidden bg-[#FDE8DF] rounded-[2rem] group">
-             <img src="/images/devotional/mala.jpg" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 mix-blend-multiply opacity-90" alt="Gallery" />
+           <div className="group relative aspect-[4/3] overflow-hidden rounded-[1.75rem] border border-[#E6C16A]/20 bg-[#FDE8DF] shadow-md">
+             <img src="/images/devotional/mala.jpg" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Decorative mala" />
            </div>
         </div>
       </section>

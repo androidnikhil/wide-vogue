@@ -17,6 +17,10 @@ const ShippingAddressPage = async () => {
     const session = await auth();
     const userId = session?.user?.id;
 
+    if (!userId) {
+      return redirect('/sign-in?callbackUrl=/shipping-address');
+    }
+
     let userAddress = cart.shippingAddress as ShippingAddress | null;
 
     let savedAddresses: ShippingAddress[] = [];

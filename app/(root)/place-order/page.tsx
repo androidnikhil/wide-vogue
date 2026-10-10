@@ -31,6 +31,10 @@ const PlaceOrderPage = async () => {
   const session = await auth();
   const userId = session?.user?.id;
 
+  if (!userId) {
+    return redirect('/sign-in?callbackUrl=/place-order');
+  }
+
   let userAddress = cart.shippingAddress as ShippingAddress | null;
   let paymentMethod = cart.paymentMethod;
 

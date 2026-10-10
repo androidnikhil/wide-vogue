@@ -5,7 +5,7 @@
     children: React.ReactNode;
   }>) {
     return (
-      <div className="flex-center min-h-screen w-full">
+      <div className="w-full min-h-screen flex items-center justify-center bg-background">
         {children}
       </div>
     );

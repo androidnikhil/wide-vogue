@@ -19,6 +19,59 @@ export const config = {
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
+      id: 'firebase',
+      name: 'Firebase',
+      credentials: {
+        idToken: { type: 'text' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.idToken) return null;
+        
+        try {
+          // Verify token using Firebase REST API
+          const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken: credentials.idToken })
+          });
+          
+          const data = await res.json();
+          if (!data.users || data.users.length === 0) return null;
+          
+          const firebaseUser = data.users[0];
+          
+          // Determine email (fallback to phone-based email if no email provided)
+          const email = firebaseUser.email || `${firebaseUser.phoneNumber}@madhavshringaar.com`;
+          const name = firebaseUser.displayName || 'NO_NAME';
+          
+          // Find or create user in Prisma
+          let user = await prisma.user.findFirst({
+            where: { email }
+          });
+          
+          if (!user) {
+            user = await prisma.user.create({
+              data: {
+                email,
+                name,
+                password: '', // Firebase users don't need a DB password
+              }
+            });
+          }
+          
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error("Firebase auth error:", error);
+          return null;
+        }
+      }
+    }),
+    CredentialsProvider({
       credentials: {
         email: { type: 'email' },
         password: { type: 'password' },

@@ -47,9 +47,11 @@ const UserButton = async () => {
               <div className='text-sm font-semibold text-on-surface'>
                 {session.user?.name}
               </div>
-              <div className='text-xs text-on-surface-variant leading-none'>
-                {session.user?.email}
-              </div>
+              {!session.user?.email?.endsWith('@madhavshringaar.com') && (
+                <div className='text-xs text-on-surface-variant leading-none'>
+                  {session.user?.email}
+                </div>
+              )}
             </div>
           </DropdownMenuLabel>
           

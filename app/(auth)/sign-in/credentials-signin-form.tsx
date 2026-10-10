@@ -38,8 +38,17 @@ const CredentialsSignInForm = () => {
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
-  // Google Auth State
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+
+  useEffect(() => {
+    // Standard robust initialization
+    if (typeof window !== 'undefined' && !recaptchaVerifierRef.current) {
+      recaptchaVerifierRef.current = new RecaptchaVerifier(firebaseAuth, 'recaptcha-container', {
+        size: 'invisible',
+      });
+    }
+  }, []);
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,18 +56,14 @@ const CredentialsSignInForm = () => {
     
     setIsSendingOtp(true);
     try {
-      const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`; // default to India code if not provided
+      const cleanPhone = phoneNumber.replace(/\\D/g, '');
+      const formattedPhone = `+91${cleanPhone.slice(-10)}`; // guarantee strictly 10 digits
       
-      // DYNAMIC RECAPTCHA: Bypass all React strict-mode bugs by injecting a fresh container into the DOM directly
-      const containerId = `recaptcha-${Date.now()}`;
-      const div = document.createElement('div');
-      div.id = containerId;
-      document.body.appendChild(div);
-
-      const appVerifier = new RecaptchaVerifier(firebaseAuth, containerId, {
-        size: 'invisible',
-      });
-      await appVerifier.render(); // Wait for the invisible iframe to fully load securely
+      const appVerifier = recaptchaVerifierRef.current;
+      if (!appVerifier) {
+        toast.error("Security check not ready. Please refresh.");
+        return;
+      }
       
       const confirmation = await signInWithPhoneNumber(firebaseAuth, formattedPhone, appVerifier);
       setConfirmationResult(confirmation);
@@ -169,6 +174,7 @@ const CredentialsSignInForm = () => {
 
   return (
     <div className='space-y-6'>
+      <div id="recaptcha-container"></div>
       <Tabs defaultValue="phone" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="phone">Login using Number</TabsTrigger>

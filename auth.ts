@@ -129,9 +129,13 @@ export const config = {
         token.id = user.id;
         token.role = user.role;
 
-        // If user has no name then use the email
+        // If user has no name then set a generic name based on email format
         if (user.name === 'NO_NAME') {
-          token.name = user.email!.split('@')[0];
+          if (user.email?.endsWith('@madhavshringaar.com')) {
+            token.name = 'Phone User';
+          } else {
+            token.name = user.email!.split('@')[0];
+          }
 
           // Update database to reflect the token name
           await prisma.user.update({

@@ -6,6 +6,7 @@ import { prisma } from '@/db/prisma';
 import { cookies } from 'next/headers';
 import { compare } from './lib/encrypt';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { sendWelcomeEmail } from '@/email';
 
 export const config = {
   pages: {
@@ -28,45 +29,104 @@ export const config = {
         if (!credentials?.idToken) return null;
         
         try {
+          const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY || "AIzaSyBIsOiajJyb3JSDT0Axn5s1h5KcLYwYlPg";
+          
           // Verify token using Firebase REST API
-          const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`, {
+          const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idToken: credentials.idToken })
           });
           
           const data = await res.json();
-          if (!data.users || data.users.length === 0) return null;
+          if (!data.users || data.users.length === 0) {
+            console.error("Firebase accounts:lookup error or no users returned:", data);
+            return null;
+          }
           
           const firebaseUser = data.users[0];
           
-          // Determine email (fallback to phone-based email if no email provided)
-          const email = firebaseUser.email || `${firebaseUser.phoneNumber}@madhavshringaar.com`;
-          const name = firebaseUser.displayName || 'NO_NAME';
-          
-          // Find or create user in Prisma
-          let user = await prisma.user.findFirst({
-            where: { email }
-          });
-          
-          if (!user) {
-            user = await prisma.user.create({
-              data: {
-                email,
-                name,
-                password: '', // Firebase users don't need a DB password
-              }
+          let user: any = null;
+
+          if (firebaseUser.phoneNumber) {
+            // PHONE AUTHENTICATION
+            const rawPhone = firebaseUser.phoneNumber.replace(/\D/g, '');
+            const cleanPhone = rawPhone.length > 10 ? rawPhone.slice(-10) : rawPhone;
+
+            // Search by real phoneNumber or previous test emails
+            user = await prisma.user.findFirst({
+              where: {
+                OR: [
+                  { phoneNumber: cleanPhone },
+                  { email: `${cleanPhone}@madhavshringaar.com` },
+                  { email: `+91${cleanPhone}@madhavshringaar.com` },
+                ],
+              },
             });
+
+            if (!user) {
+              // Create user without ANY fake email
+              user = await prisma.user.create({
+                data: {
+                  phoneNumber: cleanPhone,
+                  email: null, // No fake placeholder email
+                  name: 'NO_NAME',
+                  password: '',
+                },
+              });
+            } else if (user.email?.endsWith('@madhavshringaar.com') || !user.phoneNumber) {
+              // Clean up previous placeholder email if present
+              user = await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                  phoneNumber: cleanPhone,
+                  email: user.email?.endsWith('@madhavshringaar.com') ? null : user.email,
+                },
+              });
+            }
+
+            return {
+              id: user.id,
+              name: user.name && user.name !== 'NO_NAME' ? user.name : cleanPhone,
+              email: user.email || '',
+              role: user.role,
+            };
+          } else if (firebaseUser.email) {
+            // GOOGLE / EMAIL AUTHENTICATION
+            const email = firebaseUser.email;
+            const name = firebaseUser.displayName || email.split('@')[0];
+
+            user = await prisma.user.findFirst({
+              where: { email },
+            });
+
+            if (!user) {
+              user = await prisma.user.create({
+                data: {
+                  email,
+                  name,
+                  image: firebaseUser.photoURL || null,
+                  password: '',
+                },
+              });
+
+              // Trigger Welcome Email asynchronously
+              sendWelcomeEmail({ name, email }).catch((err) =>
+                console.error("Welcome email failed:", err)
+              );
+            }
+
+            return {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role,
+            };
           }
-          
-          return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-          };
+
+          return null;
         } catch (error) {
-          console.error("Firebase auth error:", error);
+          console.error("Firebase auth error in authorize():", error);
           return null;
         }
       }
@@ -129,19 +189,25 @@ export const config = {
         token.id = user.id;
         token.role = user.role;
 
-        // If user has no name then set a generic name based on email format
-        if (user.name === 'NO_NAME') {
-          if (user.email?.endsWith('@madhavshringaar.com')) {
-            token.name = 'Phone User';
+        // If user has no name, set clean name
+        if (user.name === 'NO_NAME' || !user.name) {
+          if ((user as any).phoneNumber) {
+            token.name = (user as any).phoneNumber;
+          } else if (user.email && !user.email.endsWith('@madhavshringaar.com')) {
+            token.name = user.email.split('@')[0];
           } else {
-            token.name = user.email!.split('@')[0];
+            token.name = 'User';
           }
 
-          // Update database to reflect the token name
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { name: token.name },
-          });
+          // Update database to reflect the token name safely
+          try {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { name: token.name },
+            });
+          } catch (updateErr) {
+            console.error("Failed to update user name in jwt callback:", updateErr);
+          }
         }
 
         if (trigger === 'signIn' || trigger === 'signUp') {

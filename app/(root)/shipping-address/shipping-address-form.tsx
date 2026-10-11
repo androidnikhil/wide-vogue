@@ -220,31 +220,31 @@ const ShippingAddressForm = ({
                   )}
                 />
 
-                {/* Guest Email */}
-                {isGuest && (
-                  <FormField
-                    control={form.control}
-                    name='guestEmail'
-                    render={({ field }) => (
-                      <FormItem className='w-full'>
-                        <FormLabel className="font-semibold text-primary">Email Address (For Order Updates)</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Mail className="absolute left-3 top-2.5 h-5 w-5 text-secondary/70" />
-                            <Input 
-                              type="email"
-                              className="pl-10 h-11 rounded-xl bg-surface border-outline-variant/50 focus-visible:ring-secondary focus-visible:border-secondary shadow-sm transition-all" 
-                              placeholder='Enter your email address' 
-                              {...field}
-                              value={field.value || ''}
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage className="text-error font-body-sm" />
-                      </FormItem>
-                    )}
-                  />
-                )}
+                {/* Order Notification Email */}
+                <FormField
+                  control={form.control}
+                  name='guestEmail'
+                  render={({ field }) => (
+                    <FormItem className='w-full'>
+                      <FormLabel className="font-semibold text-primary">
+                        Email Address (Required for Order Confirmation & Updates)
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-2.5 h-5 w-5 text-secondary/70" />
+                          <Input 
+                            type="email"
+                            className="pl-10 h-11 rounded-xl bg-surface border-outline-variant/50 focus-visible:ring-secondary focus-visible:border-secondary shadow-sm transition-all" 
+                            placeholder='Enter your email address' 
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage className="text-error font-body-sm" />
+                    </FormItem>
+                  )}
+                />
 
                 {/* Contact Number */}
                 <FormField

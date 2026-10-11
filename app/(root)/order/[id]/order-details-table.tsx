@@ -27,6 +27,7 @@ import {
   updateOrderToPaidCOD,
   updateOrderStatus,
 } from '@/lib/actions/order.actions';
+import { pushOrderToShiprocket } from '@/lib/actions/shiprocket.actions';
 import StripePayment from './stripe-payment';
 import RazorpayPayment from './razorpay-payment';
 import OrderTimeline from '@/components/shared/order/order-timeline';
@@ -167,6 +168,32 @@ const OrderDetailsTable = ({
           />
         )}
       </div>
+    );
+  };
+
+  const ShiprocketShipButton = () => {
+    const [isPending, startTransition] = useTransition();
+
+    return (
+      <Button
+        type='button'
+        size='sm'
+        variant='outline'
+        className='bg-purple-100/70 hover:bg-purple-200/80 text-purple-900 border-purple-300 font-medium'
+        disabled={isPending}
+        onClick={() => {
+          startTransition(async () => {
+            const res = await pushOrderToShiprocket(order.id);
+            if (res.success) {
+              toast.success(res.message);
+            } else {
+              toast.error(res.message);
+            }
+          });
+        }}
+      >
+        {isPending ? 'Connecting...' : order.awbNumber ? 'Re-sync with Shiprocket' : 'Generate Shipment'}
+      </Button>
     );
   };
 
@@ -371,8 +398,37 @@ const OrderDetailsTable = ({
                 <MarkAsPaidButton />
               )}
               {isAdmin && (
-                <div className='flex flex-col gap-3 mt-6 border-t pt-4'>
-                  <h3 className='font-bold text-sm text-secondary uppercase tracking-wider'>Admin Actions: Update Status</h3>
+                <div className='flex flex-col gap-4 mt-6 border-t pt-4'>
+                  <div className='flex items-center justify-between'>
+                    <h3 className='font-bold text-sm text-secondary uppercase tracking-wider'>Shipping & Logistics</h3>
+                  </div>
+
+                  <div className='p-3 rounded-xl bg-purple-50/50 border border-purple-200/60 space-y-2'>
+                    <div className='flex flex-wrap items-center justify-between gap-2'>
+                      <div className='flex items-center gap-2'>
+                        <span className="material-symbols-outlined text-purple-700 text-[20px]">local_shipping</span>
+                        <span className='font-semibold text-sm text-purple-900'>Shiprocket Integration</span>
+                      </div>
+                      <ShiprocketShipButton />
+                    </div>
+
+                    {order.awbNumber && (
+                      <div className='text-xs text-purple-900 pt-1 border-t border-purple-200/50 flex flex-wrap items-center justify-between gap-2'>
+                        <span>AWB / Tracking: <strong>{order.awbNumber}</strong></span>
+                        <a 
+                          href={order.trackingUrl || `https://shiprocket.co/tracking/${order.awbNumber}`} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="text-purple-700 underline font-medium hover:text-purple-900 inline-flex items-center gap-1"
+                        >
+                          Track on Shiprocket
+                          <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  <h3 className='font-bold text-sm text-secondary uppercase tracking-wider mt-2'>Manual Status Update</h3>
                   <div className='flex flex-wrap gap-4 items-start'>
                     <UpdateStatusButton statusLabel='Processing' statusValue='PROCESSING' />
                     <UpdateStatusButton statusLabel='Shipped' statusValue='SHIPPED' requiresAwb={true} />

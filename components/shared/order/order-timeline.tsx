@@ -72,8 +72,14 @@ const OrderTimeline = ({ order }: OrderTimelineProps) => {
                   </p>
                 )}
                 {step.title === 'Shipped' && order.awbNumber && step.isCompleted && (
-                  <Link href={`https://www.google.com/search?q=track+${order.awbNumber}`} target="_blank" className="text-primary text-sm mt-1 hover:underline">
-                    Click here to track your package
+                  <Link 
+                    href={order.trackingUrl || `https://shiprocket.co/tracking/${order.awbNumber}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary text-sm mt-1 font-medium hover:underline inline-flex items-center gap-1"
+                  >
+                    <span>Track package on Shiprocket ({order.awbNumber})</span>
+                    <span className="material-symbols-outlined text-[16px]">open_in_new</span>
                   </Link>
                 )}
               </div>

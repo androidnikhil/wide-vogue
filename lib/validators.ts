@@ -117,7 +117,7 @@ export const shippingAddressSchema = z.object({
     .regex(/^[a-zA-Z\s]+$/, 'Country can only contain alphabets'),
   lat: z.number().optional().nullable(),
   lng: z.number().optional().nullable(),
-  guestEmail: z.string().email('Invalid email address').optional().nullable(),
+  guestEmail: z.string().email('Please enter a valid email address for order confirmation & tracking updates'),
 })
 
 // Schema for payment method
@@ -169,8 +169,8 @@ export const paymentResultSchema = z.object({
 
 // Schema for updating the user profile
 export const updateProfileSchema = z.object({
-  name: z.string().min(3, 'Name must be at leaast 3 characters'),
-  email: z.string().min(3, 'Email must be at leaast 3 characters'),
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address').optional().or(z.literal('')),
 });
 
 // Schema to update users

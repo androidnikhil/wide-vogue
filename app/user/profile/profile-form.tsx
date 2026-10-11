@@ -19,11 +19,16 @@ import { z } from 'zod';
 const ProfileForm = () => {
   const { data: session, update } = useSession();
 
+  const currentEmail = session?.user?.email && !session.user.email.endsWith('@madhavshringaar.com') 
+    ? session.user.email 
+    : '';
+  const isEmailLocked = Boolean(currentEmail);
+
   const form = useForm<z.infer<typeof updateProfileSchema>>({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
-      name: session?.user?.name ?? '',
-      email: session?.user?.email ?? '',
+      name: session?.user?.name && session.user.name !== 'NO_NAME' ? session.user.name : '',
+      email: currentEmail,
     },
   });
 
@@ -31,7 +36,7 @@ const ProfileForm = () => {
     const res = await updateProfile(values);
 
     if (!res.success) {
-      return toast.error(res.message,{
+      return toast.error(res.message, {
         style: {
           backgroundColor: "#DC2626",
           color: "white",
@@ -44,6 +49,7 @@ const ProfileForm = () => {
       user: {
         ...session?.user,
         name: values.name,
+        email: values.email || session?.user?.email,
       },
     };
 
@@ -66,8 +72,8 @@ const ProfileForm = () => {
               <FormItem className='w-full'>
                 <FormControl>
                   <Input
-                    disabled
-                    placeholder='Email'
+                    disabled={isEmailLocked}
+                    placeholder='Email Address'
                     className='input-field'
                     {...field}
                   />

@@ -69,14 +69,33 @@ const CredentialsSignInForm = () => {
       setConfirmationResult(confirmation);
       toast.success("OTP sent to your phone!");
     } catch (error: any) {
-      console.error(error);
+      console.error('Phone OTP error:', error);
       
-      if (error.code === 'auth/billing-not-enabled') {
+      // Reset reCAPTCHA verifier so subsequent attempts don't fail due to poisoned state
+      try {
+        recaptchaVerifierRef.current?.clear();
+      } catch (clearErr) {}
+      recaptchaVerifierRef.current = null;
+      if (typeof window !== 'undefined') {
+        try {
+          recaptchaVerifierRef.current = new RecaptchaVerifier(firebaseAuth, 'recaptcha-container', {
+            size: 'invisible',
+          });
+        } catch (initErr) {}
+      }
+
+      if (error.code === 'auth/captcha-check-failed' || error.message?.includes('Hostname match not found')) {
+        toast.error("Firebase Domain Authorization Error: Please add 'madhavshringaar.com' and 'www.madhavshringaar.com' to Firebase Console -> Authentication -> Settings -> Authorized domains.", {
+          duration: 8000,
+        });
+      } else if (error.code === 'auth/billing-not-enabled') {
         toast.error("Billing not enabled in Firebase. Please enable Blaze plan.");
       } else if (error.code === 'auth/invalid-app-credential') {
         toast.error("Verification failed. Please try clicking Send OTP again.");
+      } else if (error.code === 'auth/too-many-requests') {
+        toast.error("Too many attempts. Please try again after a few minutes.");
       } else {
-        toast.error(error.message || "Failed to send OTP");
+        toast.error(error.message || "Failed to send OTP. Please try again.");
       }
     } finally {
       setIsSendingOtp(false);
@@ -100,13 +119,15 @@ const CredentialsSignInForm = () => {
       });
 
       if (response?.error) {
-        toast.error("Authentication failed. Please try again.");
+        console.error("NextAuth signIn error:", response.error);
+        toast.error("Authentication failed. Please verify server connection or retry.");
       } else {
-        router.push(callbackUrl);
+        toast.success("Login successful!");
+        window.location.href = callbackUrl;
       }
     } catch (error: any) {
-      console.error(error);
-      toast.error("Invalid OTP. Please try again.");
+      console.error('OTP confirmation error:', error);
+      toast.error(error.message || "Invalid OTP. Please try again.");
     } finally {
       setIsVerifyingOtp(false);
     }
@@ -126,9 +147,11 @@ const CredentialsSignInForm = () => {
       });
 
       if (response?.error) {
+        console.error("NextAuth Google signIn error:", response.error);
         toast.error("Authentication failed.");
       } else {
-        router.push(callbackUrl);
+        toast.success("Login successful!");
+        window.location.href = callbackUrl;
       }
     } catch (error: any) {
       console.error(error);

@@ -119,13 +119,15 @@ const CredentialsSignInForm = () => {
       });
 
       if (response?.error) {
-        toast.error("Authentication failed. Please try again.");
+        console.error("NextAuth signIn error:", response.error);
+        toast.error("Authentication failed. Please verify server connection or retry.");
       } else {
-        router.push(callbackUrl);
+        toast.success("Login successful!");
+        window.location.href = callbackUrl;
       }
     } catch (error: any) {
-      console.error(error);
-      toast.error("Invalid OTP. Please try again.");
+      console.error('OTP confirmation error:', error);
+      toast.error(error.message || "Invalid OTP. Please try again.");
     } finally {
       setIsVerifyingOtp(false);
     }
@@ -145,9 +147,11 @@ const CredentialsSignInForm = () => {
       });
 
       if (response?.error) {
+        console.error("NextAuth Google signIn error:", response.error);
         toast.error("Authentication failed.");
       } else {
-        router.push(callbackUrl);
+        toast.success("Login successful!");
+        window.location.href = callbackUrl;
       }
     } catch (error: any) {
       console.error(error);

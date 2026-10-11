@@ -28,25 +28,44 @@ export const config = {
         if (!credentials?.idToken) return null;
         
         try {
+          const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY || "AIzaSyBIsOiajJyb3JSDT0Axn5s1h5KcLYwYlPg";
+          
           // Verify token using Firebase REST API
-          const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`, {
+          const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idToken: credentials.idToken })
           });
           
           const data = await res.json();
-          if (!data.users || data.users.length === 0) return null;
+          if (!data.users || data.users.length === 0) {
+            console.error("Firebase accounts:lookup error or no users returned:", data);
+            return null;
+          }
           
           const firebaseUser = data.users[0];
           
-          // Determine email (fallback to phone-based email if no email provided)
-          const email = firebaseUser.email || `${firebaseUser.phoneNumber}@madhavshringaar.com`;
-          const name = firebaseUser.displayName || 'NO_NAME';
+          // Clean phone digits without '+' sign (e.g. 7078211946)
+          const rawPhone = firebaseUser.phoneNumber ? firebaseUser.phoneNumber.replace(/\D/g, '') : '';
+          const cleanPhone = rawPhone.length > 10 ? rawPhone.slice(-10) : rawPhone;
           
-          // Find or create user in Prisma
+          // Primary clean email
+          const email = firebaseUser.email || (cleanPhone ? `${cleanPhone}@madhavshringaar.com` : `${firebaseUser.localId}@madhavshringaar.com`);
+          const name = firebaseUser.displayName || (cleanPhone ? 'Phone User' : 'NO_NAME');
+          
+          // Find or create user in Prisma - check for all common phone formats to avoid duplicates
           let user = await prisma.user.findFirst({
-            where: { email }
+            where: {
+              OR: [
+                { email },
+                ...(firebaseUser.phoneNumber ? [{ email: `${firebaseUser.phoneNumber}@madhavshringaar.com` }] : []),
+                ...(cleanPhone ? [
+                  { email: `${cleanPhone}@madhavshringaar.com` },
+                  { email: `91${cleanPhone}@madhavshringaar.com` },
+                  { email: `+91${cleanPhone}@madhavshringaar.com` },
+                ] : []),
+              ],
+            },
           });
           
           if (!user) {
@@ -66,7 +85,7 @@ export const config = {
             role: user.role,
           };
         } catch (error) {
-          console.error("Firebase auth error:", error);
+          console.error("Firebase auth error in authorize():", error);
           return null;
         }
       }
@@ -137,11 +156,15 @@ export const config = {
             token.name = user.email!.split('@')[0];
           }
 
-          // Update database to reflect the token name
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { name: token.name },
-          });
+          // Update database to reflect the token name safely
+          try {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { name: token.name },
+            });
+          } catch (updateErr) {
+            console.error("Failed to update user name in jwt callback:", updateErr);
+          }
         }
 
         if (trigger === 'signIn' || trigger === 'signUp') {

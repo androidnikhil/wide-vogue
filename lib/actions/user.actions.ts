@@ -18,6 +18,7 @@ import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { PAGE_SIZE } from '../constants';
 import { revalidatePath } from 'next/cache';
+import { sendWelcomeEmail } from '@/email';
 
 // Sign in the user with credentials
 export async function signInWithCredentials(
@@ -76,6 +77,10 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       },
     });
 
+    sendWelcomeEmail({ name: user.name, email: user.email }).catch((err) =>
+      console.error('Failed to send welcome email:', err)
+    );
+
     await signIn('credentials', {
       email: user.email,
       password: plainPassword,
@@ -123,12 +128,24 @@ export async function updateUserAddress(data: ShippingAddress) {
         newAddresses = [address, ...currentAddresses].slice(0, 5); // Keep max 5
       }
 
+      const userDataToUpdate: any = { 
+        address,
+        addresses: newAddresses
+      };
+
+      if (address.guestEmail && (!currentUser.email || currentUser.email.endsWith('@madhavshringaar.com'))) {
+        userDataToUpdate.email = address.guestEmail;
+      }
+      if (address.fullName && (!currentUser.name || currentUser.name === 'NO_NAME')) {
+        userDataToUpdate.name = address.fullName;
+      }
+      if (address.contactNumber && !currentUser.phoneNumber) {
+        userDataToUpdate.phoneNumber = address.contactNumber;
+      }
+
       await prisma.user.update({
         where: { id: currentUser.id },
-        data: { 
-          address,
-          addresses: newAddresses
-        },
+        data: userDataToUpdate,
       });
     }
 
@@ -188,7 +205,7 @@ export async function deleteUserAddress(index: number) {
 
 
 // Update the user profile
-export async function updateProfile(user: { name: string; email: string }) {
+export async function updateProfile(user: { name: string; email?: string | null }) {
   try {
     const session = await auth();
 
@@ -200,13 +217,19 @@ export async function updateProfile(user: { name: string; email: string }) {
 
     if (!currentUser) throw new Error('User not found');
 
+    const updateData: any = {
+      name: user.name,
+    };
+
+    if (user.email && user.email.includes('@') && !user.email.endsWith('@madhavshringaar.com')) {
+      updateData.email = user.email;
+    }
+
     await prisma.user.update({
       where: {
         id: currentUser.id,
       },
-      data: {
-        name: user.name,
-      },
+      data: updateData,
     });
 
     return {

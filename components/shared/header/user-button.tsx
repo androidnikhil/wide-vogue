@@ -45,11 +45,21 @@ const UserButton = async () => {
           <DropdownMenuLabel className='font-normal p-2'>
             <div className='flex flex-col space-y-1'>
               <div className='text-sm font-semibold text-on-surface'>
-                {session.user?.name}
+                {session.user?.name || 'My Account'}
               </div>
-              {!session.user?.email?.endsWith('@madhavshringaar.com') && (
+              {session.user?.email && !session.user.email.endsWith('@madhavshringaar.com') ? (
                 <div className='text-xs text-on-surface-variant leading-none'>
-                  {session.user?.email}
+                  {session.user.email}
+                </div>
+              ) : (
+                <div className='pt-1'>
+                  <Link 
+                    href='/user/profile' 
+                    className='text-xs text-primary font-medium hover:underline inline-flex items-center gap-1'
+                  >
+                    <span>Complete Profile</span>
+                    <span className="material-symbols-outlined text-[13px]">arrow_forward</span>
+                  </Link>
                 </div>
               )}
             </div>

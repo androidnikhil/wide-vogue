@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MapPin, ShieldCheck, Truck, RotateCcw, PackageCheck } from 'lucide-react';
@@ -85,10 +86,14 @@ export default function ProductTrustBadges({
           <span>Free Shipping<br/>above ₹999</span>
         </div>
 
-        <div className="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-lg text-center gap-2 border border-outline-variant/20">
-          <PackageCheck className="w-6 h-6 text-secondary" />
+        <Link 
+          href="/policies/authenticity"
+          className="flex flex-col items-center justify-center p-3 bg-surface-container-low hover:bg-[#FAF7F0] rounded-lg text-center gap-1.5 border border-outline-variant/20 hover:border-[#E6C16A] transition-all group"
+        >
+          <PackageCheck className="w-6 h-6 text-secondary group-hover:scale-105 transition-transform" />
           <span>Authentic<br/>Vrindavan Product</span>
-        </div>
+          <span className="text-[10px] text-[#0F6F74] font-semibold underline opacity-80 group-hover:opacity-100">Our Promise ↗</span>
+        </Link>
       </div>
     </div>
   );

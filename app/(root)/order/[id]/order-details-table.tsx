@@ -32,6 +32,8 @@ import StripePayment from './stripe-payment';
 import RazorpayPayment from './razorpay-payment';
 import OrderTimeline from '@/components/shared/order/order-timeline';
 import { LOYALTY_CONFIG } from '@/lib/loyalty.config';
+import ReturnRequestModal from '@/components/shared/order/return-request-modal';
+import AdminReturnAction from '@/components/admin/admin-return-action';
 
 const OrderDetailsTable = ({
   order,
@@ -435,6 +437,18 @@ const OrderDetailsTable = ({
                     <UpdateStatusButton statusLabel='Out for Delivery' statusValue='OUT_FOR_DELIVERY' />
                     <UpdateStatusButton statusLabel='Delivered' statusValue='DELIVERED' />
                   </div>
+
+                  {/* Admin Return Management */}
+                  <div className="mt-4">
+                    <AdminReturnAction order={order as any} />
+                  </div>
+                </div>
+              )}
+
+              {/* Customer 7-Day Return Request */}
+              {!isAdmin && (
+                <div className="mt-4 pt-4 border-t border-outline-variant/30 flex justify-center">
+                  <ReturnRequestModal order={order as any} />
                 </div>
               )}
             </CardContent>

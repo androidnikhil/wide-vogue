@@ -43,8 +43,17 @@ const ProductForm = ({
   const form = useForm<z.infer<typeof insertProductSchema>>({
     resolver: type === 'Update' ? zodResolver(updateProductSchema) : zodResolver(insertProductSchema),
     defaultValues:
-      product && type === 'Update' ? product : productDefaultValues,
+      product && type === 'Update' ? {
+        ...product,
+        sizeVariants: (product as any).sizeVariants || [],
+      } : productDefaultValues,
   });
+
+  const selectedSizes = form.watch('sizes') || [];
+  const sizeVariants = form.watch('sizeVariants') || [];
+  const basePrice = form.watch('price') || '0';
+  const baseOriginalPrice = form.watch('originalPrice') || '0';
+  const baseStock = form.watch('stock') || 0;
 
   const onSubmit: SubmitHandler<z.infer<typeof insertProductSchema>> = async (
     values
@@ -327,6 +336,119 @@ const ProductForm = ({
               </FormItem>
             )}
           />
+
+          {/* Dynamic Size-Wise Pricing & Inventory Matrix */}
+          {selectedSizes.length > 0 && (
+            <div className="mt-2 p-4 rounded-xl border border-[#E6C16A]/50 bg-[#FAF7F0] space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h4 className="font-semibold text-sm text-[#003020] flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[#C88A20] text-base">straighten</span>
+                    Size-Specific Pricing &amp; Stock Matrix
+                  </h4>
+                  <p className="text-xs text-neutral-600">
+                    Set customized selling prices, original MRPs, and stock for each size. If left unchanged, the base price above applies.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="text-xs self-start sm:self-auto border-[#E6C16A] text-[#003020] hover:bg-[#F3E5AB]/40"
+                  onClick={() => {
+                    const updated = selectedSizes.map((s) => {
+                      const existing = sizeVariants.find((v) => v.size === s);
+                      return {
+                        size: s,
+                        price: existing?.price && Number(existing.price) > 0 ? existing.price : (basePrice || '0'),
+                        originalPrice: existing?.originalPrice && Number(existing.originalPrice) > 0 ? existing.originalPrice : (baseOriginalPrice || '0'),
+                        stock: existing?.stock !== undefined ? existing.stock : Number(baseStock || 0),
+                      };
+                    });
+                    form.setValue('sizeVariants', updated);
+                    toast.success("Applied base price and stock to all sizes");
+                  }}
+                >
+                  Auto-Fill from Base Values
+                </Button>
+              </div>
+
+              <div className="overflow-x-auto bg-white rounded-lg border border-neutral-200">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-neutral-200 bg-neutral-50 text-neutral-700">
+                      <th className="py-2.5 px-3 font-semibold">Size</th>
+                      <th className="py-2.5 px-3 font-semibold">Selling Price (₹)</th>
+                      <th className="py-2.5 px-3 font-semibold">Original MRP (₹)</th>
+                      <th className="py-2.5 px-3 font-semibold">Stock Qty</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100">
+                    {selectedSizes.map((sz) => {
+                      const variant = sizeVariants.find((v) => v.size === sz) || {
+                        size: sz,
+                        price: basePrice,
+                        originalPrice: baseOriginalPrice,
+                        stock: Number(baseStock || 0),
+                      };
+
+                      const updateVariant = (field: 'price' | 'originalPrice' | 'stock', val: any) => {
+                        const others = sizeVariants.filter((v) => v.size !== sz);
+                        const updatedVar = {
+                          ...variant,
+                          size: sz,
+                          [field]: val,
+                        };
+                        form.setValue('sizeVariants', [...others, updatedVar]);
+                      };
+
+                      return (
+                        <tr key={sz} className="hover:bg-amber-50/40 transition-colors">
+                          <td className="py-2.5 px-3 font-bold text-[#003020] whitespace-nowrap">
+                            <span className="px-2.5 py-0.5 rounded-full bg-[#E6C16A]/20 text-[#8A5A0A] font-medium text-xs border border-[#E6C16A]/40">
+                              Size {sz} No.
+                            </span>
+                          </td>
+                          <td className="py-2 px-3">
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              placeholder={basePrice || '0'}
+                              value={variant.price || ''}
+                              onChange={(e) => updateVariant('price', e.target.value)}
+                              className="h-8 w-28 text-xs bg-white"
+                            />
+                          </td>
+                          <td className="py-2 px-3">
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              placeholder={baseOriginalPrice || '0'}
+                              value={variant.originalPrice || ''}
+                              onChange={(e) => updateVariant('originalPrice', e.target.value)}
+                              className="h-8 w-28 text-xs bg-white"
+                            />
+                          </td>
+                          <td className="py-2 px-3">
+                            <Input
+                              type="number"
+                              min="0"
+                              placeholder={String(baseStock || 0)}
+                              value={variant.stock ?? ''}
+                              onChange={(e) => updateVariant('stock', Number(e.target.value || 0))}
+                              className="h-8 w-24 text-xs bg-white"
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
         <div className='upload-field flex flex-col md:flex-row gap-5'>
           {/* Images */}

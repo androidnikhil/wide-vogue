@@ -1,7 +1,11 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Returns & Refunds Policy',
+  title: '7-Day Return & Exchange Policy | Madhav Shringaar',
+  description: 'Our 7-day hassle-free return and exchange policy for Shri Laddu Gopal Ji poshak, deity attire, and devotional accessories.',
+  alternates: {
+    canonical: '/policies/returns',
+  },
 };
 
 export default function ReturnsPolicyPage() {

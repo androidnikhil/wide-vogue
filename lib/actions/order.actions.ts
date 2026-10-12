@@ -13,7 +13,15 @@ import { razorpay } from "../razorpay";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "@prisma/client";
-import { sendPurchaseReceipt } from "@/email";
+import { 
+  sendPurchaseReceipt,
+  sendAdminNewOrderAlert,
+  sendOrderShippedEmail,
+  sendOrderOutForDeliveryEmail,
+  sendOrderDeliveredEmail,
+  sendReturnRequestAlertEmail,
+  sendReturnStatusUpdateEmail
+} from "@/email";
 import crypto from "crypto";
 
 import { LOYALTY_CONFIG } from '../loyalty.config';
@@ -192,6 +200,33 @@ export async function createOrder() {
 
     if (!insertedOrderId) throw new Error("Order not created");
 
+    // Fetch created order and dispatch notifications
+    try {
+      const createdOrder = await prisma.order.findUnique({
+        where: { id: insertedOrderId },
+        include: {
+          orderitems: true,
+          user: { select: { name: true, email: true, phoneNumber: true } },
+        },
+      });
+
+      if (createdOrder) {
+        // 1. Notify Admin (info@madhavshringaar.com)
+        sendAdminNewOrderAlert({ order: createdOrder }).catch((err) =>
+          console.error("Admin order alert failed:", err)
+        );
+
+        // 2. If Cash on Delivery, send purchase receipt to customer immediately
+        if (createdOrder.paymentMethod === 'CashOnDelivery') {
+          sendPurchaseReceipt({ order: createdOrder }).catch((err) =>
+            console.error("Customer COD receipt email failed:", err)
+          );
+        }
+      }
+    } catch (notifyErr) {
+      console.error("Order notification dispatch error:", notifyErr);
+    }
+
     return {
       success: true,
       message: "Order created",
@@ -208,6 +243,29 @@ export async function getOrderById(orderId: string) {
   const data = await prisma.order.findFirst({
     where: {
       id: orderId,
+    },
+    include: {
+      orderitems: true,
+      user: { select: { name: true, email: true } },
+    },
+  });
+
+  return convertToPlainObject(data);
+}
+
+// Track order by either Order ID or AWB Tracking Number
+export async function trackOrderByQuery(query: string) {
+  const trimmed = query.trim();
+  if (!trimmed) return null;
+
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmed);
+
+  const data = await prisma.order.findFirst({
+    where: {
+      OR: [
+        { awbNumber: { equals: trimmed, mode: 'insensitive' } },
+        ...(isUuid ? [{ id: trimmed }] : []),
+      ],
     },
     include: {
       orderitems: true,
@@ -327,25 +385,14 @@ export async function updateOrderToPaid({
 
   if (order.isPaid) throw new Error("Order is already paid");
 
-  // Transaction to update order and account for product stock
-  await prisma.$transaction(async (tx) => {
-    // Iterate over products and update stock
-    for (const item of order.orderitems) {
-      await tx.product.update({
-        where: { id: item.productId },
-        data: { stock: { increment: -item.qty } },
-      });
-    }
-
-    // Set the order to paid
-    await tx.order.update({
-      where: { id: orderId },
-      data: {
-        isPaid: true,
-        paidAt: new Date(),
-        paymentResult,
-      },
-    });
+  // Set the order to paid (Stock was already securely reserved and deducted in createOrder)
+  await prisma.order.update({
+    where: { id: orderId },
+    data: {
+      isPaid: true,
+      paidAt: new Date(),
+      paymentResult,
+    },
   });
 
   // Get updated order after transaction
@@ -389,6 +436,9 @@ export async function getMyOrders({
   const data = await prisma.order.findMany({
     where: { userId: session?.user?.id },
     orderBy: { createdAt: 'desc' },
+    include: {
+      orderitems: true,
+    },
     take: limit,
     skip: (page - 1) * limit,
   });
@@ -398,7 +448,7 @@ export async function getMyOrders({
   });
 
   return {
-    data,
+    data: convertToPlainObject(data),
     totalPages: Math.ceil(dataCount / limit),
   };
 }
@@ -536,14 +586,23 @@ export async function deliverOrder(orderId: string) {
     if (!order) throw new Error('Order not found');
     if (!order.isPaid) throw new Error('Order is not paid');
 
-    await prisma.order.update({
+    const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: {
         isDelivered: true,
         deliveredAt: new Date(),
         status: 'DELIVERED',
       },
+      include: {
+        orderitems: true,
+        user: { select: { name: true, email: true, phoneNumber: true } },
+      },
     });
+
+    // Send delivered notification to both customer and admin
+    sendOrderDeliveredEmail({ order: updatedOrder }).catch((err) =>
+      console.error('Delivered notification failed:', err)
+    );
 
     revalidatePath(`/order/${orderId}`);
 
@@ -577,10 +636,31 @@ export async function updateOrderStatus(orderId: string, status: string, awbNumb
       updateData.deliveredAt = new Date();
     }
 
-    await prisma.order.update({
+    const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: updateData,
+      include: {
+        orderitems: true,
+        user: { select: { name: true, email: true, phoneNumber: true } },
+      },
     });
+
+    // Automated Notification Triggers based on status milestone
+    if (status === 'SHIPPED') {
+      sendOrderShippedEmail({
+        order: updatedOrder,
+        awbNumber: awbNumber || updatedOrder.awbNumber || undefined,
+        trackingUrl: updatedOrder.trackingUrl || undefined,
+      }).catch((err) => console.error('Shipped email notification failed:', err));
+    } else if (status === 'OUT_FOR_DELIVERY') {
+      sendOrderOutForDeliveryEmail({ order: updatedOrder }).catch((err) =>
+        console.error('Out for delivery notification failed:', err)
+      );
+    } else if (status === 'DELIVERED') {
+      sendOrderDeliveredEmail({ order: updatedOrder }).catch((err) =>
+        console.error('Delivered notification failed:', err)
+      );
+    }
 
     revalidatePath(`/order/${orderId}`);
     revalidatePath('/admin/orders');
@@ -588,6 +668,141 @@ export async function updateOrderStatus(orderId: string, status: string, awbNumb
     return {
       success: true,
       message: `Order status updated to ${status}`,
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// 7-Day Return Request (Customer)
+export async function requestOrderReturn({
+  orderId,
+  reason,
+  comments,
+}: {
+  orderId: string;
+  reason: string;
+  comments?: string;
+}) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error('Unauthorized: Please sign in to request a return');
+
+    const order = await prisma.order.findFirst({
+      where: {
+        id: orderId,
+        userId: session.user.id,
+      },
+      include: {
+        orderitems: true,
+        user: { select: { name: true, email: true, phoneNumber: true } },
+      },
+    });
+
+    if (!order) throw new Error('Order not found or unauthorized');
+
+    if (!order.isDelivered || !order.deliveredAt) {
+      throw new Error('Only delivered orders are eligible for return');
+    }
+
+    // Check 7-day return window
+    const deliveryTime = new Date(order.deliveredAt).getTime();
+    const daysSinceDelivery = (Date.now() - deliveryTime) / (1000 * 60 * 60 * 24);
+
+    if (daysSinceDelivery > 7) {
+      throw new Error('Return window has expired. Returns are only accepted within 7 days of delivery.');
+    }
+
+    if (order.refundStatus === 'RETURN_REQUESTED' || order.refundStatus === 'RETURN_APPROVED') {
+      throw new Error('A return request is already active for this order');
+    }
+
+    const fullReason = comments ? `${reason} — ${comments}` : reason;
+
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        refundStatus: 'RETURN_REQUESTED',
+        returnReason: fullReason,
+        returnRequestedAt: new Date(),
+      },
+      include: {
+        orderitems: true,
+        user: { select: { name: true, email: true, phoneNumber: true } },
+      },
+    });
+
+    // Notify Admin (info@madhavshringaar.com) & Customer
+    sendReturnRequestAlertEmail({
+      order: updatedOrder,
+      reason,
+      comments,
+    }).catch((err) => console.error('Return request alert email failed:', err));
+
+    revalidatePath(`/order/${orderId}`);
+    revalidatePath('/user/orders');
+    revalidatePath('/admin/orders');
+
+    return {
+      success: true,
+      message: 'Return request submitted successfully. Our team will review within 24 hours.',
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// Process Return Request (Admin: Accept or Reject)
+export async function processReturnRequest({
+  orderId,
+  action,
+  note,
+}: {
+  orderId: string;
+  action: 'APPROVED' | 'REJECTED';
+  note?: string;
+}) {
+  try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
+
+    const order = await prisma.order.findFirst({
+      where: { id: orderId },
+      include: {
+        orderitems: true,
+        user: { select: { name: true, email: true, phoneNumber: true } },
+      },
+    });
+
+    if (!order) throw new Error('Order not found');
+
+    const newRefundStatus = action === 'APPROVED' ? 'RETURN_APPROVED' : 'RETURN_REJECTED';
+
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        refundStatus: newRefundStatus,
+      },
+      include: {
+        orderitems: true,
+        user: { select: { name: true, email: true, phoneNumber: true } },
+      },
+    });
+
+    // Notify Customer of Admin Decision
+    sendReturnStatusUpdateEmail({
+      order: updatedOrder,
+      action,
+      note,
+    }).catch((err) => console.error('Return status update email failed:', err));
+
+    revalidatePath(`/order/${orderId}`);
+    revalidatePath('/admin/orders');
+    revalidatePath('/user/orders');
+
+    return {
+      success: true,
+      message: `Return request ${action.toLowerCase()} successfully`,
     };
   } catch (error) {
     return { success: false, message: formatError(error) };

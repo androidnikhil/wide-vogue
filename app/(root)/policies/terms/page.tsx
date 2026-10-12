@@ -1,7 +1,11 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service',
+  title: 'Terms of Service | Madhav Shringaar',
+  description: 'Terms of Service for Madhav Shringaar. Understand user conditions, ordering terms, and delivery policies for our online devotional store.',
+  alternates: {
+    canonical: '/policies/terms',
+  },
 };
 
 export default function TermsOfServicePage() {

@@ -41,28 +41,92 @@ const CredentialsSignInForm = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
 
-  useEffect(() => {
-    // Standard robust initialization
-    if (typeof window !== 'undefined' && !recaptchaVerifierRef.current) {
-      recaptchaVerifierRef.current = new RecaptchaVerifier(firebaseAuth, 'recaptcha-container', {
+  // Fully automatic silent reCAPTCHA refresher
+  const initOrRefreshRecaptcha = () => {
+    if (typeof window === 'undefined') return null;
+
+    try {
+      // 1. Safely clear any existing verifier instance
+      if (recaptchaVerifierRef.current) {
+        try {
+          recaptchaVerifierRef.current.clear();
+        } catch (clearErr) {
+          console.warn('Recaptcha instance clear warning:', clearErr);
+        }
+        recaptchaVerifierRef.current = null;
+      }
+
+      // 2. Wipe DOM inside the recaptcha container to prevent "already rendered" collision
+      const container = document.getElementById('recaptcha-container');
+      if (container) {
+        container.innerHTML = '';
+      }
+
+      // 3. Reset any global grecaptcha widget if tracked
+      try {
+        if ((window as any).grecaptcha && typeof (window as any).grecaptcha.reset === 'function') {
+          (window as any).grecaptcha.reset();
+        }
+      } catch (e) {}
+
+      // 4. Create brand new RecaptchaVerifier instance
+      const verifier = new RecaptchaVerifier(firebaseAuth, 'recaptcha-container', {
         size: 'invisible',
+        callback: () => {
+          console.log('reCAPTCHA successfully verified');
+        },
+        'expired-callback': () => {
+          console.log('reCAPTCHA token expired, auto-refreshing...');
+          initOrRefreshRecaptcha();
+        },
       });
+
+      recaptchaVerifierRef.current = verifier;
+      return verifier;
+    } catch (err: any) {
+      console.error('Error initializing fresh reCAPTCHA:', err);
+      return null;
     }
+  };
+
+  useEffect(() => {
+    initOrRefreshRecaptcha();
+
+    return () => {
+      if (recaptchaVerifierRef.current) {
+        try {
+          recaptchaVerifierRef.current.clear();
+        } catch (e) {}
+        recaptchaVerifierRef.current = null;
+      }
+      const container = document.getElementById('recaptcha-container');
+      if (container) container.innerHTML = '';
+    };
   }, []);
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phoneNumber) return toast.error("Please enter a valid phone number");
+    if (!phoneNumber || phoneNumber.length < 10) {
+      return toast.error("Please enter a valid 10-digit Indian mobile number");
+    }
     
     setIsSendingOtp(true);
     try {
-      const cleanPhone = phoneNumber.replace(/\\D/g, '');
-      const formattedPhone = `+91${cleanPhone.slice(-10)}`; // guarantee strictly 10 digits
+      const cleanPhone = phoneNumber.replace(/\D/g, '');
+      const formattedPhone = `+91${cleanPhone.slice(-10)}`; // strictly 10 digits
       
-      const appVerifier = recaptchaVerifierRef.current;
+      // Ensure clean, fresh verifier so stale/consumed tokens never poison the request
+      let appVerifier = recaptchaVerifierRef.current;
       if (!appVerifier) {
-        toast.error("Security check not ready. Please refresh.");
-        return;
+        appVerifier = initOrRefreshRecaptcha();
+      }
+      
+      if (!appVerifier) {
+        toast.error("Security verification initializing. Retrying...");
+        appVerifier = initOrRefreshRecaptcha();
+        if (!appVerifier) {
+          throw new Error("Unable to initialize security check. Please click refresh.");
+        }
       }
       
       const confirmation = await signInWithPhoneNumber(firebaseAuth, formattedPhone, appVerifier);
@@ -71,31 +135,21 @@ const CredentialsSignInForm = () => {
     } catch (error: any) {
       console.error('Phone OTP error:', error);
       
-      // Reset reCAPTCHA verifier so subsequent attempts don't fail due to poisoned state
-      try {
-        recaptchaVerifierRef.current?.clear();
-      } catch (clearErr) {}
-      recaptchaVerifierRef.current = null;
-      if (typeof window !== 'undefined') {
-        try {
-          recaptchaVerifierRef.current = new RecaptchaVerifier(firebaseAuth, 'recaptcha-container', {
-            size: 'invisible',
-          });
-        } catch (initErr) {}
-      }
+      // Auto-refresh reCAPTCHA immediately on error so the very next attempt succeeds
+      initOrRefreshRecaptcha();
 
       if (error.code === 'auth/captcha-check-failed' || error.message?.includes('Hostname match not found')) {
-        toast.error("Firebase Domain Authorization Error: Please add 'madhavshringaar.com' and 'www.madhavshringaar.com' to Firebase Console -> Authentication -> Settings -> Authorized domains.", {
-          duration: 8000,
+        toast.error("Domain Authorization: Please ensure madhavshringaar.com and localhost are authorized in Firebase Console.", {
+          duration: 7000,
         });
       } else if (error.code === 'auth/billing-not-enabled') {
-        toast.error("Billing not enabled in Firebase. Please enable Blaze plan.");
+        toast.error("Firebase billing is not enabled. Please enable the Blaze plan in Firebase Console.");
       } else if (error.code === 'auth/invalid-app-credential') {
-        toast.error("Verification failed. Please try clicking Send OTP again.");
+        toast.error("Security check auto-refreshed. Please click 'Send OTP' again.");
       } else if (error.code === 'auth/too-many-requests') {
-        toast.error("Too many attempts. Please try again after a few minutes.");
+        toast.error("Too many attempts. Please wait a few moments and try again.");
       } else {
-        toast.error(error.message || "Failed to send OTP. Please try again.");
+        toast.error(error.message || "Failed to send OTP. Security check refreshed, please try again.");
       }
     } finally {
       setIsSendingOtp(false);
@@ -255,7 +309,11 @@ const CredentialsSignInForm = () => {
               <Button 
                 type="button" 
                 variant="ghost" 
-                onClick={() => setConfirmationResult(null)} 
+                onClick={() => {
+                  setConfirmationResult(null);
+                  setOtp('');
+                  initOrRefreshRecaptcha();
+                }} 
                 className='w-full'
               >
                 Use a different number

@@ -46,7 +46,7 @@ export default async function Header() {
 <Image
   alt="Madhav Shringaar"
   className="h-11 w-auto max-w-[clamp(6rem,42vw,10rem)] object-contain sm:h-[4.25rem] sm:max-w-[min(48vw,260px)] md:h-[4.75rem]"
-  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ"
+  src="/images/logo.png"
   width={500}
   height={200}
   quality={85}
@@ -54,7 +54,7 @@ export default async function Header() {
 />
 </Link>
 <Link className="hidden items-center gap-2 lg:flex" href="/">
-<Image alt="Madhav Shringaar" className="h-14 md:h-20 w-auto object-contain scale-110 ml-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ" width={200} height={80} />
+<Image alt="Madhav Shringaar" className="h-14 md:h-20 w-auto object-contain scale-110 ml-2" src="/images/logo.png" width={200} height={80} />
 </Link>
 </div>
 

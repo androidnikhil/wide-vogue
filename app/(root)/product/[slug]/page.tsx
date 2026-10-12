@@ -14,6 +14,65 @@ import ProductTrustBadges from '@/components/shared/product/product-trust-badges
 import PincodeChecker from '@/components/shared/product/pincode-checker';
 import { getRecommendedProducts } from '@/lib/actions/recommendations.actions';
 import ProductCard from '@/components/shared/product/product-card';
+import { Metadata } from 'next';
+import { APP_URL } from '@/lib/constants';
+
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await props.params;
+  const product = await getProductBySlug(slug);
+
+  if (!product) {
+    return {
+      title: 'Product Not Found | Madhav Shringaar',
+    };
+  }
+
+  const ogImage = product.images?.[0] || '/images/devotional/complete_shringar.webp';
+  const title = `${product.name} | Laddu Gopal Poshak & Shringaar - Agra & Noida`;
+  const description = `${product.name} - Handcrafted ${product.category} for Shri Laddu Gopal Ji. Authentic Vrindavan craftsmanship, deity-safe fabric. Express delivery in Agra, Noida, Delhi NCR & across India. Price: ₹${product.price}.`;
+
+  return {
+    title,
+    description,
+    keywords: [
+      product.name,
+      `${product.category} Agra`,
+      `${product.category} Noida`,
+      'Laddu Gopal poshak Agra',
+      'Laddu Gopal dress Noida',
+      'Kanha ji poshak online',
+      'Braj devotional shringaar',
+      'Madhav Shringaar Agra Noida',
+      ...(product.sizes || []).map((s: string) => `Size ${s} Laddu Gopal poshak`),
+    ],
+    alternates: {
+      canonical: `/product/${product.slug}`,
+    },
+    openGraph: {
+      title: `${product.name} | Madhav Shringaar`,
+      description,
+      url: `${APP_URL}/product/${product.slug}`,
+      siteName: 'Madhav Shringaar',
+      images: [
+        {
+          url: ogImage.startsWith('http') ? ogImage : `${APP_URL}${ogImage}`,
+          width: 800,
+          height: 800,
+          alt: product.name,
+        },
+      ],
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${product.name} | Madhav Shringaar`,
+      description,
+      images: [ogImage.startsWith('http') ? ogImage : `${APP_URL}${ogImage}`],
+    },
+  };
+}
 
 const ProductDetailsPage = async (props: {
   params: Promise<{ slug: string }>;
@@ -30,8 +89,50 @@ const ProductDetailsPage = async (props: {
 
   const cart = await getMyCart();
 
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    image: (product.images || []).map((img: string) => (img.startsWith('http') ? img : `${APP_URL}${img}`)),
+    description: product.description || `${product.name} - Divine Laddu Gopal Ji poshak and shringaar operating from Agra and Noida.`,
+    sku: product.id,
+    mpn: product.slug,
+    brand: {
+      '@type': 'Brand',
+      name: product.brand || 'Madhav Shringaar',
+    },
+    offers: {
+      '@type': 'Offer',
+      url: `${APP_URL}/product/${product.slug}`,
+      priceCurrency: 'INR',
+      price: Number(product.price).toFixed(2),
+      priceValidUntil: '2027-12-31',
+      itemCondition: 'https://schema.org/NewCondition',
+      availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      seller: {
+        '@type': 'Store',
+        name: 'Madhav Shringaar (Agra & Noida)',
+        telephone: '+917078211946',
+        url: APP_URL,
+      },
+    },
+    ...(Number(product.numReviews) > 0
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: Number(product.rating).toFixed(1),
+            reviewCount: Number(product.numReviews),
+          },
+        }
+      : {}),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <section className="pb-10 pt-4 max-w-7xl mx-auto px-4 md:px-8">
         <div className='grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12'>
           {/* Images Column (Left) */}
@@ -78,6 +179,7 @@ const ProductDetailsPage = async (props: {
                     <AddToCart
                       cart={cart}
                       sizes={product.sizes}
+                      sizeVariants={(product as any).sizeVariants}
                       item={{
                         productId: product.id,
                         name: product.name,

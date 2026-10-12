@@ -22,13 +22,15 @@ export const prisma = basePrisma.$extends({
   result: {
     product: {
       price: {
+        needs: { price: true },
         compute(product) {
-          return product.price.toString();
+          return product.price?.toString() ?? '0';
         },
       },
       rating: {
+        needs: { rating: true },
         compute(product) {
-          return product.rating.toString();
+          return product.rating?.toString() ?? '0';
         },
       },
     },

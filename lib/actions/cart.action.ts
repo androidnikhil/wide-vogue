@@ -59,6 +59,25 @@ export async function addItemToCart(data: CartItem) {
     });
     if (!product) throw new Error('Product not found');
 
+    // SECURITY: Enforce authoritative server-side price from product or variant
+    let authoritativePrice = product.price.toString();
+    if (item.size && product.sizeVariants) {
+      try {
+        const variants = typeof product.sizeVariants === 'string' 
+          ? JSON.parse(product.sizeVariants) 
+          : product.sizeVariants;
+        if (Array.isArray(variants)) {
+          const matchingVariant = variants.find((v: any) => v.size === item.size);
+          if (matchingVariant && matchingVariant.price) {
+            authoritativePrice = Number(matchingVariant.price).toFixed(2);
+          }
+        }
+      } catch (err) {
+        console.error("Error parsing sizeVariants in addItemToCart:", err);
+      }
+    }
+    item.price = authoritativePrice;
+
     if (!cart) {
       // Create new cart object
       const newCart = insertCartSchema.parse({

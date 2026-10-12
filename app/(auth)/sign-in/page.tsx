@@ -40,10 +40,13 @@ const SignInPage = async (props: {
         
         <div className="relative z-10 flex flex-col items-center">
           <Link href='/'>
-            <img
-              src='https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ'
+            <Image
+              src='/images/logo.png'
               className='h-32 w-auto object-contain drop-shadow-md mb-8 hover:scale-105 transition-transform duration-300'
               alt={`${APP_NAME} logo`}
+              width={240}
+              height={96}
+              sizes="240px"
             />
           </Link>
           <h1 className="text-4xl font-bold tracking-tight mb-4 text-center">Welcome to Madhav Shringaar</h1>
@@ -61,7 +64,7 @@ const SignInPage = async (props: {
               <div className='md:hidden flex justify-center mb-4'>
                 <Link href='/'>
                   <img
-                    src='https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ'
+                    src='/images/logo.png'
                     className='h-24 w-auto object-contain'
                     alt={`${APP_NAME} logo`}
                   />

@@ -1,19 +1,14 @@
 import { Metadata } from 'next';
 import { getMyOrders } from '@/lib/actions/order.actions';
-import { formatCurrency, formatDateTime, formatId } from '@/lib/utils';
-import Link from 'next/link';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import Pagination from '@/components/shared/pagination';
+import OrdersListClient from './orders-list-client';
+import { Package, Truck, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
-  title: 'My Orders',
+  title: 'My Orders & Deliveries | Madhav Shringaar',
+  description: 'View order history, track live shipments, and download standard A4 tax invoices.',
 };
 
 const OrdersPage = async (props: {
@@ -26,54 +21,43 @@ const OrdersPage = async (props: {
   });
 
   return (
-    <div className='space-y-2'>
-      <h2 className='h2-bold'>Orders</h2>
-      <div className='overflow-x-auto'>
-        <Table className='border border-gray-300 mb-4'>
-          <TableHeader className="bg-gray-200">
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>DATE</TableHead>
-              <TableHead>TOTAL</TableHead>
-              <TableHead>PAID</TableHead>
-              <TableHead>DELIVERED</TableHead>
-              <TableHead>ACTIONS</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {orders.data.map((order) => (
-              <TableRow key={order.id} className="odd:bg-white even:bg-gray-100">
-                <TableCell>{formatId(order.id)}</TableCell>
-                <TableCell>
-                  {formatDateTime(order.createdAt).dateTime}
-                </TableCell>
-                <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
-                <TableCell>
-                  {order.isPaid && order.paidAt
-                    ? formatDateTime(order.paidAt).dateTime
-                    : 'Not Paid'}
-                </TableCell>
-                <TableCell>
-                  {order.isDelivered && order.deliveredAt
-                    ? formatDateTime(order.deliveredAt).dateTime
-                    : 'Not Delivered'}
-                </TableCell>
-                <TableCell>
-                  <Link href={`/order/${order.id}`}>
-                    <span className='px-2'>Details</span>
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {orders.totalPages > 1 && (
+    <div className='max-w-5xl mx-auto space-y-6 pb-12'>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-neutral-200/80 shadow-xs">
+        <div>
+          <h1 className="font-serif text-xl md:text-2xl font-bold text-[#003020] flex items-center gap-2">
+            <Package className="w-6 h-6 text-[#0F6F74]" />
+            Your Orders & Deliveries
+          </h1>
+          <p className="text-xs md:text-sm text-neutral-500 mt-1">
+            Track active Shiprocket courier dispatches and download GST-compliant tax invoices.
+          </p>
+        </div>
+
+        <Button
+          asChild
+          variant="outline"
+          className="rounded-xl border-neutral-300 text-xs self-start sm:self-auto gap-2"
+        >
+          <Link href="/track-order">
+            <Truck className="w-4 h-4 text-[#0F6F74]" />
+            Live AWB Tracking
+          </Link>
+        </Button>
+      </div>
+
+      {/* Orders List */}
+      <OrdersListClient orders={orders.data as any} />
+
+      {/* Pagination */}
+      {orders.totalPages > 1 && (
+        <div className="pt-4 flex justify-center">
           <Pagination
             page={Number(page) || 1}
-            totalPages={orders?.totalPages}
+            totalPages={orders.totalPages}
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

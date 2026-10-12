@@ -27,6 +27,7 @@ model Product {
   createdAt        DateTime    @default(now()) @db.Timestamp(6)
   updatedAt        DateTime    @updatedAt
   sizes            String[]    @default([])
+  sizeVariants     Json?       @default("[]")
   isReturnable     Boolean     @default(false)
   returnPolicyText String?
   returnWindowDays Int         @default(0)
@@ -49,6 +50,8 @@ model User {
   createdAt      DateTime   @default(now()) @db.Timestamp(6)
   updatedAt      DateTime   @updatedAt
   addresses      Json[]     @default([])
+  savedCards     Json?      @default("[]")
+  savedUpiIds    Json?      @default("[]")
   bhaktiPoints   Int        @default(0)
   lifetimePoints Int        @default(0)
   account        Account[]

@@ -1,39 +1,52 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { getOrderById } from '@/lib/actions/order.actions';
+import { trackOrderByQuery } from '@/lib/actions/order.actions';
 import { Loader } from 'lucide-react';
 import OrderTimeline from '@/components/shared/order/order-timeline';
 
 const TrackOrderForm = () => {
-  const [orderId, setOrderId] = useState('');
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get('awb') || searchParams.get('orderId') || '';
+  const [orderQuery, setOrderQuery] = useState(initialQuery);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [order, setOrder] = useState<any>(null);
 
-  const handleTrack = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!orderId) return;
+  const fetchTracking = async (q: string) => {
+    if (!q.trim()) return;
 
     setLoading(true);
     setError('');
     setOrder(null);
 
     try {
-      const foundOrder = await getOrderById(orderId);
+      const foundOrder = await trackOrderByQuery(q);
       if (foundOrder) {
         setOrder(foundOrder);
       } else {
-        setError('Order not found. Please check your Order ID.');
+        setError('Order not found. Please verify your Order ID or AWB Tracking Number.');
       }
     } catch (err) {
-      setError('Invalid Order ID format or order not found.');
+      setError('Unable to locate order. Please check the details entered.');
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (initialQuery) {
+      fetchTracking(initialQuery);
+    }
+  }, [initialQuery]);
+
+  const handleTrack = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await fetchTracking(orderQuery);
   };
 
   return (
@@ -41,12 +54,12 @@ const TrackOrderForm = () => {
       {!order ? (
         <form onSubmit={handleTrack} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="orderId">Order ID</Label>
+            <Label htmlFor="orderQuery">Order ID or AWB Tracking Number</Label>
             <Input
-              id="orderId"
-              placeholder="e.g. 49b55d94-244b-47f3..."
-              value={orderId}
-              onChange={(e) => setOrderId(e.target.value)}
+              id="orderQuery"
+              placeholder="e.g. 49b55d94-244b-47f3... or AWB 1432423..."
+              value={orderQuery}
+              onChange={(e) => setOrderQuery(e.target.value)}
               required
             />
           </div>
@@ -60,7 +73,7 @@ const TrackOrderForm = () => {
         <div className="space-y-6">
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20 text-center">
             <p className="text-sm text-on-surface-variant">Order Status for</p>
-            <p className="font-title-lg text-primary">{orderId}</p>
+            <p className="font-title-lg text-primary">{order.id}</p>
           </div>
           <OrderTimeline order={order} />
           <Button variant="outline" className="w-full" onClick={() => setOrder(null)}>

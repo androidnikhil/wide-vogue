@@ -12,13 +12,13 @@ export default function Footer() {
 {/* Col 1: Brand Anchor Card */}
 <div className="space-y-4">
 <div className="bg-surface p-3 rounded-lg inline-block shadow-sm">
-<img alt="Madhav Shringaar" className="h-20 w-auto min-w-[200px] object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD75rl5ZEaBmmpEx8y3K6w9XKaa_YtA4qg-eZYvR09fY8aGbt8WfkJzr6vIa1EErPd-NEnnR0qn0ASZMdDyMkwAbgo7Kwm9uHSzGH7PszRApulz6AhHNGWrWP2vTxv7i4rQcfqBIsZLVKjaXbMN5JUFRib8F6LobfCqnxBN8DjAGaRO5a_qAJy4lM5R6Hr0W5fLylioAMZdWhKuNSlx6MarSv-oxVReVcEX5KO8YC6M1D_lyxi_VXYf7Vq3uPSLH6ARog" />
+<Image alt="Madhav Shringaar" width={180} height={70} className="h-16 w-auto object-contain" src="/images/logo.png" />
 </div>
 <p className="font-body-sm text-body-sm text-white/80 leading-relaxed">
             Bringing divine adornments, authentic fabrics, and revered seva essentials to every Kanha devotee with eternal dedication.
           </p>
 <div className="flex items-center gap-3 pt-2">
-<a aria-label="WhatsApp" className="w-8 h-8 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="#">
+<a aria-label="WhatsApp" className="w-8 h-8 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="https://wa.me/919410048805" target="_blank" rel="noopener noreferrer">
 <span className="material-symbols-outlined text-sm">chat</span>
 </a>
 <a aria-label="YouTube" className="w-8 h-8 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="#">
@@ -33,10 +33,10 @@ export default function Footer() {
 <div>
 <h3 className="font-title-lg text-title-lg text-secondary-fixed mb-4">Quick Seva Links</h3>
 <ul className="space-y-2 text-white/90 font-label-md text-label-md">
-<li><a className="hover:text-secondary-fixed transition-colors" href="#">Home</a></li>
-<li><a className="hover:text-secondary-fixed transition-colors" href="#">About Us</a></li>
-<li><a className="hover:text-secondary-fixed transition-colors" href="#size-guide">Size Chart Guide (0-6 No.)</a></li>
-<li><a className="hover:text-secondary-fixed transition-colors" href="#">Authentic Fabric Promise</a></li>
+<li><Link className="hover:text-secondary-fixed transition-colors" href="/">Home</Link></li>
+<li><Link className="hover:text-secondary-fixed transition-colors" href="/faq">Help Centre &amp; Devotee FAQs</Link></li>
+<li><Link className="hover:text-secondary-fixed transition-colors" href="/size-chart">Size Chart Guide (0-6 No.)</Link></li>
+<li><Link className="hover:text-secondary-fixed transition-colors" href="/policies/authenticity">Authentic Fabric Promise</Link></li>
 <li><Link className="hover:text-secondary-fixed transition-colors" href="/policies/shipping">Shipping &amp; Pan-India Delivery</Link></li>
 <li><Link className="hover:text-secondary-fixed transition-colors" href="/policies/returns">Exchange &amp; Return Policy</Link></li>
 </ul>
@@ -77,7 +77,10 @@ export default function Footer() {
 </div>
 <div className="flex items-start gap-2.5">
 <span className="material-symbols-outlined text-secondary-fixed text-lg mt-0.5">location_on</span>
-<p className="text-xs">Vrindavan Dham &amp; Mathura Craft Workshop, Uttar Pradesh, India</p>
+<div>
+  <p className="text-xs font-semibold text-surface">Operating from Agra &amp; Noida</p>
+  <p className="text-xs text-white/70">Uttar Pradesh / Delhi NCR | Express Pan-India Delivery</p>
+</div>
 </div>
 </div>
 </div>
@@ -90,7 +93,7 @@ export default function Footer() {
 <span>•</span>
 <Link className="hover:text-secondary-fixed transition-colors" href="/policies/terms">Terms of Service</Link>
 <span>•</span>
-<a className="hover:text-secondary-fixed transition-colors" href="#">Authenticity Promise</a>
+<Link className="hover:text-secondary-fixed transition-colors" href="/policies/authenticity">Authenticity Promise</Link>
 </div>
 </div>
 </div>

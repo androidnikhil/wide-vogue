@@ -74,14 +74,26 @@ import {
                       : 'Not Paid'}
                   </TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                      order.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
-                      order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' :
-                      order.status === 'OUT_FOR_DELIVERY' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {order.status || 'PENDING'}
-                    </span>
+                    <div className="flex flex-col gap-1 items-start">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                        order.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
+                        order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' :
+                        order.status === 'OUT_FOR_DELIVERY' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {order.status || 'PENDING'}
+                      </span>
+                      {order.refundStatus === 'RETURN_REQUESTED' && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                          ⚠️ RETURN REQ
+                        </span>
+                      )}
+                      {order.refundStatus === 'RETURN_APPROVED' && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
+                          ✅ RETURN OK
+                        </span>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Button asChild variant='outline' size='sm'>

@@ -31,7 +31,7 @@ export default function MobileMenu() {
     <div className="md:flex lg:hidden">
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="text-primary hover:text-secondary hover:bg-transparent">
+          <Button variant="ghost" size="icon" className="h-9 w-9 text-primary hover:text-secondary hover:bg-transparent">
             <Menu className="h-6 w-6" />
             <span className="sr-only">Open menu</span>
           </Button>

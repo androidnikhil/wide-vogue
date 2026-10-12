@@ -8,6 +8,7 @@ import { getMyCart } from '@/lib/actions/cart.action';
 import { getWishlist } from '@/lib/actions/wishlist.actions';
 import UserButton from './user-button';
 import MobileMenu from './mobile-menu';
+import MobileSearch from './mobile-search';
 
 export default async function Header() {
   const cart = await getMyCart();
@@ -20,36 +21,36 @@ export default async function Header() {
 <div className="bg-primary-container text-on-primary font-label-md text-label-md py-1.5 px-4 md:px-8 border-b border-secondary/20 max-sm:bg-gradient-to-r max-sm:from-[#003A2C] max-sm:via-[#064936] max-sm:to-[#003A2C] max-sm:text-[#F7EAC7] max-sm:border-b-[#C2A66A]/60 max-sm:py-2 max-sm:px-2">
 <div className="max-w-7xl mx-auto flex justify-between items-center text-xs max-sm:grid max-sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] max-sm:gap-1">
 <div className="flex items-center gap-2 max-sm:min-w-0 max-sm:gap-1">
-<span className="material-symbols-outlined text-secondary-fixed text-base max-sm:text-[#E6C16A] max-sm:text-[17px]">local_shipping</span>
+<span className="material-symbols-outlined text-secondary-fixed text-base max-sm:shrink-0 max-sm:text-[#E6C16A] max-sm:text-[15px]">local_shipping</span>
 <span className="hidden sm:inline">🚚 Free Shipping above ₹999 across India</span>
-<span className="sm:hidden max-sm:text-[9px] max-sm:font-semibold max-sm:leading-tight">Free Shipping ₹999+</span>
+<span className="sm:hidden max-sm:whitespace-nowrap max-sm:text-[7px] max-sm:font-semibold max-sm:leading-tight max-sm:tracking-tight">Free Shipping ₹999+</span>
 </div>
-<div className="font-headline-sm text-secondary-fixed text-sm md:text-base tracking-widest font-bold animate-pulse max-sm:whitespace-nowrap max-sm:text-[10px] max-sm:tracking-normal max-sm:text-[#E6C16A] max-sm:[animation:none]">
+<div className="font-headline-sm text-secondary-fixed text-sm md:text-base tracking-widest font-bold animate-pulse max-sm:whitespace-nowrap max-sm:text-[9px] max-sm:tracking-normal max-sm:text-[#E6C16A] max-sm:[animation:none]">
         ॥ Radhe Radhe ॥
       </div>
-<div className="flex items-center gap-1 text-primary-fixed max-sm:min-w-0 max-sm:justify-end max-sm:gap-1 max-sm:text-[#F7EAC7]">
-<span className="material-symbols-outlined text-secondary-fixed text-base max-sm:text-[#E6C16A] max-sm:text-[17px]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+<div className="flex min-w-0 items-center gap-1 text-primary-fixed max-sm:justify-self-end max-sm:gap-0.5 max-sm:-translate-x-1 max-sm:text-[#F7EAC7]">
+<span className="material-symbols-outlined shrink-0 text-secondary-fixed text-base max-sm:hidden" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
 <span className="hidden md:inline">Trusted by 10,000+ Happy Devotees</span>
-<span className="md:hidden max-sm:text-[9px] max-sm:font-semibold max-sm:leading-tight">10,000+ Devotees</span>
+<span className="md:hidden max-sm:whitespace-nowrap max-sm:text-[7px] max-sm:font-semibold max-sm:leading-tight max-sm:tracking-tight">10,000+ Devotees</span>
 </div>
 </div>
 </div>
 
 <header id="main-header" className="sticky top-0 w-full z-50 border-b border-outline-variant/10 py-2 bg-[#FBF7EE]/95 shadow-sm backdrop-blur-lg">
-<div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 flex flex-col gap-2">
-<div className="flex items-center justify-between gap-2">
+<div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 flex flex-col gap-2 max-sm:px-2">
+<div className="flex items-center justify-between gap-2 max-sm:gap-1 max-[359px]:flex-wrap">
 
-<div className="flex shrink-0 items-center gap-2">
+<div className="flex min-w-0 flex-1 items-center gap-2 max-sm:gap-1 max-[359px]:w-full max-[359px]:flex-none">
 <MobileMenu />
-<Link className="flex items-center gap-2 lg:hidden" href="/">
+<Link className="flex min-w-0 items-center gap-2 lg:hidden" href="/">
 <Image
   alt="Madhav Shringaar"
-  className="h-16 w-auto max-w-[min(48vw,260px)] object-contain sm:h-[4.25rem] md:h-[4.75rem]"
+  className="h-11 w-auto max-w-[clamp(6rem,42vw,10rem)] object-contain sm:h-[4.25rem] sm:max-w-[min(48vw,260px)] md:h-[4.75rem]"
   src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ"
   width={500}
   height={200}
   quality={85}
-  sizes="(max-width: 640px) 48vw, (max-width: 1023px) 260px, 200px"
+  sizes="(max-width: 640px) 42vw, (max-width: 1023px) 260px, 200px"
 />
 </Link>
 <Link className="hidden items-center gap-2 lg:flex" href="/">
@@ -71,11 +72,9 @@ export default async function Header() {
 
 </div>
 
-<div className="flex shrink-0 items-center gap-1 md:gap-2 lg:gap-5">
+<div className="flex shrink-0 items-center gap-1 md:gap-2 lg:gap-5 max-sm:gap-0.5 max-[359px]:ml-auto">
 
-<button aria-label="Search items" className="md:hidden p-2 text-on-surface hover:text-secondary active:scale-95" id="toggleMobileSearch">
-<span className="material-symbols-outlined text-2xl">search</span>
-</button>
+<MobileSearch />
 
 <div className="hidden lg:flex items-center">
   <UserButton />
@@ -98,13 +97,6 @@ export default async function Header() {
 </div>
 </div>
 
-<div className="hidden md:hidden pt-2 pb-1" id="mobileSearchField">
-<form action="/search" className="relative flex items-center w-full">
-<input name="q" className="w-full pl-10 pr-20 py-2 bg-surface-container-low border border-outline-variant/40 rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary" placeholder="Search dresses, mukut, bansuri..." type="text"/>
-<span className="material-symbols-outlined absolute left-3 text-secondary text-lg">search</span>
-<button type="submit" className="absolute right-1 px-3 py-1 gold-gradient-btn text-primary-container font-label-sm text-label-sm rounded">Find</button>
-</form>
-</div>
 </div>
 
 <nav className="hidden lg:block bg-surface-container-low border-t border-outline-variant/20">

@@ -12,7 +12,7 @@ export default function Footer() {
 {/* Col 1: Brand Anchor Card */}
 <div className="space-y-4">
 <div className="bg-surface p-3 rounded-lg inline-block shadow-sm">
-<img alt="Madhav Shringaar" className="h-20 w-auto min-w-[200px] object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD75rl5ZEaBmmpEx8y3K6w9XKaa_YtA4qg-eZYvR09fY8aGbt8WfkJzr6vIa1EErPd-NEnnR0qn0ASZMdDyMkwAbgo7Kwm9uHSzGH7PszRApulz6AhHNGWrWP2vTxv7i4rQcfqBIsZLVKjaXbMN5JUFRib8F6LobfCqnxBN8DjAGaRO5a_qAJy4lM5R6Hr0W5fLylioAMZdWhKuNSlx6MarSv-oxVReVcEX5KO8YC6M1D_lyxi_VXYf7Vq3uPSLH6ARog" />
+<Image alt="Madhav Shringaar" className="h-20 w-auto min-w-[200px] object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD75rl5ZEaBmmpEx8y3K6w9XKaa_YtA4qg-eZYvR09fY8aGbt8WfkJzr6vIa1EErPd-NEnnR0qn0ASZMdDyMkwAbgo7Kwm9uHSzGH7PszRApulz6AhHNGWrWP2vTxv7i4rQcfqBIsZLVKjaXbMN5JUFRib8F6LobfCqnxBN8DjAGaRO5a_qAJy4lM5R6Hr0W5fLylioAMZdWhKuNSlx6MarSv-oxVReVcEX5KO8YC6M1D_lyxi_VXYf7Vq3uPSLH6ARog" width={250} height={80} sizes="250px" />
 </div>
 <p className="font-body-sm text-body-sm text-white/80 leading-relaxed">
             Bringing divine adornments, authentic fabrics, and revered seva essentials to every Kanha devotee with eternal dedication.

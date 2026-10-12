@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function BannerList({ banners }: { banners: Banner[] }) {
   if (banners.length === 0) {
@@ -38,7 +39,7 @@ export default function BannerList({ banners }: { banners: Banner[] }) {
           {banners.map((banner) => (
             <TableRow key={banner.id}>
               <TableCell>
-                <img src={banner.imageUrl} alt={banner.title} className="h-12 w-24 object-cover rounded shadow-sm" />
+                <Image src={banner.imageUrl} alt={banner.title} width={96} height={48} sizes="96px" className="h-12 w-24 object-cover rounded shadow-sm" />
               </TableCell>
               <TableCell className="font-medium">{banner.title}</TableCell>
               <TableCell className="text-on-surface-variant max-w-[200px] truncate">

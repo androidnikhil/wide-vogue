@@ -36,10 +36,13 @@ const SignInPage = async (props: {
       <Card>
         <CardHeader className='space-y-4'>
           <Link href='/' className='flex-center'>
-            <img
+            <Image
               src='https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ'
               className='h-24 w-auto object-contain'
               alt={`${APP_NAME} logo`}
+              width={240}
+              height={96}
+              sizes="240px"
             />
           </Link>
           <CardTitle className='text-center'>Sign In</CardTitle>

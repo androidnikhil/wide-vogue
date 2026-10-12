@@ -30,7 +30,7 @@ const ProductCarousel = ({ data }: { data: Product[] }) => {
       <CarouselContent>
         {data.map((product: Product) => (
           <CarouselItem key={product.id}>
-            <Link href={`/product/${product.slug}`}>
+            <Link href={`/product/${product.slug}`} className="group block overflow-hidden">
               <div className='relative mx-auto'>
                 <Image
                   src={product.banner!}
@@ -38,7 +38,7 @@ const ProductCarousel = ({ data }: { data: Product[] }) => {
                   height={680}
                   width={1920}
                   sizes='100vw'
-                  className='w-full h-[300px] md:h-[400px] lg:h-[500px] xl:h-[600px] object-cover object-center'
+                  className='w-full h-[300px] md:h-[400px] lg:h-[500px] xl:h-[600px] object-cover object-center transition-transform duration-700 group-hover:scale-[1.02] group-active:scale-[1.02]'
                 />
 
               </div>

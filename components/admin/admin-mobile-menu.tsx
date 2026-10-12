@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/s
 import MainNav from '@/app/admin/main-nav';
 import Link from 'next/link';
 import { APP_NAME } from '@/lib/constants';
+import Image from 'next/image';
 
 export default function AdminMobileMenu({
   children
@@ -24,10 +25,13 @@ export default function AdminMobileMenu({
         <SheetTitle className="sr-only">Admin Navigation</SheetTitle>
         <div className='h-20 flex items-center justify-center border-b border-outline-variant/30 px-4'>
           <Link href='/' className='flex items-center justify-center w-full' onClick={() => setOpen(false)}>
-            <img
+            <Image
               src='https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ'
               className='h-12 w-auto object-contain'
               alt={APP_NAME}
+              width={180}
+              height={72}
+              sizes="180px"
             />
           </Link>
         </div>

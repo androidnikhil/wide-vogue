@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { createBanner } from '@/lib/actions/banner.actions';
 import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 
 export default function BannerForm() {
   const router = useRouter();
@@ -96,7 +97,7 @@ export default function BannerForm() {
             {imageUrl && (
               <div className="mt-4">
                 <p className="text-sm text-on-surface-variant mb-2">Preview:</p>
-                <img src={imageUrl} alt="Preview" className="w-full max-h-[200px] object-cover rounded-lg shadow-sm" />
+                <Image src={imageUrl} alt="Preview" width={1200} height={600} sizes="(max-width: 768px) 100vw, 50vw" className="w-full max-h-[200px] object-cover rounded-lg shadow-sm" />
                 <input type="hidden" name="imageUrl" value={imageUrl} />
               </div>
             )}

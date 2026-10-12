@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/types";
-import AddToCart from "./add-to-cart";
+import ProductCardCartButton from "./product-card-cart-button";
 import WishlistButton from "./wishlist-button";
 import ProductPrice from "./product-price";
 
@@ -10,17 +10,20 @@ const ProductCard = ({ product }: { product: Product }) => {
     const discount = product.discountPercent || 0;
 
     return (
-        <div className="bg-white rounded-[1.5rem] border border-outline-variant/40 hover:border-secondary/50 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 group-hover:rotate-1 flex flex-col justify-between overflow-hidden group">
+        <div className="bg-white rounded-[1.5rem] border border-outline-variant/40 hover:border-secondary/50 shadow-sm hover:shadow-xl hover:-translate-y-2 active:scale-[0.99] transition-all duration-500 group-hover:rotate-1 flex flex-col justify-between overflow-hidden group">
             <div className="relative bg-surface-container p-2 aspect-square overflow-hidden flex items-center justify-center">
                 <span className="absolute top-2 left-2 z-10 px-2 py-0.5 bg-primary-container text-surface font-label-sm text-label-sm rounded text-[10px]">
                     {product.category || "Featured"}
                 </span>
                 <WishlistButton productId={product.id} />
-                <Link href={`/product/${product.slug}`} className="w-full h-full">
-                    <img
+                <Link href={`/product/${product.slug}`} className="w-full h-full block">
+                    <Image
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+                        className="w-full h-full object-cover group-hover:scale-[1.03] group-active:scale-[1.03] transition-transform duration-700 ease-out"
                         src={product.images[0] || "https://placehold.co/400x400/png"}
+                        width={400}
+                        height={400}
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                 </Link>
             </div>
@@ -48,29 +51,18 @@ const ProductCard = ({ product }: { product: Product }) => {
                             </>
                         )}
                     </div>
-                    {product.stock > 0 ? (
-                        product.sizes && product.sizes.length > 0 ? (
-                            <Link href={`/product/${product.slug}`} className="w-full py-1.5 gold-gradient-btn text-primary-container font-label-md text-label-md rounded font-bold hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-1">
-                                <span className="material-symbols-outlined text-sm">straighten</span>
-                                Select Size
-                            </Link>
-                        ) : (
-                            <AddToCart 
-                                item={{
-                                    productId: product.id,
-                                    name: product.name,
-                                    slug: product.slug,
-                                    price: product.price.toString(),
-                                    qty: 1,
-                                    image: product.images[0] || "https://placehold.co/400x400/png"
-                                }}
-                            />
-                        )
-                    ) : (
-                        <button disabled className="w-full py-1.5 bg-outline-variant text-on-surface-variant font-label-md text-label-md rounded font-bold opacity-70 cursor-not-allowed flex items-center justify-center gap-1">
-                            Out of Stock
-                        </button>
-                    )}
+                    <ProductCardCartButton
+                        product={{
+                            id: product.id,
+                            name: product.name,
+                            slug: product.slug,
+                            price: product.price.toString(),
+                            images: product.images,
+                            sizes: product.sizes,
+                            sizeVariants: (product as any).sizeVariants,
+                            stock: product.stock,
+                        }}
+                    />
                 </div>
             </div>
         </div>

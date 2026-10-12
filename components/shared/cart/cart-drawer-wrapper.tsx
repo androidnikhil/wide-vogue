@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function CartDrawerWrapper({ cart }: { cart: any }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,18 +40,18 @@ export default function CartDrawerWrapper({ cart }: { cart: any }) {
                     let itemImage = item.image || '';
                     if (itemImage.includes('sample-products')) {
                         const nameLower = item.name ? item.name.toLowerCase() : '';
-                        if (nameLower.includes('poshak') || itemImage.includes('p1')) itemImage = '/images/devotional/poshak.jpg';
-                        else if (nameLower.includes('mukut') || itemImage.includes('p2')) itemImage = '/images/devotional/mukut.jpg';
-                        else if (nameLower.includes('bansuri') || itemImage.includes('p3')) itemImage = '/images/devotional/bansuri.jpg';
-                        else if (nameLower.includes('jewel') || itemImage.includes('p4')) itemImage = '/images/devotional/jewellery.jpg';
-                        else if (nameLower.includes('aasan') || itemImage.includes('p5')) itemImage = '/images/devotional/aasan.jpg';
-                        else itemImage = '/images/devotional/complete_shringar.jpg';
+                        if (nameLower.includes('poshak') || itemImage.includes('p1')) itemImage = '/images/devotional/poshak.webp';
+                        else if (nameLower.includes('mukut') || itemImage.includes('p2')) itemImage = '/images/devotional/mukut.webp';
+                        else if (nameLower.includes('bansuri') || itemImage.includes('p3')) itemImage = '/images/devotional/bansuri.webp';
+                        else if (nameLower.includes('jewel') || itemImage.includes('p4')) itemImage = '/images/devotional/jewellery.webp';
+                        else if (nameLower.includes('aasan') || itemImage.includes('p5')) itemImage = '/images/devotional/aasan.webp';
+                        else itemImage = '/images/devotional/complete_shringar.webp';
                     }
                     return (
                       <div key={item.productId} className="p-3 bg-surface-container-low rounded-xl border border-outline/10 hover:border-secondary/40 transition-colors">
                           <div className="flex gap-3">
                               <div className="w-16 h-16 rounded-md bg-surface overflow-hidden shrink-0 border border-outline/10">
-                                  <img src={itemImage} alt={item.name} className="w-full h-full object-cover" />
+                                  <Image src={itemImage} alt={item.name} fill sizes="64px" className="object-cover" />
                               </div>
                               <div className="flex flex-col justify-between flex-1 overflow-hidden">
                                   <h4 className="font-bold text-primary text-sm truncate font-sans">{item.name}</h4>

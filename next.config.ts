@@ -2,10 +2,22 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    formats: ['image/webp'],
+    qualities: [85],
     remotePatterns: [
       {
         protocol: "https",
         hostname: "utfs.io",
+        port: '',
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        port: '',
+      },
+      {
+        protocol: "https",
+        hostname: "placehold.co",
         port: '',
       }
     ]

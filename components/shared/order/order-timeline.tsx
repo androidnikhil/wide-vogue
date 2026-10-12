@@ -10,6 +10,7 @@ const OrderTimeline = ({ order }: OrderTimelineProps) => {
   const isPaid = order.isPaid;
   const isDelivered = order.isDelivered;
   const status = order.status || 'PENDING';
+  const refundStatus = order.refundStatus;
   
   const steps = [
     {
@@ -21,17 +22,24 @@ const OrderTimeline = ({ order }: OrderTimelineProps) => {
     },
     {
       title: 'Processing',
-      description: isPaid ? 'Payment Confirmed' : 'Awaiting Payment',
+      description: isPaid ? 'Payment Confirmed & Packing' : 'Awaiting Payment',
       icon: CheckCircle2,
-      isCompleted: status === 'PROCESSING' || status === 'SHIPPED' || status === 'DELIVERED' || isDelivered,
+      isCompleted: status === 'PROCESSING' || status === 'SHIPPED' || status === 'OUT_FOR_DELIVERY' || status === 'DELIVERED' || isDelivered,
       isActive: status === 'PROCESSING',
     },
     {
       title: 'Shipped',
       description: order.awbNumber ? `Tracking: ${order.awbNumber}` : '',
       icon: Truck,
-      isCompleted: status === 'SHIPPED' || status === 'DELIVERED' || isDelivered,
+      isCompleted: status === 'SHIPPED' || status === 'OUT_FOR_DELIVERY' || status === 'DELIVERED' || isDelivered,
       isActive: status === 'SHIPPED',
+    },
+    {
+      title: 'Out for Delivery',
+      description: status === 'OUT_FOR_DELIVERY' ? 'Courier executive is on the way' : '',
+      icon: Truck,
+      isCompleted: status === 'OUT_FOR_DELIVERY' || status === 'DELIVERED' || isDelivered,
+      isActive: status === 'OUT_FOR_DELIVERY',
     },
     {
       title: 'Delivered',
@@ -87,6 +95,41 @@ const OrderTimeline = ({ order }: OrderTimelineProps) => {
           );
         })}
       </div>
+
+      {refundStatus && (
+        <div className="mt-6 pt-4 border-t border-outline-variant/30">
+          {refundStatus === 'RETURN_REQUESTED' && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-3.5">
+              <p className="font-bold text-sm flex items-center gap-1.5">
+                <span>🔄</span> 7-Day Return Request Under Review
+              </p>
+              <p className="text-xs text-amber-800 mt-1">
+                Submitted on {order.returnRequestedAt ? new Date(order.returnRequestedAt).toLocaleDateString() : 'recently'}. Reason: {order.returnReason || 'Return requested'}.
+              </p>
+            </div>
+          )}
+          {refundStatus === 'RETURN_APPROVED' && (
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl p-3.5">
+              <p className="font-bold text-sm flex items-center gap-1.5">
+                <span>✅</span> Return Request Approved
+              </p>
+              <p className="text-xs text-emerald-800 mt-1">
+                Reverse pickup is being scheduled with our courier partner. Please keep the sacred items carefully packed in their original box.
+              </p>
+            </div>
+          )}
+          {refundStatus === 'RETURN_REJECTED' && (
+            <div className="bg-red-50 border border-red-200 text-red-900 rounded-xl p-3.5">
+              <p className="font-bold text-sm flex items-center gap-1.5">
+                <span>ℹ️</span> Return Request Closed
+              </p>
+              <p className="text-xs text-red-800 mt-1">
+                Reason / Note: {order.returnReason || 'Item does not qualify under 7-day return policy.'}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

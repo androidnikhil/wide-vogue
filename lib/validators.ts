@@ -9,6 +9,15 @@ const currency = z
     "Price must have exactly two decimal place"
   );
 
+export const sizeVariantSchema = z.object({
+  size: z.string(),
+  price: z.string().or(z.number().transform(v => String(v))),
+  originalPrice: z.string().or(z.number().transform(v => String(v))).optional(),
+  stock: z.coerce.number().int().min(0).default(0),
+});
+
+export type SizeVariant = z.infer<typeof sizeVariantSchema>;
+
 export const insertProductSchema = z.object({
   name: z.string().min(3, "Name must be have at least 3 characters").max(255),
   slug: z.string().min(3, "Slug must be have at least 3 characters").max(255),
@@ -25,6 +34,7 @@ export const insertProductSchema = z.object({
     z.string().min(1, "Product should have at least 1 image")
   ),
   sizes: z.array(z.string()).default([]),
+  sizeVariants: z.array(sizeVariantSchema).optional().default([]),
   isFeatured: z.boolean(),
   banner: z.string().nullable(),
   price: currency,
@@ -171,6 +181,10 @@ export const paymentResultSchema = z.object({
 export const updateProfileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address').optional().or(z.literal('')),
+  phoneNumber: z.string()
+    .regex(/^[6-9]\d{9}$/, 'Must be a valid 10-digit Indian mobile number')
+    .optional()
+    .or(z.literal('')),
 });
 
 // Schema to update users

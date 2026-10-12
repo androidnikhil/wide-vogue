@@ -68,13 +68,34 @@ const UserButton = async () => {
           <div className="h-px bg-outline-variant/30 my-1"></div>
 
           <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
-            <Link href='/user/profile' className='w-full px-3 py-2 text-sm text-on-surface'>
-             Profile
+            <Link href='/user' className='w-full px-3 py-2 text-sm text-on-surface flex items-center justify-between'>
+              <span>My Account</span>
+              <span className="text-[10px] bg-[#E6C16A]/30 text-[#8A5A0A] font-semibold px-1.5 py-0.5 rounded">Hub</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
             <Link href='/user/orders' className='w-full px-3 py-2 text-sm text-on-surface'>
-              Orders
+              Orders & Tracking
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
+            <Link href='/wishlist' className='w-full px-3 py-2 text-sm text-on-surface'>
+              Wishlist
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
+            <Link href='/user/addresses' className='w-full px-3 py-2 text-sm text-on-surface'>
+              Saved Addresses
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
+            <Link href='/user/gift-cards' className='w-full px-3 py-2 text-sm text-on-surface'>
+              Gift Cards & Rewards
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
+            <Link href='/user/profile' className='w-full px-3 py-2 text-sm text-on-surface'>
+              Edit Profile
             </Link>
           </DropdownMenuItem>
 

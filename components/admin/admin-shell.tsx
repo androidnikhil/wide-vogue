@@ -7,6 +7,7 @@ import MainNav from '@/app/admin/main-nav';
 import AdminSearch from '@/components/admin/admin-search';
 import AdminMobileMenu from '@/components/admin/admin-mobile-menu';
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import Image from 'next/image';
 
 export default function AdminShell({
   children,
@@ -28,19 +29,25 @@ export default function AdminShell({
         <div className="h-20 flex items-center justify-between border-b border-outline-variant/30 px-4 shrink-0">
           {!isCollapsed && (
             <Link href="/" className="flex items-center justify-center w-full">
-              <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ"
+              <Image
+                src="/images/logo.png"
                 className="h-16 w-auto object-contain"
                 alt={APP_NAME}
+                width={240}
+                height={96}
+                sizes="240px"
               />
             </Link>
           )}
           {isCollapsed && (
             <Link href="/" className="flex items-center justify-center w-full">
-               <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ"
+               <Image
+                src="/images/logo.png"
                 className="h-12 w-auto object-contain opacity-80"
                 alt={APP_NAME}
+                width={180}
+                height={72}
+                sizes="180px"
               />
             </Link>
           )}

@@ -48,9 +48,9 @@ export default function CartDrawerWrapper({ cart }: { cart: any }) {
                         else itemImage = '/images/devotional/complete_shringar.webp';
                     }
                     return (
-                      <div key={item.productId} className="p-3 bg-surface-container-low rounded-xl border border-outline/10 hover:border-secondary/40 transition-colors">
+                      <div key={`${item.productId}-${item.size || ''}`} className="p-3 bg-surface-container-low rounded-xl border border-outline/10 hover:border-secondary/40 transition-colors">
                           <div className="flex gap-3">
-                              <div className="w-16 h-16 rounded-md bg-surface overflow-hidden shrink-0 border border-outline/10">
+                              <div className="relative w-16 h-16 rounded-md bg-surface overflow-hidden shrink-0 border border-outline/10">
                                   <Image src={itemImage} alt={item.name} fill sizes="64px" className="object-cover" />
                               </div>
                               <div className="flex flex-col justify-between flex-1 overflow-hidden">

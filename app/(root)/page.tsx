@@ -68,27 +68,27 @@ export default async function Homepage({
               <span className="font-bold text-xs uppercase tracking-[0.2em] text-[#003020]">Divine Essentials</span>
             </div>
             
-            <h1 className="text-6xl md:text-[6.5rem] text-[#003020] font-bold tracking-tight leading-[0.95] font-serif mb-6 relative z-10 drop-shadow-sm">
+            <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-[6.5rem] text-[#003020] font-bold tracking-tight leading-[1.05] md:leading-[1] lg:leading-[0.95] font-serif mb-6 relative z-10 drop-shadow-sm">
               Adorn Your <br />
-              <span className="inline-block transform -rotate-3 text-[#0F6F74] italic font-medium bg-[#E6C16A]/20 px-4 rounded-3xl mt-2">Beloved</span> Kanha
+              <span className="inline-block transform -rotate-3 text-[#0F6F74] italic font-medium bg-[#E6C16A]/20 px-3 sm:px-4 rounded-3xl mt-2">Beloved</span> Kanha
             </h1>
             
-            <p className="text-xl md:text-2xl text-[#003020]/70 max-w-md font-serif mb-10 pl-6 border-l-4 border-[#C88A20] rounded-sm">
+            <p className="text-lg sm:text-xl md:text-2xl text-[#003020]/70 max-w-md font-serif mb-8 sm:mb-10 pl-4 sm:pl-6 border-l-4 border-[#C88A20] rounded-sm">
               Beautiful Poshak & Shringar, Chosen With Love.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Link href="/search?category=Poshak" className="bg-[#003020] px-10 py-5 rounded-[2rem] text-white font-bold shadow-xl shadow-[#003020]/20 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 text-center uppercase tracking-widest text-sm border-2 border-[#003020]">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+              <Link href="/search?category=Poshak" className="bg-[#003020] px-8 sm:px-10 py-3.5 sm:py-5 rounded-[2rem] text-white font-bold shadow-xl shadow-[#003020]/20 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 text-center uppercase tracking-widest text-xs sm:text-sm border-2 border-[#003020]">
                 Shop Poshak
               </Link>
-              <Link href="/search?category=Mukut" className="bg-white px-10 py-5 rounded-[2rem] text-[#003020] font-bold shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300 text-center uppercase tracking-widest text-sm border-2 border-[#E6C16A]/30">
+              <Link href="/search?category=Mukut" className="bg-white px-8 sm:px-10 py-3.5 sm:py-5 rounded-[2rem] text-[#003020] font-bold shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300 text-center uppercase tracking-widest text-xs sm:text-sm border-2 border-[#E6C16A]/30">
                 Explore Shringar
               </Link>
             </div>
           </div>
 
           {/* RIGHT: Floating Artwork & Organic Layout */}
-          <div className="lg:col-span-7 relative h-[550px] lg:h-[750px] w-full flex justify-center lg:justify-end items-center mt-10 lg:mt-0">
+          <div className="lg:col-span-7 relative h-[420px] sm:h-[500px] lg:h-[750px] w-full flex justify-center lg:justify-end items-center mt-6 lg:mt-0">
             {/* Organic Blob Background for Image */}
             <div className="absolute w-[90%] h-[90%] bg-gradient-to-tr from-[#E6C16A] to-[#FDE8DF] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] animate-[spin_30s_linear_infinite] opacity-50 blur-xl"></div>
             <div className="absolute w-[80%] h-[80%] bg-[#0F6F74] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] animate-[spin_25s_linear_infinite_reverse] opacity-20 blur-2xl"></div>
@@ -235,7 +235,7 @@ export default async function Homepage({
           <p className="text-[#003020]/60 max-w-2xl text-lg">Real Madhav Shringaar products, ready for your beloved Kanha.</p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
           {latestProducts && latestProducts.length > 0 ? (
             latestProducts.slice(0, 4).map((product: any) => (
                 <div key={product.id} className="w-full transform hover:-translate-y-2 transition-transform duration-300">

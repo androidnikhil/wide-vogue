@@ -9,12 +9,13 @@ import {
   Tailwind,
   Text,
   Button,
-  Hr,
   Row,
   Column,
+  Img,
 } from '@react-email/components';
 import * as React from 'react';
 import { formatCurrency } from '@/lib/utils';
+import { EmailHeader, EmailContactFooter, BRAND_COLORS } from './email-components';
 
 interface OrderDeliveredEmailProps {
   order: any;
@@ -29,122 +30,104 @@ export default function OrderDeliveredEmail({
     order.user?.name ||
     (order.shippingAddress as any)?.fullName ||
     'Beloved Devotee';
+  const cleanOrderId = `OD${(order.id || '').replace(/-/g, '').slice(0, 16).toUpperCase()}`;
+  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'https://www.madhavshringaar.com';
+
+  const deliveredDate = order.deliveredAt
+    ? new Date(order.deliveredAt).toLocaleString('en-IN', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      })
+    : 'Recently';
+
+  if (isAdminNotification) {
+    return (
+      <Html>
+        <Head />
+        <Preview>✅ Order #{cleanOrderId} Delivered Successfully</Preview>
+        <Tailwind>
+          <Body style={{ backgroundColor: '#F3F4F6', fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", margin: 0, padding: '24px 0' }}>
+            <Container style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '16px', maxWidth: '600px', margin: '0 auto', padding: '32px 24px' }}>
+              <EmailHeader title="Madhav Shringaar" subtitle="Admin Logistics Notice" />
+              <Section style={{ textAlign: 'center', margin: '16px 0' }}>
+                <Heading style={{ fontSize: '20px', fontWeight: 800, color: '#065F46', margin: '0 0 8px 0' }}>
+                  ✅ Order #{cleanOrderId} Delivered
+                </Heading>
+                <Text style={{ fontSize: '13px', color: '#4B5563', margin: 0 }}>
+                  Customer: <strong>{customerName}</strong> • Delivered on {deliveredDate}
+                </Text>
+              </Section>
+              <EmailContactFooter />
+            </Container>
+          </Body>
+        </Tailwind>
+      </Html>
+    );
+  }
 
   return (
     <Html>
       <Head />
-      <Preview>
-        {isAdminNotification
-          ? `✅ Order #${order.id?.slice(0, 8).toUpperCase()} Delivered Successfully`
-          : `🌸 Your Sacred Order #${order.id?.slice(0, 8).toUpperCase()} Has Been Delivered!`}
-      </Preview>
+      <Preview>🌸 Your Sacred Order #{cleanOrderId} Has Been Delivered! - Madhav Shringaar</Preview>
       <Tailwind>
-        <Body className="bg-[#FAF7F0] font-sans py-8">
-          <Container className="bg-white border border-[#E6C16A]/40 rounded-2xl max-w-[580px] mx-auto p-8 shadow-sm">
-            {/* Header */}
-            <Section className="text-center mb-6">
-              <Heading className="text-2xl font-bold text-[#003020] m-0">
-                Madhav Shringaar
+        <Body style={{ backgroundColor: BRAND_COLORS.cream, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", margin: 0, padding: '24px 0' }}>
+          <Container style={{ backgroundColor: BRAND_COLORS.white, border: `1px solid ${BRAND_COLORS.border}`, borderRadius: '16px', maxWidth: '600px', margin: '0 auto', padding: '32px 24px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}>
+            
+            <EmailHeader 
+              title="Madhav Shringaar" 
+              subtitle="Sacred Package Delivered" 
+            />
+
+            <Section style={{ margin: '16px 0 20px 0' }}>
+              <Heading style={{ fontSize: '20px', fontWeight: 700, color: BRAND_COLORS.primary, margin: '0 0 8px 0' }}>
+                Radhe Radhe, {customerName}! 🙏
               </Heading>
-              <Text className="text-xs text-[#C88A20] tracking-widest uppercase font-semibold mt-1">
-                {isAdminNotification ? 'Admin Delivery Notice' : 'Divine Essentials For Your Beloved Kanha'}
+              <Text style={{ fontSize: '13px', color: BRAND_COLORS.textMuted, lineHeight: '1.6', margin: 0 }}>
+                We are overjoyed to let you know that your sacred order <strong style={{ color: BRAND_COLORS.primary, fontFamily: 'monospace' }}>#{cleanOrderId}</strong> has been safely handed over at your doorstep!
               </Text>
             </Section>
 
-            <Hr className="border-[#F0EAE1] my-4" />
-
-            <Section className="my-4">
-              <Text className="text-lg font-semibold text-[#003020] mb-2">
-                {isAdminNotification
-                  ? `Order #${order.id} Delivered`
-                  : `Radhe Radhe, ${customerName}! 🙏`}
+            {/* Delivered Success Card */}
+            <Section style={{ backgroundColor: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: '12px', padding: '20px', margin: '20px 0', textAlign: 'center' }}>
+              <Text style={{ fontSize: '28px', margin: '0 0 4px 0' }}>
+                🌸
               </Text>
-              <Text className="text-sm text-neutral-700 leading-relaxed m-0">
-                {isAdminNotification
-                  ? `Order #${order.id} for ${customerName} has been successfully delivered and marked complete.`
-                  : 'Your sacred package has been delivered to your doorstep. May Thakur Ji bless your home with divine grace, joy, and peace!'}
+              <Text style={{ fontSize: '16px', fontWeight: 800, color: '#065F46', margin: '0 0 4px 0' }}>
+                Delivered Successfully on {deliveredDate}
               </Text>
-            </Section>
-
-            {/* Delivery Confirmation Card */}
-            <Section className="bg-[#FAF7F0] border border-[#E6C16A] rounded-xl p-5 my-5 text-center">
-              <Text className="text-3xl m-0 mb-1">🎉</Text>
-              <Text className="text-base font-bold text-[#003020] m-0">
-                Package Delivered Successfully
+              <Text style={{ fontSize: '12px', color: '#047857', margin: '0 0 16px 0' }}>
+                May these sacred poshak and shringaar bring divine blessings to your temple seva!
               </Text>
-              <Text className="text-xs text-neutral-600 mt-2 m-0">
-                Delivered on: {new Date(order.deliveredAt || Date.now()).toLocaleDateString('en-IN', { dateStyle: 'full' })}
-              </Text>
-              {order.awbNumber && (
-                <Text className="text-xs font-mono text-neutral-500 mt-1 m-0">
-                  AWB: {order.awbNumber}
-                </Text>
-              )}
-            </Section>
 
-            {/* 7-Day Return Guarantee Notice for Customer */}
-            {!isAdminNotification && (
-              <Section className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 my-4">
-                <Text className="text-xs uppercase tracking-wider font-bold text-emerald-800 m-0 mb-1">
-                  ✨ 7-Day Devotional Guarantee
-                </Text>
-                <Text className="text-xs text-emerald-700 leading-relaxed m-0">
-                  We inspect each item with reverence. If an eligible item has any size or defect issue, you can request a return directly from your <strong>My Orders</strong> page within 7 days of delivery.
-                </Text>
-              </Section>
-            )}
-
-            {/* Delivered Items */}
-            <Section className="my-4">
-              <Text className="text-xs uppercase tracking-wider font-bold text-neutral-500 m-0 mb-3">
-                Delivered Items ({order.orderitems?.length || 0})
-              </Text>
-              {order.orderitems?.map((item: any, idx: number) => (
-                <Row key={idx} className="border-b border-neutral-100 py-2">
-                  <Column className="w-3/4">
-                    <Text className="text-sm font-medium text-neutral-800 m-0">
-                      {item.name}
-                    </Text>
-                    <Text className="text-xs text-neutral-500 m-0">
-                      Qty: {item.qty} {item.size ? `• ${item.size}` : ''}
-                    </Text>
-                  </Column>
-                  <Column className="w-1/4 text-right">
-                    <Text className="text-sm font-bold text-neutral-800 m-0">
-                      {formatCurrency(Number(item.price) * item.qty)}
-                    </Text>
-                  </Column>
-                </Row>
-              ))}
-            </Section>
-
-            <Section className="text-center my-6">
               <Button
-                className="bg-[#003020] text-[#F3D98F] px-6 py-3 rounded-xl font-bold text-sm no-underline inline-block shadow-sm"
-                href={`https://www.madhavshringaar.com/order/${order.id}`}
+                href={`${serverUrl}/user/orders`}
+                style={{
+                  backgroundColor: BRAND_COLORS.primary,
+                  color: BRAND_COLORS.goldLight,
+                  padding: '12px 28px',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                }}
               >
-                {isAdminNotification ? 'Open in Admin Panel' : 'View Order Details & Invoice'} &rarr;
+                View Order & Download Invoice &rarr;
               </Button>
             </Section>
 
-            <Hr className="border-[#F0EAE1] my-4" />
-
-            <Section className="text-center mt-4">
-              <Text className="text-xs text-neutral-500 m-0 mb-1">
-                Questions or support? We are at your seva.
+            {/* 7-Day Return & Exchange Promise */}
+            <Section style={{ backgroundColor: BRAND_COLORS.cream, border: `1px solid ${BRAND_COLORS.border}`, borderRadius: '12px', padding: '16px 20px', margin: '20px 0' }}>
+              <Text style={{ fontSize: '12px', fontWeight: 700, color: BRAND_COLORS.primary, margin: '0 0 6px 0' }}>
+                🔄 7-Day Hassle-Free Devotional Return / Exchange
               </Text>
-              <Text className="text-xs text-neutral-500 m-0 mb-2">
-                <a
-                  href="mailto:info@madhavshringaar.com"
-                  className="text-[#C88A20] font-semibold underline"
-                >
-                  info@madhavshringaar.com
-                </a>
-              </Text>
-              <Text className="text-[11px] text-neutral-400 m-0">
-                © {new Date().getFullYear()} Madhav Shringaar. All rights reserved.
+              <Text style={{ fontSize: '12px', color: BRAND_COLORS.textMuted, lineHeight: '1.5', margin: 0 }}>
+                If you need a different size for your Laddu Gopal or if anything isn&apos;t completely perfect with your items, you can easily request a return or size exchange within 7 days directly from your <strong>My Orders</strong> portal.
               </Text>
             </Section>
+
+            <EmailContactFooter />
+
           </Container>
         </Body>
       </Tailwind>

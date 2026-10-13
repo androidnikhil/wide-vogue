@@ -2,6 +2,8 @@ import nodemailer from 'nodemailer';
 import { render } from '@react-email/components';
 import { SENDER_EMAIL, ADMIN_EMAIL, APP_NAME } from '@/lib/constants';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 dotenv.config();
 
 import PurchaseReceiptEmail from './purchase-receipt';
@@ -23,6 +25,20 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const getLogoAttachment = () => {
+  const logoPath = path.join(process.cwd(), 'public', 'images', 'logo.png');
+  if (fs.existsSync(logoPath)) {
+    return [
+      {
+        filename: 'logo.png',
+        path: logoPath,
+        cid: 'madhav_logo',
+      },
+    ];
+  }
+  return [];
+};
+
 const getRecipientEmail = (order: any): string | null => {
   const email =
     (order.shippingAddress as any)?.guestEmail ||
@@ -37,6 +53,10 @@ const getRecipientEmail = (order: any): string | null => {
   return email;
 };
 
+const getCleanOrderId = (orderId: string = '') => {
+  return `OD${orderId.replace(/-/g, '').slice(0, 16).toUpperCase()}`;
+};
+
 // 1. Send Purchase / Order Confirmation to Customer (Online & COD)
 export const sendPurchaseReceipt = async ({ order }: { order: any }) => {
   try {
@@ -46,13 +66,15 @@ export const sendPurchaseReceipt = async ({ order }: { order: any }) => {
       return;
     }
 
+    const cleanId = getCleanOrderId(order.id);
     const emailHtml = await render(<PurchaseReceiptEmail order={order} />);
 
     await transporter.sendMail({
       from: process.env.EMAIL_FROM || `${APP_NAME} <${SENDER_EMAIL}>`,
       to: recipientEmail,
-      subject: `Order Confirmation #${order.id.slice(0, 8).toUpperCase()} - ${APP_NAME}`,
+      subject: `🌸 Order Confirmation #${cleanId} - ${APP_NAME}`,
       html: emailHtml,
+      attachments: getLogoAttachment(),
     });
     console.log(`Purchase receipt email successfully sent to ${recipientEmail}`);
   } catch (error) {
@@ -64,13 +86,15 @@ export const sendPurchaseReceipt = async ({ order }: { order: any }) => {
 export const sendAdminNewOrderAlert = async ({ order }: { order: any }) => {
   try {
     const adminEmail = process.env.ADMIN_EMAIL || ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com';
+    const cleanId = getCleanOrderId(order.id);
     const emailHtml = await render(<AdminOrderAlertEmail order={order} />);
 
     await transporter.sendMail({
       from: process.env.EMAIL_FROM || `${APP_NAME} Orders <${SENDER_EMAIL}>`,
       to: adminEmail,
-      subject: `🚨 New Order #${order.id.slice(0, 8).toUpperCase()} - ₹${Number(order.totalPrice).toFixed(0)} (${order.paymentMethod})`,
+      subject: `🚨 New Order #${cleanId} - ₹${Number(order.totalPrice).toFixed(0)} (${order.paymentMethod})`,
       html: emailHtml,
+      attachments: getLogoAttachment(),
     });
     console.log(`Admin order alert successfully sent to ${adminEmail}`);
   } catch (error) {
@@ -90,8 +114,9 @@ export const sendWelcomeEmail = async ({ name, email }: { name: string; email: s
     await transporter.sendMail({
       from: process.env.EMAIL_FROM || `${APP_NAME} <${SENDER_EMAIL}>`,
       to: email,
-      subject: `Welcome to Madhav Shringaar - Divine Essentials for Your Beloved Kanha`,
+      subject: `🙏 Welcome to Madhav Shringaar - Divine Essentials for Your Beloved Kanha`,
       html: emailHtml,
+      attachments: getLogoAttachment(),
     });
     console.log(`Welcome email successfully sent to ${email}`);
   } catch (error) {
@@ -113,6 +138,7 @@ export const sendOrderShippedEmail = async ({
     const recipientEmail = getRecipientEmail(order);
     if (!recipientEmail) return;
 
+    const cleanId = getCleanOrderId(order.id);
     const emailHtml = await render(
       <OrderShippedEmail
         order={order}
@@ -124,8 +150,9 @@ export const sendOrderShippedEmail = async ({
     await transporter.sendMail({
       from: process.env.EMAIL_FROM || `${APP_NAME} Shipping <${SENDER_EMAIL}>`,
       to: recipientEmail,
-      subject: `🚚 Your Order #${order.id.slice(0, 8).toUpperCase()} Has Shipped! - ${APP_NAME}`,
+      subject: `🚚 Sacred Order #${cleanId} Has Shipped! - ${APP_NAME}`,
       html: emailHtml,
+      attachments: getLogoAttachment(),
     });
     console.log(`Order shipped email sent to ${recipientEmail}`);
   } catch (error) {
@@ -139,13 +166,15 @@ export const sendOrderOutForDeliveryEmail = async ({ order }: { order: any }) =>
     const recipientEmail = getRecipientEmail(order);
     if (!recipientEmail) return;
 
+    const cleanId = getCleanOrderId(order.id);
     const emailHtml = await render(<OrderOutForDeliveryEmail order={order} />);
 
     await transporter.sendMail({
       from: process.env.EMAIL_FROM || `${APP_NAME} Delivery <${SENDER_EMAIL}>`,
       to: recipientEmail,
-      subject: `🛵 Out for Delivery Today: Order #${order.id.slice(0, 8).toUpperCase()} - ${APP_NAME}`,
+      subject: `🛵 Out for Delivery Today: Order #${cleanId} - ${APP_NAME}`,
       html: emailHtml,
+      attachments: getLogoAttachment(),
     });
     console.log(`Order out for delivery email sent to ${recipientEmail}`);
   } catch (error) {
@@ -158,6 +187,7 @@ export const sendOrderDeliveredEmail = async ({ order }: { order: any }) => {
   try {
     const recipientEmail = getRecipientEmail(order);
     const adminEmail = process.env.ADMIN_EMAIL || ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com';
+    const cleanId = getCleanOrderId(order.id);
 
     // To Customer
     if (recipientEmail) {
@@ -167,8 +197,9 @@ export const sendOrderDeliveredEmail = async ({ order }: { order: any }) => {
       await transporter.sendMail({
         from: process.env.EMAIL_FROM || `${APP_NAME} <${SENDER_EMAIL}>`,
         to: recipientEmail,
-        subject: `🌸 Order #${order.id.slice(0, 8).toUpperCase()} Delivered - Thank You!`,
+        subject: `🌸 Order #${cleanId} Delivered - Thank You!`,
         html: customerHtml,
+        attachments: getLogoAttachment(),
       });
       console.log(`Order delivered email sent to customer ${recipientEmail}`);
     }
@@ -180,8 +211,9 @@ export const sendOrderDeliveredEmail = async ({ order }: { order: any }) => {
     await transporter.sendMail({
       from: process.env.EMAIL_FROM || `${APP_NAME} Delivery <${SENDER_EMAIL}>`,
       to: adminEmail,
-      subject: `✅ Order #${order.id.slice(0, 8).toUpperCase()} Delivered Successfully`,
+      subject: `✅ Order #${cleanId} Delivered Successfully`,
       html: adminHtml,
+      attachments: getLogoAttachment(),
     });
     console.log(`Order delivered notice sent to admin ${adminEmail}`);
   } catch (error) {
@@ -202,6 +234,7 @@ export const sendReturnRequestAlertEmail = async ({
   try {
     const adminEmail = process.env.ADMIN_EMAIL || ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com';
     const recipientEmail = getRecipientEmail(order);
+    const cleanId = getCleanOrderId(order.id);
 
     // To Admin
     const adminHtml = await render(
@@ -215,8 +248,9 @@ export const sendReturnRequestAlertEmail = async ({
     await transporter.sendMail({
       from: process.env.EMAIL_FROM || `${APP_NAME} Returns <${SENDER_EMAIL}>`,
       to: adminEmail,
-      subject: `⚠️ Return Request Generated for Order #${order.id.slice(0, 8).toUpperCase()} (${reason})`,
+      subject: `⚠️ Return Request for Order #${cleanId} (${reason})`,
       html: adminHtml,
+      attachments: getLogoAttachment(),
     });
     console.log(`Return request alert sent to admin ${adminEmail}`);
 
@@ -233,8 +267,9 @@ export const sendReturnRequestAlertEmail = async ({
       await transporter.sendMail({
         from: process.env.EMAIL_FROM || `${APP_NAME} <${SENDER_EMAIL}>`,
         to: recipientEmail,
-        subject: `Return Request Received for Order #${order.id.slice(0, 8).toUpperCase()}`,
+        subject: `Return Request Received for Order #${cleanId}`,
         html: customerHtml,
+        attachments: getLogoAttachment(),
       });
       console.log(`Return request confirmation sent to customer ${recipientEmail}`);
     }
@@ -257,20 +292,22 @@ export const sendReturnStatusUpdateEmail = async ({
     const recipientEmail = getRecipientEmail(order);
     if (!recipientEmail) return;
 
+    const cleanId = getCleanOrderId(order.id);
     const emailHtml = await render(
       <ReturnStatusUpdateEmail order={order} action={action} note={note} />
     );
 
     const subject =
       action === 'APPROVED'
-        ? `✅ Return Request Approved - Order #${order.id.slice(0, 8).toUpperCase()}`
-        : `Update on Return Request - Order #${order.id.slice(0, 8).toUpperCase()}`;
+        ? `✅ Return Request Approved - Order #${cleanId}`
+        : `Update on Return Request - Order #${cleanId}`;
 
     await transporter.sendMail({
       from: process.env.EMAIL_FROM || `${APP_NAME} Returns <${SENDER_EMAIL}>`,
       to: recipientEmail,
       subject,
       html: emailHtml,
+      attachments: getLogoAttachment(),
     });
     console.log(`Return status update email sent to customer ${recipientEmail}`);
   } catch (error) {

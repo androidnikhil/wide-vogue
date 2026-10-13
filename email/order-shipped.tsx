@@ -9,12 +9,13 @@ import {
   Tailwind,
   Text,
   Button,
-  Hr,
   Row,
   Column,
+  Img,
 } from '@react-email/components';
 import * as React from 'react';
 import { formatCurrency } from '@/lib/utils';
+import { EmailHeader, EmailContactFooter, BRAND_COLORS } from './email-components';
 
 interface OrderShippedEmailProps {
   order: any;
@@ -31,119 +32,84 @@ export default function OrderShippedEmail({
     order.user?.name ||
     (order.shippingAddress as any)?.fullName ||
     'Beloved Devotee';
+  const cleanOrderId = `OD${(order.id || '').replace(/-/g, '').slice(0, 16).toUpperCase()}`;
   const effectiveAwb = awbNumber || order.awbNumber || 'In Transit';
   const effectiveTrackingUrl =
     trackingUrl ||
     order.trackingUrl ||
     (order.awbNumber
       ? `https://shiprocket.co/tracking/${order.awbNumber}`
-      : 'https://www.madhavshringaar.com/track-order');
+      : `${process.env.NEXT_PUBLIC_SERVER_URL || 'https://www.madhavshringaar.com'}/track-order?awb=${order.awbNumber || ''}`);
 
   return (
     <Html>
       <Head />
-      <Preview>🚚 Your Sacred Order #{order.id?.slice(0, 8).toUpperCase()} Has Been Shipped!</Preview>
+      <Preview>🚚 Sacred Order #{cleanOrderId} Has Shipped! - Madhav Shringaar</Preview>
       <Tailwind>
-        <Body className="bg-[#FAF7F0] font-sans py-8">
-          <Container className="bg-white border border-[#E6C16A]/40 rounded-2xl max-w-[580px] mx-auto p-8 shadow-sm">
-            {/* Header */}
-            <Section className="text-center mb-6">
-              <Heading className="text-2xl font-bold text-[#003020] m-0">
-                Madhav Shringaar
-              </Heading>
-              <Text className="text-xs text-[#C88A20] tracking-widest uppercase font-semibold mt-1">
-                Divine Essentials For Your Beloved Kanha
-              </Text>
-            </Section>
+        <Body style={{ backgroundColor: BRAND_COLORS.cream, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", margin: 0, padding: '24px 0' }}>
+          <Container style={{ backgroundColor: BRAND_COLORS.white, border: `1px solid ${BRAND_COLORS.border}`, borderRadius: '16px', maxWidth: '600px', margin: '0 auto', padding: '32px 24px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}>
+            
+            <EmailHeader 
+              title="Madhav Shringaar" 
+              subtitle="Sacred Shipment Dispatched" 
+            />
 
-            <Hr className="border-[#F0EAE1] my-4" />
-
-            <Section className="my-4">
-              <Text className="text-lg font-semibold text-[#003020] mb-2">
+            <Section style={{ margin: '16px 0 20px 0' }}>
+              <Heading style={{ fontSize: '20px', fontWeight: 700, color: BRAND_COLORS.primary, margin: '0 0 8px 0' }}>
                 Radhe Radhe, {customerName}! 🙏
-              </Text>
-              <Text className="text-sm text-neutral-600 leading-relaxed m-0">
-                Great news! Your sacred package has been carefully packed with devotion and dispatched via our express courier partner.
+              </Heading>
+              <Text style={{ fontSize: '13px', color: BRAND_COLORS.textMuted, lineHeight: '1.6', margin: 0 }}>
+                Wonderful news! Your sacred package for Order <strong style={{ color: BRAND_COLORS.primary, fontFamily: 'monospace' }}>#{cleanOrderId}</strong> has been carefully packed with devotion and handed over to our express courier partner.
               </Text>
             </Section>
 
-            {/* Shipment Tracking Box */}
-            <Section className="bg-[#FAF7F0] border border-[#E6C16A] rounded-xl p-5 my-5 text-center">
-              <Text className="text-xs uppercase tracking-wider font-bold text-[#003020] m-0">
-                Courier Tracking Details
+            {/* Courier Tracking Box (Flipkart Style) */}
+            <Section style={{ backgroundColor: BRAND_COLORS.cream, border: `1px solid ${BRAND_COLORS.border}`, borderRadius: '12px', padding: '20px', margin: '20px 0', textAlign: 'center' }}>
+              <Text style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', color: BRAND_COLORS.secondary, fontWeight: 700, margin: 0 }}>
+                Shiprocket Courier Tracking Details
               </Text>
-              <Text className="text-xl font-bold font-mono text-[#003020] my-2">
+              <Text style={{ fontSize: '20px', fontWeight: 800, color: BRAND_COLORS.primary, margin: '8px 0 4px 0', fontFamily: 'monospace' }}>
                 AWB: {effectiveAwb}
               </Text>
-              <Text className="text-xs text-neutral-600 m-0 mb-4">
-                Partner: Shiprocket Pan-India Express
+              <Text style={{ fontSize: '12px', color: BRAND_COLORS.textMuted, margin: '0 0 16px 0' }}>
+                Courier: Delhivery / Shiprocket Pan-India Express
               </Text>
+
               <Button
-                className="bg-[#003020] text-[#F3D98F] px-6 py-3 rounded-xl font-bold text-sm no-underline inline-block shadow-sm"
                 href={effectiveTrackingUrl}
+                style={{
+                  backgroundColor: BRAND_COLORS.primary,
+                  color: BRAND_COLORS.goldLight,
+                  padding: '12px 28px',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                }}
               >
                 Track Live Package Status &rarr;
               </Button>
             </Section>
 
             {/* Delivery Address */}
-            <Section className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 my-4">
-              <Text className="text-xs uppercase tracking-wider font-bold text-neutral-500 m-0 mb-1">
-                Shipping To:
+            <Section style={{ backgroundColor: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '12px', padding: '16px 20px', margin: '20px 0' }}>
+              <Text style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', color: BRAND_COLORS.textMuted, fontWeight: 700, margin: '0 0 4px 0' }}>
+                Shipping Destination:
               </Text>
-              <Text className="text-sm font-semibold text-neutral-800 m-0">
+              <Text style={{ fontSize: '13px', fontWeight: 700, color: BRAND_COLORS.textDark, margin: '0 0 2px 0' }}>
                 {(order.shippingAddress as any)?.fullName}
               </Text>
-              <Text className="text-xs text-neutral-600 m-0 mt-0.5 leading-relaxed">
-                {(order.shippingAddress as any)?.streetAddress},{' '}
-                {(order.shippingAddress as any)?.city},{' '}
-                {(order.shippingAddress as any)?.postalCode}
+              <Text style={{ fontSize: '12px', color: BRAND_COLORS.textMuted, lineHeight: '1.5', margin: '0 0 4px 0' }}>
+                {(order.shippingAddress as any)?.streetAddress}, {(order.shippingAddress as any)?.city} - {(order.shippingAddress as any)?.postalCode}
+              </Text>
+              <Text style={{ fontSize: '12px', color: BRAND_COLORS.primary, fontWeight: 600, margin: 0 }}>
+                📞 +91 {(order.shippingAddress as any)?.contactNumber}
               </Text>
             </Section>
 
-            {/* Order Items */}
-            <Section className="my-4">
-              <Text className="text-xs uppercase tracking-wider font-bold text-neutral-500 m-0 mb-3">
-                Items In This Package
-              </Text>
-              {order.orderitems?.map((item: any, idx: number) => (
-                <Row key={idx} className="border-b border-neutral-100 py-2">
-                  <Column className="w-3/4">
-                    <Text className="text-sm font-medium text-neutral-800 m-0">
-                      {item.name}
-                    </Text>
-                    <Text className="text-xs text-neutral-500 m-0">
-                      Qty: {item.qty} {item.size ? `• ${item.size}` : ''}
-                    </Text>
-                  </Column>
-                  <Column className="w-1/4 text-right">
-                    <Text className="text-sm font-bold text-neutral-800 m-0">
-                      {formatCurrency(Number(item.price) * item.qty)}
-                    </Text>
-                  </Column>
-                </Row>
-              ))}
-            </Section>
+            <EmailContactFooter />
 
-            <Hr className="border-[#F0EAE1] my-4" />
-
-            <Section className="text-center mt-4">
-              <Text className="text-xs text-neutral-500 m-0 mb-1">
-                Need help with your delivery? We are here for you.
-              </Text>
-              <Text className="text-xs text-neutral-500 m-0 mb-2">
-                Email us at{' '}
-                <a
-                  href="mailto:info@madhavshringaar.com"
-                  className="text-[#C88A20] font-semibold underline"
-                >
-                  info@madhavshringaar.com
-                </a>
-              </Text>
-              <Text className="text-[11px] text-neutral-400 m-0">
-                © {new Date().getFullYear()} Madhav Shringaar. All rights reserved.
-              </Text>
-            </Section>
           </Container>
         </Body>
       </Tailwind>

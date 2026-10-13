@@ -90,3 +90,5 @@ export const signUpDefaultValues = {
 
   export const SENDER_EMAIL = process.env.SENDER_EMAIL || 'info@madhavshringaar.com';
   export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com';
+  export const SUPPORT_PHONE = process.env.SUPPORT_PHONE || '+91 79821 60480';
+  export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '7982160480';

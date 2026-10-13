@@ -81,7 +81,7 @@ export default function InvoiceClient({ order }: InvoiceClientProps) {
                 <p className="font-bold text-[#003020]">Madhav Shringaar Private Limited</p>
                 <p>Sacred Workshop & Deity Crafts, Raman Reti Road</p>
                 <p>Vrindavan Dham, Mathura, Uttar Pradesh - 281121, India</p>
-                <p>Support: +91 94100 48805 | Email: info@madhavshringaar.com</p>
+                <p>Support: +91 79821 60480 | Email: info@madhavshringaar.com</p>
                 <p className="text-[11px] text-neutral-500 font-mono">
                   GSTIN: 09AAAFM1234F1Z5 • MSME: UDYAM-UP-55-0012891
                 </p>

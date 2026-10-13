@@ -105,7 +105,7 @@ export async function getUserById(userId: string) {
 }
 
 // Update the user's address
-export async function updateUserAddress(data: ShippingAddress) {
+export async function updateUserAddress(data: ShippingAddress, saveAddress: boolean = true) {
   try {
     const session = await auth();
 
@@ -116,22 +116,24 @@ export async function updateUserAddress(data: ShippingAddress) {
     const address = shippingAddressSchema.parse(data);
 
     if (currentUser) {
-      const currentAddresses = Array.isArray(currentUser.addresses) ? currentUser.addresses as Prisma.JsonObject[] : [];
-      
-      // Check if address already exists (simple match on streetAddress and city)
-      const addressExists = currentAddresses.some(
-        (a: any) => a.streetAddress === address.streetAddress && a.city === address.city
-      );
+      const userDataToUpdate: any = {};
 
-      let newAddresses = currentAddresses;
-      if (!addressExists) {
-        newAddresses = [address, ...currentAddresses].slice(0, 5); // Keep max 5
+      if (saveAddress) {
+        const currentAddresses = Array.isArray(currentUser.addresses) ? currentUser.addresses as Prisma.JsonObject[] : [];
+        
+        // Check if address already exists (match on streetAddress, postalCode, and city)
+        const addressExists = currentAddresses.some(
+          (a: any) => a.streetAddress === address.streetAddress && a.city === address.city && a.postalCode === address.postalCode
+        );
+
+        let newAddresses = currentAddresses;
+        if (!addressExists) {
+          newAddresses = [address, ...currentAddresses].slice(0, 5); // Keep max 5
+        }
+
+        userDataToUpdate.address = address;
+        userDataToUpdate.addresses = newAddresses;
       }
-
-      const userDataToUpdate: any = { 
-        address,
-        addresses: newAddresses
-      };
 
       if (address.guestEmail && (!currentUser.email || currentUser.email.endsWith('@madhavshringaar.com'))) {
         userDataToUpdate.email = address.guestEmail;
@@ -143,10 +145,12 @@ export async function updateUserAddress(data: ShippingAddress) {
         userDataToUpdate.phoneNumber = address.contactNumber;
       }
 
-      await prisma.user.update({
-        where: { id: currentUser.id },
-        data: userDataToUpdate,
-      });
+      if (Object.keys(userDataToUpdate).length > 0) {
+        await prisma.user.update({
+          where: { id: currentUser.id },
+          data: userDataToUpdate,
+        });
+      }
     }
 
     // Always update the cart's shipping address

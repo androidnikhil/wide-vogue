@@ -9,9 +9,9 @@ import {
   Tailwind,
   Text,
   Button,
-  Hr,
 } from '@react-email/components';
 import * as React from 'react';
+import { EmailHeader, EmailContactFooter, BRAND_COLORS } from './email-components';
 
 interface ReturnStatusUpdateEmailProps {
   order: any;
@@ -28,109 +28,94 @@ export default function ReturnStatusUpdateEmail({
     order.user?.name ||
     (order.shippingAddress as any)?.fullName ||
     'Beloved Devotee';
+  const cleanOrderId = `OD${(order.id || '').replace(/-/g, '').slice(0, 16).toUpperCase()}`;
   const isApproved = action === 'APPROVED';
+  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'https://www.madhavshringaar.com';
 
   return (
     <Html>
       <Head />
       <Preview>
         {isApproved
-          ? `✅ Return Approved for Order #${order.id?.slice(0, 8).toUpperCase()}`
-          : `Update on Return Request for Order #${order.id?.slice(0, 8).toUpperCase()}`}
+          ? `✅ Return Request Approved - Order #${cleanOrderId}`
+          : `Update on Return Request - Order #${cleanOrderId}`}
       </Preview>
       <Tailwind>
-        <Body className="bg-[#FAF7F0] font-sans py-8">
-          <Container className="bg-white border border-[#E6C16A]/40 rounded-2xl max-w-[580px] mx-auto p-8 shadow-sm">
-            {/* Header */}
-            <Section className="text-center mb-6">
-              <Heading className="text-2xl font-bold text-[#003020] m-0">
-                Madhav Shringaar
-              </Heading>
-              <Text className="text-xs text-[#C88A20] tracking-widest uppercase font-semibold mt-1">
-                Return Request Status Update
-              </Text>
-            </Section>
+        <Body style={{ backgroundColor: BRAND_COLORS.cream, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", margin: 0, padding: '24px 0' }}>
+          <Container style={{ backgroundColor: BRAND_COLORS.white, border: `1px solid ${BRAND_COLORS.border}`, borderRadius: '16px', maxWidth: '600px', margin: '0 auto', padding: '32px 24px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}>
+            
+            <EmailHeader 
+              title="Madhav Shringaar" 
+              subtitle="Return / Exchange Update" 
+            />
 
-            <Hr className="border-[#F0EAE1] my-4" />
-
-            <Section className="my-4">
-              <Text className="text-lg font-semibold text-[#003020] mb-2">
+            <Section style={{ margin: '16px 0 20px 0' }}>
+              <Heading style={{ fontSize: '20px', fontWeight: 700, color: BRAND_COLORS.primary, margin: '0 0 8px 0' }}>
                 Radhe Radhe, {customerName}! 🙏
-              </Text>
-              <Text className="text-sm text-neutral-700 leading-relaxed m-0">
-                This is an update regarding your return request for Order <strong>#{order.id}</strong>.
+              </Heading>
+              <Text style={{ fontSize: '13px', color: BRAND_COLORS.textMuted, lineHeight: '1.6', margin: 0 }}>
+                This is an official update regarding your 7-day return request for Order <strong style={{ color: BRAND_COLORS.primary, fontFamily: 'monospace' }}>#{cleanOrderId}</strong>.
               </Text>
             </Section>
 
-            {/* Decision Status Card */}
+            {/* Status Highlight Card */}
             <Section
-              className={`rounded-xl p-5 my-5 text-center border ${
-                isApproved
-                  ? 'bg-emerald-50 border-emerald-300'
-                  : 'bg-amber-50 border-amber-300'
-              }`}
+              style={{
+                backgroundColor: isApproved ? '#ECFDF5' : '#FEF2F2',
+                border: `1px solid ${isApproved ? '#A7F3D0' : '#FECACA'}`,
+                borderRadius: '12px',
+                padding: '20px',
+                margin: '20px 0',
+                textAlign: 'center',
+              }}
             >
-              <Text className="text-3xl m-0 mb-1">{isApproved ? '✅' : 'ℹ️'}</Text>
+              <Text style={{ fontSize: '24px', margin: '0 0 4px 0' }}>
+                {isApproved ? '✅' : 'ℹ️'}
+              </Text>
               <Text
-                className={`text-base font-bold m-0 ${
-                  isApproved ? 'text-emerald-800' : 'text-amber-800'
-                }`}
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 800,
+                  color: isApproved ? '#065F46' : '#991B1B',
+                  margin: '0 0 6px 0',
+                }}
               >
-                {isApproved ? 'Return Request Approved' : 'Return Request Closed / Rejected'}
+                {isApproved ? 'Return Request Approved' : 'Return Request Closed'}
               </Text>
-              <Text className="text-xs text-neutral-700 mt-2 m-0 leading-relaxed">
+              <Text
+                style={{
+                  fontSize: '13px',
+                  color: isApproved ? '#047857' : '#B91C1C',
+                  margin: 0,
+                  lineHeight: '1.5',
+                }}
+              >
                 {isApproved
-                  ? 'Our courier partner will contact you shortly to schedule a reverse pickup from your registered address. Please keep the items packed in their original box.'
-                  : 'After careful inspection, your return request could not be processed.'}
+                  ? 'Our courier partner will arrange reverse pickup within 2-3 business days. Please keep the sacred poshak safely packed.'
+                  : (note || 'Your request could not be processed under the current 7-day policy guidelines.')}
               </Text>
-              {note && (
-                <Section className="mt-3 pt-3 border-t border-neutral-200/80">
-                  <Text className="text-xs text-neutral-500 m-0">Admin Note:</Text>
-                  <Text className="text-xs text-neutral-800 m-0 mt-1 italic">
-                    &ldquo;{note}&rdquo;
-                  </Text>
-                </Section>
-              )}
             </Section>
 
-            {isApproved && (
-              <Section className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 my-4">
-                <Text className="text-xs uppercase tracking-wider font-bold text-neutral-600 m-0 mb-2">
-                  🔄 Refund Instructions:
-                </Text>
-                <Text className="text-xs text-neutral-600 leading-relaxed m-0">
-                  Once the returned package reaches our Vrindavan Dham fulfillment center and passes inspection, your refund will be processed back to your original payment method (or bank account / store credit) within 3-5 business days.
-                </Text>
-              </Section>
-            )}
-
-            <Section className="text-center my-6">
+            <Section style={{ textAlign: 'center', margin: '24px 0 16px 0' }}>
               <Button
-                className="bg-[#003020] text-[#F3D98F] px-6 py-3 rounded-xl font-bold text-sm no-underline inline-block shadow-sm"
-                href={`https://www.madhavshringaar.com/order/${order.id}`}
+                href={`${serverUrl}/order/${order.id}`}
+                style={{
+                  backgroundColor: BRAND_COLORS.primary,
+                  color: BRAND_COLORS.goldLight,
+                  padding: '12px 28px',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                }}
               >
                 View Order Details &rarr;
               </Button>
             </Section>
 
-            <Hr className="border-[#F0EAE1] my-4" />
+            <EmailContactFooter />
 
-            <Section className="text-center mt-4">
-              <Text className="text-xs text-neutral-500 m-0 mb-1">
-                Have questions? Reach out to us anytime:
-              </Text>
-              <Text className="text-xs text-neutral-500 m-0 mb-2">
-                <a
-                  href="mailto:info@madhavshringaar.com"
-                  className="text-[#C88A20] font-semibold underline"
-                >
-                  info@madhavshringaar.com
-                </a>
-              </Text>
-              <Text className="text-[11px] text-neutral-400 m-0">
-                © {new Date().getFullYear()} Madhav Shringaar. All rights reserved.
-              </Text>
-            </Section>
           </Container>
         </Body>
       </Tailwind>

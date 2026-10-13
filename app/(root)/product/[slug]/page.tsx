@@ -112,7 +112,7 @@ const ProductDetailsPage = async (props: {
       seller: {
         '@type': 'Store',
         name: 'Madhav Shringaar (Agra & Noida)',
-        telephone: '+917078211946',
+        telephone: '+917982160480',
         url: APP_URL,
       },
     },

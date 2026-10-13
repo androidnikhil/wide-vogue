@@ -1,10 +1,57 @@
-image: atlassian/default-image:4
+image: node:20
+
+definitions:
+  caches:
+    npm: ~/.npm
+  services:
+    docker:
+      memory: 2048
+  steps:
+    - step: &lint-and-typecheck
+        name: Lint and Type Check
+        caches:
+          - npm
+        script:
+          - npm ci --legacy-peer-deps
+          - npm run lint
+          - npm run type-check
+
+    - step: &test
+        name: Run Unit Tests
+        caches:
+          - npm
+        script:
+          - npm ci --legacy-peer-deps
+          - npm test
+
+    - step: &docker-build-check
+        name: Docker Build Verification
+        services:
+          - docker
+        script:
+          - docker build --target development -t madhav-shringar-dev:ci .
+          - docker build --target runner -t madhav-shringar-prod:ci .
 
 pipelines:
+  default:
+    - step: *lint-and-typecheck
+    - step: *test
+    - step: *docker-build-check
+
+  pull-requests:
+    '**':
+      - step: *lint-and-typecheck
+      - step: *test
+      - step: *docker-build-check
+
   branches:
     main:
+      - step: *lint-and-typecheck
+      - step: *test
+      - step: *docker-build-check
       - step:
           name: Sync to GitHub
+          image: atlassian/default-image:4
           script:
             - git remote add github https://x-access-token:${GITHUB_TOKEN}@github.com/androidnikhil/wide-vogue.git
             - git push github HEAD:main --force

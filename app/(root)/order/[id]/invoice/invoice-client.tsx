@@ -75,8 +75,8 @@ export default function InvoiceClient({ order }: InvoiceClientProps) {
                 <p className="font-semibold text-neutral-800">Operating Hubs: Agra & Noida (Delhi NCR / UP)</p>
                 <p>Sacred Workshop: Raman Reti Road, Vrindavan Dham, Mathura - 281121, UP, India</p>
                 <p>Devotee Care / WhatsApp: <strong>+91 79821 60480</strong> | Email: info@madhavshringaar.com</p>
-                <p className="text-[11px] text-neutral-500 font-mono">
-                  GSTIN: 09AAAFM1234F1Z5 • MSME: UDYAM-UP-55-0012891
+                <p className="text-[11px] text-neutral-600 font-mono">
+                  GSTIN: <strong className="text-neutral-900 font-bold">09EHFPP7126A1ZE</strong> • MSME: <strong className="text-neutral-900 font-bold">UDYAM-UP-01-0152376</strong>
                 </p>
               </div>
             </div>

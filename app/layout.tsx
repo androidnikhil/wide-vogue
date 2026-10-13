@@ -70,6 +70,7 @@ const jsonLdLocalBusiness = {
   image: `${APP_URL}/images/devotional/complete_shringar.webp`,
   telephone: '+917982160480',
   email: 'info@madhavshringaar.com',
+  taxID: '09EHFPP7126A1ZE',
   priceRange: '₹₹',
   currenciesAccepted: 'INR',
   paymentAccepted: 'Cash on Delivery, UPI, Credit Card, Debit Card, Net Banking',

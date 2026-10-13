@@ -180,7 +180,7 @@ export default function AdminOrderClient({ order }: AdminOrderClientProps) {
             size="sm"
             className="bg-[#003020] hover:bg-[#002518] text-[#F3D98F] text-xs font-bold gap-1.5 shadow-sm h-9 px-3.5"
           >
-            <Link href={`/order/${order.id}/invoice`} target="_blank" title="View & Print Single-Page A4 Invoice">
+            <Link href={`/admin/orders/${order.id}/invoice`} title="View & Print Single-Page A4 Invoice inside Admin Portal">
               <Printer className="w-4 h-4 text-[#F3D98F]" />
               Print Tax Invoice (A4)
             </Link>
@@ -192,9 +192,9 @@ export default function AdminOrderClient({ order }: AdminOrderClientProps) {
             size="sm"
             className="h-9 px-3 text-xs font-medium gap-1.5 bg-white border-neutral-300 hover:bg-neutral-50"
           >
-            <Link href={`/order/${order.id}`} target="_blank" title="View customer-facing storefront view">
+            <Link href={`/order/${order.id}`} target="_blank" title="Preview customer-facing storefront view in new tab">
               <ExternalLink className="w-3.5 h-3.5 text-neutral-600" />
-              Customer View
+              Preview Storefront
             </Link>
           </Button>
         </div>

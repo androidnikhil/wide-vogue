@@ -24,7 +24,7 @@ export default function AdminMobileMenu({
       <SheetContent side="left" className="w-64 p-0 bg-surface border-r border-outline-variant/30 flex flex-col">
         <SheetTitle className="sr-only">Admin Navigation</SheetTitle>
         <div className='h-20 flex items-center justify-center border-b border-outline-variant/30 px-4'>
-          <Link href='/' className='flex items-center justify-center w-full' onClick={() => setOpen(false)}>
+          <Link href='/admin/overview' className='flex items-center justify-center w-full' onClick={() => setOpen(false)}>
             <Image
               src='/images/logo.png'
               className='h-12 w-auto object-contain'

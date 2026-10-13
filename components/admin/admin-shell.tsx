@@ -22,13 +22,13 @@ export default function AdminShell({
     <div className="flex min-h-screen bg-surface-container-lowest">
       {/* Sidebar Navigation (Desktop) */}
       <aside
-        className={`hidden md:flex flex-col fixed inset-y-0 z-20 bg-surface border-r border-outline-variant/30 transition-all duration-300 shadow-sm ${
+        className={`hidden md:flex flex-col fixed inset-y-0 z-20 bg-surface border-r border-outline-variant/30 transition-all duration-300 shadow-sm print:hidden ${
           isCollapsed ? 'w-20' : 'w-64'
         }`}
       >
         <div className="h-20 flex items-center justify-between border-b border-outline-variant/30 px-4 shrink-0">
           {!isCollapsed && (
-            <Link href="/" className="flex items-center justify-center w-full">
+            <Link href="/admin/overview" className="flex items-center justify-center w-full">
               <Image
                 src="/images/logo.png"
                 className="h-16 w-auto object-contain"
@@ -40,7 +40,7 @@ export default function AdminShell({
             </Link>
           )}
           {isCollapsed && (
-            <Link href="/" className="flex items-center justify-center w-full">
+            <Link href="/admin/overview" className="flex items-center justify-center w-full">
                <Image
                 src="/images/logo.png"
                 className="h-12 w-auto object-contain opacity-80"
@@ -60,12 +60,12 @@ export default function AdminShell({
 
       {/* Main Content Area */}
       <div
-        className={`flex-1 flex flex-col transition-all duration-300 ${
+        className={`flex-1 flex flex-col transition-all duration-300 print:ml-0 print:p-0 ${
           isCollapsed ? 'md:ml-20' : 'md:ml-64'
         }`}
       >
         {/* Top Header */}
-        <header className="h-20 border-b border-outline-variant/30 bg-surface/80 backdrop-blur-md flex items-center px-4 justify-between sticky top-0 z-10 shadow-sm">
+        <header className="h-20 border-b border-outline-variant/30 bg-surface/80 backdrop-blur-md flex items-center px-4 justify-between sticky top-0 z-10 shadow-sm print:hidden">
           <div className="flex items-center gap-3">
             <AdminMobileMenu>{userButton}</AdminMobileMenu>
             
@@ -92,8 +92,8 @@ export default function AdminShell({
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto bg-surface-container-lowest">
-          <div className="max-w-7xl mx-auto w-full">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto bg-surface-container-lowest print:p-0 print:m-0 print:bg-white">
+          <div className="max-w-7xl mx-auto w-full print:max-w-none print:m-0 print:p-0">
             {children}
           </div>
         </main>

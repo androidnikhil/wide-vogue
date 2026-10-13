@@ -102,7 +102,7 @@ import {
                         <Link href={`/admin/orders/${order.id}`}>Details</Link>
                       </Button>
                       <Button asChild variant='outline' size='sm' className="h-8 px-2.5 bg-neutral-50 hover:bg-neutral-100 border-neutral-300 text-neutral-800" title="Print Tax Invoice & Packing Slip">
-                        <Link href={`/order/${order.id}/invoice`} target="_blank">
+                        <Link href={`/admin/orders/${order.id}/invoice`}>
                           <Printer className="w-3.5 h-3.5 mr-1 text-[#003020]" />
                           Invoice
                         </Link>

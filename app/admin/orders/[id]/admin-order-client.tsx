@@ -235,8 +235,10 @@ export default function AdminOrderClient({ order }: AdminOrderClientProps) {
               <span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Payment:</span>
               {order.isPaid ? (
                 <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300">✓ Paid</Badge>
-              ) : (
+              ) : order.paymentMethod === 'CashOnDelivery' ? (
                 <Badge className="bg-amber-100 text-amber-900 border-amber-300">COD Unpaid</Badge>
+              ) : (
+                <Badge className="bg-rose-100 text-rose-900 border-rose-300">Payment Pending / Unpaid</Badge>
               )}
             </div>
             <p className="text-xs text-neutral-600 mt-0.5">
@@ -364,8 +366,8 @@ export default function AdminOrderClient({ order }: AdminOrderClientProps) {
                 <div className="space-y-2 border-t md:border-t-0 md:border-l border-neutral-200 pt-3 md:pt-0 md:pl-4">
                   <div>
                     <p className="text-[10px] uppercase font-bold text-neutral-500 tracking-wider">Phone / WhatsApp</p>
-                    <p className="font-bold text-sm text-neutral-900 flex items-center gap-2 mt-0.5">
-                      +91 {address.contactNumber || 'No phone provided'}
+                    <div className="font-bold text-sm text-neutral-900 flex items-center gap-2 mt-0.5">
+                      <span>+91 {address.contactNumber || 'No phone provided'}</span>
                       {address.contactNumber && (
                         <div className="flex items-center gap-1.5 ml-1">
                           <a
@@ -386,7 +388,7 @@ export default function AdminOrderClient({ order }: AdminOrderClientProps) {
                           </a>
                         </div>
                       )}
-                    </p>
+                    </div>
                   </div>
 
                   <div>
@@ -403,24 +405,53 @@ export default function AdminOrderClient({ order }: AdminOrderClientProps) {
                 </div>
               </div>
 
-              {/* COD Cash Collection Alert */}
-              {!order.isPaid && order.paymentMethod === 'CashOnDelivery' && (
-                <div className="mt-2 p-3 bg-amber-50 border border-amber-300 rounded-xl flex items-center justify-between gap-3">
+              {/* Payment Status Alert & Actions */}
+              {!order.isPaid ? (
+                order.paymentMethod === 'CashOnDelivery' ? (
+                  <div className="mt-2 p-3 bg-amber-50 border border-amber-300 rounded-xl flex items-center justify-between gap-3">
+                    <div className="space-y-0.5">
+                      <p className="font-bold text-amber-900 text-xs">📦 Cash on Delivery (Uncollected)</p>
+                      <p className="text-[11px] text-amber-800">
+                        Collect exact cash of <strong>{formatCurrency(order.totalPrice)}</strong> upon parcel delivery.
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={isPending}
+                      onClick={handleMarkAsPaidCOD}
+                      className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shrink-0 h-8 px-3"
+                    >
+                      Mark Cash Collected
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="mt-2 p-3 bg-rose-50 border border-rose-300 rounded-xl flex items-center justify-between gap-3">
+                    <div className="space-y-0.5">
+                      <p className="font-bold text-rose-900 text-xs">⚠️ Online Payment Pending / Unverified ({order.paymentMethod})</p>
+                      <p className="text-[11px] text-rose-800">
+                        Payment was not recorded as completed. If customer paid via UPI/screenshot/bank transfer, verify and mark paid.
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={isPending}
+                      onClick={handleMarkAsPaidCOD}
+                      className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shrink-0 h-8 px-3"
+                    >
+                      Mark as Paid (Verified)
+                    </Button>
+                  </div>
+                )
+              ) : (
+                <div className="mt-2 p-3 bg-emerald-50 border border-emerald-300 rounded-xl flex items-center justify-between gap-3">
                   <div className="space-y-0.5">
-                    <p className="font-bold text-amber-900 text-xs">⚠️ Cash on Delivery (Uncollected)</p>
-                    <p className="text-[11px] text-amber-800">
-                      Collect exact cash of <strong>{formatCurrency(order.totalPrice)}</strong> upon parcel delivery.
+                    <p className="font-bold text-emerald-900 text-xs">✓ Payment Received & Verified ({order.paymentMethod})</p>
+                    <p className="text-[11px] text-emerald-800">
+                      Order total of <strong>{formatCurrency(order.totalPrice)}</strong> has been paid in full.
                     </p>
                   </div>
-                  <Button
-                    type="button"
-                    size="sm"
-                    disabled={isPending}
-                    onClick={handleMarkAsPaidCOD}
-                    className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shrink-0 h-8 px-3"
-                  >
-                    Mark Cash Collected
-                  </Button>
                 </div>
               )}
             </CardContent>

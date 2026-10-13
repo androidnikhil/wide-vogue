@@ -116,24 +116,46 @@ export default function InvoiceClient({ order }: InvoiceClientProps) {
             </div>
 
             {/* Courier Delivery Instruction Strip */}
-            {!order.isPaid && order.paymentMethod === 'CashOnDelivery' ? (
+            {order.isPaid ? (
+              order.paymentMethod === 'CashOnDelivery' ? (
+                <div className="p-1.5 px-2.5 bg-emerald-50 border border-emerald-400 rounded-md flex items-center justify-between text-[11px]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-emerald-900 uppercase">✓ Cash Collected (COD Paid):</span>
+                    <span className="text-[10px] text-emerald-800">Cash payment collected in full for this parcel.</span>
+                  </div>
+                  <div className="font-mono font-bold text-emerald-950 text-xs shrink-0 pl-2">
+                    Paid: {formatCurrency(grandTotal)}
+                  </div>
+                </div>
+              ) : (
+                <div className="p-1.5 px-2.5 bg-emerald-50 border border-emerald-400 rounded-md flex items-center justify-between text-[11px]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-emerald-900 uppercase">✓ Prepaid Order (Paid):</span>
+                    <span className="text-[10px] text-emerald-800">Paid securely via {order.paymentMethod}. Deliver parcel without collecting cash.</span>
+                  </div>
+                  <div className="font-mono font-bold text-emerald-950 text-xs shrink-0 pl-2">
+                    Prepaid: {formatCurrency(grandTotal)}
+                  </div>
+                </div>
+              )
+            ) : order.paymentMethod === 'CashOnDelivery' ? (
               <div className="p-1.5 px-2.5 bg-amber-50 border border-amber-400 rounded-md flex items-center justify-between text-[11px]">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-amber-900 uppercase">📦 Cash on Delivery (COD):</span>
-                  <span className="text-[10px] text-amber-800">Courier delivery boy must collect cash from recipient.</span>
+                  <span className="font-bold text-amber-900 uppercase">📦 Cash on Delivery (COD - Collect Cash):</span>
+                  <span className="text-[10px] text-amber-800">Courier delivery boy must collect exact cash from recipient upon handover.</span>
                 </div>
                 <div className="font-mono font-bold text-amber-950 text-xs shrink-0 pl-2">
-                  Collect: {formatCurrency(grandTotal)}
+                  Collect Cash: {formatCurrency(grandTotal)}
                 </div>
               </div>
             ) : (
-              <div className="p-1.5 px-2.5 bg-emerald-50 border border-emerald-400 rounded-md flex items-center justify-between text-[11px]">
+              <div className="p-1.5 px-2.5 bg-rose-50 border border-rose-400 rounded-md flex items-center justify-between text-[11px]">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-emerald-900 uppercase">✓ Prepaid Order:</span>
-                  <span className="text-[10px] text-emerald-800">Paid securely via {order.paymentMethod}. Deliver parcel without collecting cash.</span>
+                  <span className="font-bold text-rose-900 uppercase">⚠️ Payment Pending / Unpaid:</span>
+                  <span className="text-[10px] text-rose-800">Transaction via {order.paymentMethod} is pending verification. Do not deliver as prepaid.</span>
                 </div>
-                <div className="font-mono font-bold text-emerald-950 text-xs shrink-0 pl-2">
-                  Prepaid: {formatCurrency(grandTotal)}
+                <div className="font-mono font-bold text-rose-950 text-xs shrink-0 pl-2">
+                  Amount Due: {formatCurrency(grandTotal)}
                 </div>
               </div>
             )}
@@ -160,6 +182,12 @@ export default function InvoiceClient({ order }: InvoiceClientProps) {
               <div className="border-l border-neutral-200 pl-3 space-y-0.5">
                 <p className="font-bold text-[#003020] uppercase tracking-wider text-[9px] mb-0.5">
                   Logistics & Dispatch:
+                </p>
+                <p className="flex justify-between">
+                  <span className="text-neutral-500">Payment Status:</span>
+                  <strong className={order.isPaid ? 'text-emerald-700 font-bold' : order.paymentMethod === 'CashOnDelivery' ? 'text-amber-800 font-bold' : 'text-rose-700 font-bold'}>
+                    {order.isPaid ? 'PAID' : order.paymentMethod === 'CashOnDelivery' ? 'COD (UNPAID)' : 'PENDING / UNPAID'}
+                  </strong>
                 </p>
                 <p className="flex justify-between">
                   <span className="text-neutral-500">Payment Mode:</span>

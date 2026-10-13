@@ -212,6 +212,29 @@ const OrderDetailsTable = ({
 
   return (
     <>
+      {/* Admin Mode Top Navigation Banner */}
+      {isAdmin && (
+        <div className="mb-4 p-3.5 bg-[#003020] text-[#F3D98F] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md border border-[#E6C16A]/40">
+          <div className="flex items-center gap-2.5 text-xs">
+            <span className="font-bold text-white uppercase tracking-wider text-[10px] px-2 py-0.5 bg-[#FAF7F0]/20 rounded-md">
+              Admin Portal
+            </span>
+            <span className="text-white/90">
+              You are currently viewing this order in customer storefront mode.
+            </span>
+          </div>
+          <Button
+            asChild
+            size="sm"
+            className="bg-[#F3D98F] hover:bg-[#e8cb77] text-[#003020] text-xs font-bold gap-1.5 h-8 px-3.5 rounded-xl shrink-0 shadow-xs"
+          >
+            <Link href={`/admin/orders/${order.id}`}>
+              Open in Admin Order Portal &rarr;
+            </Link>
+          </Button>
+        </div>
+      )}
+
       {/* Breadcrumb & Invoice Actions Navigation */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <nav className="text-xs text-neutral-500 flex items-center gap-1.5 flex-wrap">

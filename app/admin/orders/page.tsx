@@ -99,7 +99,7 @@ import {
                   <TableCell>
                     <div className="flex items-center gap-1.5">
                       <Button asChild variant='outline' size='sm' className="h-8 px-2.5">
-                        <Link href={`/order/${order.id}`}>Details</Link>
+                        <Link href={`/admin/orders/${order.id}`}>Details</Link>
                       </Button>
                       <Button asChild variant='outline' size='sm' className="h-8 px-2.5 bg-neutral-50 hover:bg-neutral-100 border-neutral-300 text-neutral-800" title="Print Tax Invoice & Packing Slip">
                         <Link href={`/order/${order.id}/invoice`} target="_blank">

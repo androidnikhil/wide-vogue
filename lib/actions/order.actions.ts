@@ -621,7 +621,12 @@ export async function deliverOrder(orderId: string) {
 }
 
 // Update order status (Admin)
-export async function updateOrderStatus(orderId: string, status: string, awbNumber?: string) {
+export async function updateOrderStatus(
+  orderId: string,
+  status: string,
+  awbNumber?: string,
+  trackingUrl?: string
+) {
   try {
     const session = await auth();
     if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
@@ -634,6 +639,11 @@ export async function updateOrderStatus(orderId: string, status: string, awbNumb
     const updateData: any = { status };
     if (awbNumber) {
       updateData.awbNumber = awbNumber;
+    }
+    if (trackingUrl) {
+      updateData.trackingUrl = trackingUrl;
+    } else if (awbNumber && !order.trackingUrl) {
+      updateData.trackingUrl = `https://shiprocket.co/tracking/${awbNumber}`;
     }
     
     if (status === 'DELIVERED') {
@@ -668,12 +678,53 @@ export async function updateOrderStatus(orderId: string, status: string, awbNumb
     }
 
     revalidatePath(`/order/${orderId}`);
+    revalidatePath(`/admin/orders/${orderId}`);
     revalidatePath('/admin/orders');
 
     return {
       success: true,
       message: `Order status updated to ${status}`,
     };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// Manual Courier & AWB Dispatch (Admin)
+export async function dispatchManualCourier({
+  orderId,
+  courierName,
+  awbNumber,
+}: {
+  orderId: string;
+  courierName?: string;
+  awbNumber: string;
+}) {
+  try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
+
+    if (!awbNumber || !awbNumber.trim()) {
+      throw new Error('Please enter a valid AWB Tracking Number');
+    }
+
+    const cleanAwb = awbNumber.trim();
+    let trackingUrl = `https://shiprocket.co/tracking/${cleanAwb}`;
+
+    const courierLower = (courierName || '').toLowerCase();
+    if (courierLower.includes('delhivery')) {
+      trackingUrl = `https://www.delhivery.com/track/package/${cleanAwb}`;
+    } else if (courierLower.includes('bluedart')) {
+      trackingUrl = `https://www.bluedart.com/tracking?trackNumber=${cleanAwb}`;
+    } else if (courierLower.includes('india post') || courierLower.includes('speed post')) {
+      trackingUrl = `https://www.indiapost.gov.in/_layouts/15/dpt.cept.tracking/trackconsignment.aspx`;
+    } else if (courierLower.includes('dtdc')) {
+      trackingUrl = `https://www.dtdc.in/tracking/shipment-tracking.asp?awbNo=${cleanAwb}`;
+    } else if (courierLower.includes('ekart')) {
+      trackingUrl = `https://ekartlogistics.com/shipmenttrack/${cleanAwb}`;
+    }
+
+    return await updateOrderStatus(orderId, 'SHIPPED', cleanAwb, trackingUrl);
   } catch (error) {
     return { success: false, message: formatError(error) };
   }

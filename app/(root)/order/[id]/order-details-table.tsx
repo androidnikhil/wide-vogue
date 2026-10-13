@@ -34,7 +34,7 @@ import OrderTimeline from '@/components/shared/order/order-timeline';
 import { LOYALTY_CONFIG } from '@/lib/loyalty.config';
 import ReturnRequestModal from '@/components/shared/order/return-request-modal';
 import AdminReturnAction from '@/components/admin/admin-return-action';
-import { Copy, Check, FileText, ChevronRight, Phone, MessageSquare } from 'lucide-react';
+import { Copy, Check, FileText, ChevronRight, Phone, MessageSquare, Printer } from 'lucide-react';
 
 const OrderDetailsTable = ({
   order,
@@ -212,16 +212,30 @@ const OrderDetailsTable = ({
 
   return (
     <>
-      {/* Flipkart Breadcrumb Navigation */}
-      <nav className="text-xs text-neutral-500 mb-4 flex items-center gap-1.5 flex-wrap">
-        <Link href="/" className="hover:text-[#003020] hover:underline">Home</Link>
-        <span>&gt;</span>
-        <Link href="/user/orders" className="hover:text-[#003020] hover:underline">My Account</Link>
-        <span>&gt;</span>
-        <Link href="/user/orders" className="hover:text-[#003020] hover:underline">My Orders</Link>
-        <span>&gt;</span>
-        <span className="text-neutral-800 font-semibold font-mono">{cleanOrderId}</span>
-      </nav>
+      {/* Breadcrumb & Invoice Actions Navigation */}
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <nav className="text-xs text-neutral-500 flex items-center gap-1.5 flex-wrap">
+          <Link href="/" className="hover:text-[#003020] hover:underline">Home</Link>
+          <span>&gt;</span>
+          <Link href="/user/orders" className="hover:text-[#003020] hover:underline">My Account</Link>
+          <span>&gt;</span>
+          <Link href="/user/orders" className="hover:text-[#003020] hover:underline">My Orders</Link>
+          <span>&gt;</span>
+          <span className="text-neutral-800 font-semibold font-mono">{cleanOrderId}</span>
+        </nav>
+
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="h-8 px-3 rounded-xl border-neutral-300 text-xs font-semibold gap-1.5 bg-white hover:bg-neutral-50 shadow-xs text-neutral-800"
+        >
+          <Link href={`/order/${order.id}/invoice`} target="_blank" title="View & Print Official Tax Invoice">
+            <Printer className="w-3.5 h-3.5 text-[#003020]" />
+            <span>Tax Invoice & Packing Slip</span>
+          </Link>
+        </Button>
+      </div>
 
       {/* Flipkart-Style Order Summary Header Banner */}
       <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-xs p-5 mb-6">
@@ -513,6 +527,31 @@ const OrderDetailsTable = ({
               )}
               {isAdmin && (
                 <div className='flex flex-col gap-4 mt-6 border-t pt-4'>
+                  {/* Admin Order Packing & Tax Invoice Action Card */}
+                  <div className='p-3.5 rounded-xl bg-[#FAF7F0] border border-[#E6C16A]/70 space-y-2 shadow-xs'>
+                    <div className='flex items-center justify-between flex-wrap gap-2'>
+                      <div>
+                        <h4 className='font-bold text-xs text-[#003020] flex items-center gap-1.5'>
+                          <Printer className="w-3.5 h-3.5 text-[#C88A20]" />
+                          Warehouse Packing & Tax Invoice
+                        </h4>
+                        <p className='text-[11px] text-neutral-600 mt-0.5 leading-relaxed'>
+                          Print official A4 Tax Invoice with logo for the parcel pouch before courier handover.
+                        </p>
+                      </div>
+                      <Button
+                        asChild
+                        size="sm"
+                        className="bg-[#003020] hover:bg-[#002518] text-[#F3D98F] text-xs font-bold gap-1.5 shadow-xs h-8 px-3"
+                      >
+                        <Link href={`/order/${order.id}/invoice`} target="_blank">
+                          <Printer className="w-3.5 h-3.5" />
+                          Print Invoice (A4)
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+
                   <div className='flex items-center justify-between'>
                     <h3 className='font-bold text-sm text-secondary uppercase tracking-wider'>Shipping & Logistics</h3>
                   </div>

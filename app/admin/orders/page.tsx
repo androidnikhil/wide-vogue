@@ -14,6 +14,7 @@ import {
   import Pagination from '@/components/shared/pagination';
   import DeleteDialog from '@/components/shared/delete-dialog';
   import { requireAdmin } from '@/lib/auth-guard';
+  import { Printer } from 'lucide-react';
   
   export const metadata: Metadata = {
     title: 'Admin Orders',
@@ -96,10 +97,18 @@ import {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Button asChild variant='outline' size='sm'>
-                      <Link href={`/order/${order.id}`}>Details</Link>
-                    </Button>
-                    <DeleteDialog id={order.id} action={deleteOrder} />
+                    <div className="flex items-center gap-1.5">
+                      <Button asChild variant='outline' size='sm' className="h-8 px-2.5">
+                        <Link href={`/order/${order.id}`}>Details</Link>
+                      </Button>
+                      <Button asChild variant='outline' size='sm' className="h-8 px-2.5 bg-neutral-50 hover:bg-neutral-100 border-neutral-300 text-neutral-800" title="Print Tax Invoice & Packing Slip">
+                        <Link href={`/order/${order.id}/invoice`} target="_blank">
+                          <Printer className="w-3.5 h-3.5 mr-1 text-[#003020]" />
+                          Invoice
+                        </Link>
+                      </Button>
+                      <DeleteDialog id={order.id} action={deleteOrder} />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

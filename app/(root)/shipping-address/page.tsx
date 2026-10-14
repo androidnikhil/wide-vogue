@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 import { ShippingAddress } from '@/types';
 import ShippingAddressForm from './shipping-address-form';
 import CheckoutSteps from '@/components/shared/checkout-steps';
+import { isDummyPhoneEmail } from '@/lib/constants';
 
 export const metadata: Metadata = {
     title: 'Shipping Address'
@@ -71,7 +72,7 @@ const ShippingAddressPage = async () => {
 
       userAddress = {
         fullName: baseAddress?.fullName || (user.name && user.name !== 'NO_NAME' ? user.name : '') || '',
-        guestEmail: baseAddress?.guestEmail || (user.email && !user.email.endsWith('@madhavshringaar.com') ? user.email : '') || '',
+        guestEmail: baseAddress?.guestEmail || (user.email && !isDummyPhoneEmail(user.email) ? user.email : '') || '',
         contactNumber: baseAddress?.contactNumber || (user.phoneNumber ? user.phoneNumber.replace(/^\+91/, '') : '') || '',
         streetAddress: baseAddress?.streetAddress || '',
         city: baseAddress?.city || '',

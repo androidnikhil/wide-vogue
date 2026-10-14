@@ -32,67 +32,81 @@ export const SEO_KEYWORDS = [
 ];
 
 export const signInDefaultValues = {
-    email: '',
-    password: '',
-  };
+  email: '',
+  password: '',
+};
    
 export const signUpDefaultValues = {
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  };
+  name: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+};
 
-  export const shippingAddressDefaultValues = {
-    fullName: '',
-    streetAddress: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    contactNumber: '',
-    country: '',
+export const shippingAddressDefaultValues = {
+  fullName: '',
+  streetAddress: '',
+  city: '',
+  state: '',
+  postalCode: '',
+  contactNumber: '',
+  country: '',
+};
+
+export const PAYMENT_METHODS = ['UPI', 'Card', 'NetBanking', 'CashOnDelivery'];
+export const DEFAULT_PAYMENT_METHOD = process.env.DEFAULT_PAYMENT_METHOD || 'UPI';
+
+export const PAGE_SIZE = Number(process.env.PAGE_SIZE) || 12;
+
+export const productDefaultValues = {
+  name: '',
+  slug: '',
+  category: '',
+  images: [],
+  sizes: [],
+  sizeVariants: [],
+  brand: '',
+  description: '',
+  price: '0',
+  originalPrice: '0',
+  discountPercent: 0,
+  stock: 0,
+  rating: '0',
+  numReviews: '0',
+  isFeatured: false,
+  banner: null,
+  isReturnable: false,
+  returnWindowDays: 0,
+  returnPolicyText: '',
+};
+
+export const USER_ROLES = process.env.USER_ROLES ? process.env.USER_ROLES.split(',') : ['user', 'admin'];
+
+export const reviewFormDefaultValues = {
+  title: '',
+  comment: '',
+  rating: 0,
+};
+
+export const SENDER_EMAIL = process.env.SENDER_EMAIL || 'info@madhavshringaar.com';
+export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com';
+export const SUPPORT_PHONE = process.env.SUPPORT_PHONE || '+91 70782 11946';
+export const CALLING_PHONE = process.env.CALLING_PHONE || '+91 70782 11946';
+export const CALLING_NUMBER = '7078211946';
+export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '7982160480';
+export const COMPANY_GSTIN = process.env.COMPANY_GSTIN || '09EHFPP7126A1ZE';
+export const COMPANY_MSME = process.env.COMPANY_MSME || 'UDYAM-UP-01-0152376';
+
+
+/**
+ * Checks if an email is an old auto-generated dummy phone email (e.g. 9876543210@madhavshringaar.com)
+ * Real store email addresses (like nikhil.pandey@madhavshringaar.com or info@madhavshringaar.com) are NEVER dummy emails.
+ */
+export const isDummyPhoneEmail = (email?: string | null): boolean => {
+  if (!email) return false;
+  const trimmed = email.trim().toLowerCase();
+  if (trimmed === 'nikhil.pandey@madhavshringaar.com' || trimmed === 'info@madhavshringaar.com') {
+    return false;
   }
-
-  export const PAYMENT_METHODS = ['UPI', 'Card', 'NetBanking', 'CashOnDelivery'];
-  export const DEFAULT_PAYMENT_METHOD = process.env.DEFAULT_PAYMENT_METHOD || 'UPI';
-
-  export const PAGE_SIZE = Number(process.env.PAGE_SIZE) || 12;
-
-  export const productDefaultValues = {
-    name: '',
-    slug: '',
-    category: '',
-    images: [],
-    sizes: [],
-    sizeVariants: [],
-    brand: '',
-    description: '',
-    price: '0',
-    originalPrice: '0',
-    discountPercent: 0,
-    stock: 0,
-    rating: '0',
-    numReviews: '0',
-    isFeatured: false,
-    banner: null,
-    isReturnable: false,
-    returnWindowDays: 0,
-    returnPolicyText: '',
-  };
-
-  export const USER_ROLES = process.env.USER_ROLES ? process.env.USER_ROLES.split(',') : ['user', 'admin'];
-
-  export const reviewFormDefaultValues = {
-    title: '',
-    comment: '',
-    rating: 0,
-  };
-
-  export const SENDER_EMAIL = process.env.SENDER_EMAIL || 'info@madhavshringaar.com';
-  export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com';
-  export const SUPPORT_PHONE = process.env.SUPPORT_PHONE || '+91 70782 11946';
-  export const CALLING_PHONE = process.env.CALLING_PHONE || '+91 70782 11946';
-  export const CALLING_NUMBER = '7078211946';
-  export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '7982160480';
-  export const COMPANY_GSTIN = process.env.COMPANY_GSTIN || '09EHFPP7126A1ZE';
-  export const COMPANY_MSME = process.env.COMPANY_MSME || 'UDYAM-UP-01-0152376';
+  return /^\+?\d+@madhavshringaar\.com$/i.test(trimmed);
+};

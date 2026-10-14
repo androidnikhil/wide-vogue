@@ -374,96 +374,108 @@ export default async function Homepage({
           </div>
 
           {/* 4 Human-Crafted Seva Pillars */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Card 1: Braj Dhām Karigari */}
-            <div className="bg-white/95 rounded-[2rem] p-7 shadow-xs hover:shadow-xl transition-all duration-300 border border-[#E6C16A]/30 flex flex-col justify-between group hover:-translate-y-1 relative">
-              <div className="absolute top-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-[#C88A20] to-transparent rounded-full opacity-60 group-hover:opacity-100 transition-opacity" />
+            <div className="bg-white rounded-3xl p-7 shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-[#D4A346]/40 hover:border-[#B37812] ring-1 ring-[#D4A346]/15 hover:ring-[#B37812]/30 flex flex-col justify-between group hover:-translate-y-1.5 relative">
               <div>
-                <div className="w-16 h-16 rounded-2xl bg-[#FDF8EC] border border-[#E6C16A]/40 flex items-center justify-center text-[#C88A20] mb-5 shadow-xs group-hover:scale-105 transition-transform">
-                   <span className="material-symbols-outlined text-3xl">workspace_premium</span>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FFF9EE] to-[#FBF2DE] border border-[#D4A346]/40 flex items-center justify-center text-[#C88A20] shadow-xs group-hover:scale-105 group-hover:border-[#B37812]/60 transition-all duration-300">
+                    <span className="material-symbols-outlined text-3xl">workspace_premium</span>
+                  </div>
+                  <span className="inline-flex items-center text-[11px] font-bold text-[#8A5A0A] bg-[#FAF3E0] border border-[#D4A346]/35 px-3 py-1 rounded-full tracking-wide uppercase font-sans">
+                    {t.home.pillar1Top}
+                  </span>
                 </div>
-                <div className="inline-block text-[11px] font-bold text-[#8A5A0A] bg-[#FAF3E0] px-2.5 py-0.5 rounded-full mb-2 tracking-wide uppercase font-sans">
-                  {t.home.pillar1Top}
-                </div>
-                <h3 className="font-bold text-[#003020] font-serif text-xl mb-2.5">
+                <h3 className="font-bold text-[#003020] font-serif text-xl tracking-tight mb-2.5 group-hover:text-[#8A5A0A] transition-colors">
                   {t.home.pillar1Title}
                 </h3>
-                <p className="text-[#003020]/75 text-sm leading-relaxed font-light mb-4">
+                <p className="text-[#003020]/80 text-sm leading-relaxed font-light mb-6">
                   {t.home.pillar1Desc}
                 </p>
               </div>
-              <div className="pt-3 border-t border-[#E6C16A]/20 flex items-center gap-1.5 text-xs text-[#0F6F74] font-medium font-sans">
-                <span className="material-symbols-outlined text-sm">verified</span>
-                <span>{t.home.pillar1Badge}</span>
+              <div className="pt-4 border-t border-neutral-100">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#FAF3E0]/70 border border-[#D4A346]/30 text-xs text-[#8A5A0A] font-semibold font-sans">
+                  <span className="material-symbols-outlined text-base text-[#0F6F74] shrink-0">verified</span>
+                  <span className="truncate">{t.home.pillar1Badge}</span>
+                </div>
               </div>
             </div>
 
-            {/* Card 2: Pavitra Surakshit Packaging */}
-            <div className="bg-white/95 rounded-[2rem] p-7 shadow-xs hover:shadow-xl transition-all duration-300 border border-[#0F6F74]/20 flex flex-col justify-between group hover:-translate-y-1 relative">
-              <div className="absolute top-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-[#0F6F74] to-transparent rounded-full opacity-60 group-hover:opacity-100 transition-opacity" />
+            {/* Card 2: Pavitra Safe Packaging */}
+            <div className="bg-white rounded-3xl p-7 shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-[#0F6F74]/35 hover:border-[#0F6F74] ring-1 ring-[#0F6F74]/15 hover:ring-[#0F6F74]/35 flex flex-col justify-between group hover:-translate-y-1.5 relative">
               <div>
-                <div className="w-16 h-16 rounded-2xl bg-[#E8F3EE] border border-[#0F6F74]/30 flex items-center justify-center text-[#0F6F74] mb-5 shadow-xs group-hover:scale-105 transition-transform">
-                   <span className="material-symbols-outlined text-3xl">local_shipping</span>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#EAF5F2] to-[#DEF0EB] border border-[#0F6F74]/30 flex items-center justify-center text-[#0F6F74] shadow-xs group-hover:scale-105 group-hover:border-[#0F6F74]/60 transition-all duration-300">
+                    <span className="material-symbols-outlined text-3xl">local_shipping</span>
+                  </div>
+                  <span className="inline-flex items-center text-[11px] font-bold text-[#0F6F74] bg-[#EAF5F2] border border-[#0F6F74]/30 px-3 py-1 rounded-full tracking-wide uppercase font-sans">
+                    {t.home.pillar2Top}
+                  </span>
                 </div>
-                <div className="inline-block text-[11px] font-bold text-[#0F6F74] bg-[#E8F3EE] px-2.5 py-0.5 rounded-full mb-2 tracking-wide uppercase font-sans">
-                  {t.home.pillar2Top}
-                </div>
-                <h3 className="font-bold text-[#003020] font-serif text-xl mb-2.5">
+                <h3 className="font-bold text-[#003020] font-serif text-xl tracking-tight mb-2.5 group-hover:text-[#0F6F74] transition-colors">
                   {t.home.pillar2Title}
                 </h3>
-                <p className="text-[#003020]/75 text-sm leading-relaxed font-light mb-4">
+                <p className="text-[#003020]/80 text-sm leading-relaxed font-light mb-6">
                   {t.home.pillar2Desc}
                 </p>
               </div>
-              <div className="pt-3 border-t border-[#0F6F74]/20 flex items-center gap-1.5 text-xs text-[#0F6F74] font-medium font-sans">
-                <span className="material-symbols-outlined text-sm">inventory_2</span>
-                <span>{t.home.pillar2Badge}</span>
+              <div className="pt-4 border-t border-neutral-100">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#EAF5F2]/70 border border-[#0F6F74]/30 text-xs text-[#0F6F74] font-semibold font-sans">
+                  <span className="material-symbols-outlined text-base text-[#0F6F74] shrink-0">inventory_2</span>
+                  <span className="truncate">{t.home.pillar2Badge}</span>
+                </div>
               </div>
             </div>
 
             {/* Card 3: Size Fit Guarantee (0 to 6 No.) */}
-            <div className="bg-white/95 rounded-[2rem] p-7 shadow-xs hover:shadow-xl transition-all duration-300 border border-[#E6C16A]/30 flex flex-col justify-between group hover:-translate-y-1 relative">
-              <div className="absolute top-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-[#E6C16A] to-transparent rounded-full opacity-60 group-hover:opacity-100 transition-opacity" />
+            <div className="bg-white rounded-3xl p-7 shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-[#D97706]/35 hover:border-[#B45309] ring-1 ring-[#D97706]/15 hover:ring-[#B45309]/30 flex flex-col justify-between group hover:-translate-y-1.5 relative">
               <div>
-                <div className="w-16 h-16 rounded-2xl bg-[#FDF2E9] border border-[#E6C16A]/40 flex items-center justify-center text-[#C88A20] mb-5 shadow-xs group-hover:scale-105 transition-transform">
-                   <span className="material-symbols-outlined text-3xl">favorite</span>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FFF5ED] to-[#FEEAD9] border border-[#D97706]/40 flex items-center justify-center text-[#D97706] shadow-xs group-hover:scale-105 group-hover:border-[#B45309]/60 transition-all duration-300">
+                    <span className="material-symbols-outlined text-3xl">favorite</span>
+                  </div>
+                  <span className="inline-flex items-center text-[11px] font-bold text-[#B45309] bg-[#FFF5ED] border border-[#D97706]/35 px-3 py-1 rounded-full tracking-wide uppercase font-sans">
+                    {t.home.pillar3Top}
+                  </span>
                 </div>
-                <div className="inline-block text-[11px] font-bold text-[#8A5A0A] bg-[#FAF3E0] px-2.5 py-0.5 rounded-full mb-2 tracking-wide uppercase font-sans">
-                  {t.home.pillar3Top}
-                </div>
-                <h3 className="font-bold text-[#003020] font-serif text-xl mb-2.5">
+                <h3 className="font-bold text-[#003020] font-serif text-xl tracking-tight mb-2.5 group-hover:text-[#B45309] transition-colors">
                   {t.home.pillar3Title}
                 </h3>
-                <p className="text-[#003020]/75 text-sm leading-relaxed font-light mb-4">
+                <p className="text-[#003020]/80 text-sm leading-relaxed font-light mb-6">
                   {t.home.pillar3Desc}
                 </p>
               </div>
-              <div className="pt-3 border-t border-[#E6C16A]/20 flex items-center gap-1.5 text-xs text-[#0F6F74] font-medium font-sans">
-                <span className="material-symbols-outlined text-sm">published_with_changes</span>
-                <span>{t.home.pillar3Badge}</span>
+              <div className="pt-4 border-t border-neutral-100">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#FFF5ED]/80 border border-[#D97706]/30 text-xs text-[#B45309] font-semibold font-sans">
+                  <span className="material-symbols-outlined text-base text-[#D97706] shrink-0">published_with_changes</span>
+                  <span className="truncate">{t.home.pillar3Badge}</span>
+                </div>
               </div>
             </div>
 
             {/* Card 4: Devotee Care on Call & WhatsApp */}
-            <div className="bg-white/95 rounded-[2rem] p-7 shadow-xs hover:shadow-xl transition-all duration-300 border border-[#003020]/20 flex flex-col justify-between group hover:-translate-y-1 relative">
-              <div className="absolute top-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-[#003020] to-transparent rounded-full opacity-60 group-hover:opacity-100 transition-opacity" />
+            <div className="bg-white rounded-3xl p-7 shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-[#003020]/25 hover:border-[#003020] ring-1 ring-[#003020]/15 hover:ring-[#003020]/30 flex flex-col justify-between group hover:-translate-y-1.5 relative">
               <div>
-                <div className="w-16 h-16 rounded-2xl bg-[#F5F5F3] border border-[#003020]/20 flex items-center justify-center text-[#003020] mb-5 shadow-xs group-hover:scale-105 transition-transform">
-                   <span className="material-symbols-outlined text-3xl">support_agent</span>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F0F5F2] to-[#E2EBE5] border border-[#003020]/20 flex items-center justify-center text-[#003020] shadow-xs group-hover:scale-105 group-hover:border-[#003020]/50 transition-all duration-300">
+                    <span className="material-symbols-outlined text-3xl">support_agent</span>
+                  </div>
+                  <span className="inline-flex items-center text-[11px] font-bold text-[#003020] bg-[#F0F5F2] border border-[#003020]/25 px-3 py-1 rounded-full tracking-wide uppercase font-sans">
+                    {t.home.pillar4Top}
+                  </span>
                 </div>
-                <div className="inline-block text-[11px] font-bold text-[#003020] bg-neutral-100 px-2.5 py-0.5 rounded-full mb-2 tracking-wide uppercase font-sans">
-                  {t.home.pillar4Top}
-                </div>
-                <h3 className="font-bold text-[#003020] font-serif text-xl mb-2.5">
+                <h3 className="font-bold text-[#003020] font-serif text-xl tracking-tight mb-2.5 group-hover:text-[#003020] transition-colors">
                   {t.home.pillar4Title}
                 </h3>
-                <p className="text-[#003020]/75 text-sm leading-relaxed font-light mb-4">
+                <p className="text-[#003020]/80 text-sm leading-relaxed font-light mb-6">
                   {t.home.pillar4Desc}
                 </p>
               </div>
-              <div className="pt-3 border-t border-[#003020]/15 flex items-center gap-1.5 text-xs text-[#003020] font-medium font-sans">
-                <span className="material-symbols-outlined text-sm text-[#25D366]">chat</span>
-                <span>{t.home.pillar4Badge}</span>
+              <div className="pt-4 border-t border-neutral-100">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F0F5F2]/80 border border-[#003020]/20 text-xs text-[#003020] font-semibold font-sans">
+                  <span className="material-symbols-outlined text-base text-[#25D366] shrink-0">chat</span>
+                  <span className="truncate">{t.home.pillar4Badge}</span>
+                </div>
               </div>
             </div>
           </div>

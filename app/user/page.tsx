@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { getUserAccountData } from '@/lib/actions/user.actions';
+import { isDummyPhoneEmail } from '@/lib/constants';
 import { 
   Package, 
   MapPin, 
@@ -36,7 +37,7 @@ export default async function UserAccountPage() {
   const user = await getUserAccountData();
   const userName = user?.name && user.name !== 'NO_NAME' ? user.name : 'Devotee';
   const userPhone = user?.phoneNumber || '';
-  const userEmail = user?.email && !user.email.endsWith('@madhavshringaar.com') ? user.email : '';
+  const userEmail = user?.email && !isDummyPhoneEmail(user.email) ? user.email : '';
   const orderCount = user?._count?.Order || 0;
   const wishlistCount = user?._count?.Wishlist || 0;
   const addressesCount = Array.isArray(user?.addresses) ? user.addresses.length : (user?.address ? 1 : 0);

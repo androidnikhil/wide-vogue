@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { User, Mail, Phone, Loader2, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { isDummyPhoneEmail } from '@/lib/constants';
 
 interface ProfileFormProps {
   initialUser?: {
@@ -33,12 +34,10 @@ const ProfileForm = ({ initialUser }: ProfileFormProps) => {
   const router = useRouter();
   const { data: session, update } = useSession();
 
-  const currentEmail = initialUser?.email || (
-    session?.user?.email && !session.user.email.endsWith('@madhavshringaar.com')
-      ? session.user.email
-      : ''
-  );
-  const isEmailLocked = Boolean(currentEmail && !currentEmail.endsWith('@madhavshringaar.com'));
+  const currentEmail = (initialUser?.email && !isDummyPhoneEmail(initialUser.email))
+    ? initialUser.email
+    : (session?.user?.email && !isDummyPhoneEmail(session.user.email) ? session.user.email : '');
+  const isEmailLocked = Boolean(currentEmail && !isDummyPhoneEmail(currentEmail));
 
   const form = useForm<z.infer<typeof updateProfileSchema>>({
     resolver: zodResolver(updateProfileSchema),

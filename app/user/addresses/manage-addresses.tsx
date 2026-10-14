@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { ShippingAddress } from '@/types';
 import { shippingAddressSchema } from '@/lib/validators';
 import { updateUserAddress, deleteUserAddress } from '@/lib/actions/user.actions';
+import { isDummyPhoneEmail } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -65,7 +66,7 @@ export default function ManageAddresses({
       postalCode: '',
       contactNumber: defaultPhone || '',
       country: 'India',
-      guestEmail: defaultEmail && !defaultEmail.endsWith('@madhavshringaar.com') ? defaultEmail : '',
+      guestEmail: defaultEmail && !isDummyPhoneEmail(defaultEmail) ? defaultEmail : '',
     },
     mode: 'onTouched',
   });

@@ -1,12 +1,10 @@
 import { Badge } from '@/components/ui/badge';
 import { getProductBySlug } from '@/lib/actions/product.action';
 import { notFound } from 'next/navigation';
-import ProductPrice from '@/components/shared/product/product-price';
 import ProductImages from '@/components/shared/product/product-images';
 import AddToCart from '@/components/shared/product/add-to-cart';
 import { getMyCart } from '@/lib/actions/cart.action';
 import ReviewList from './review-list';
-import WishlistButton from '@/components/shared/product/wishlist-button';
 import { auth } from '@/auth';
 import Rating from '@/components/shared/product/rating';
 import ProductTrustBadges from '@/components/shared/product/product-trust-badges';
@@ -170,37 +168,22 @@ const ProductDetailsPage = async (props: {
 
             {/* Price & Cart Actions */}
             <div className='py-6 border-b border-outline-variant/30'>
-              <div className='mb-6 flex items-baseline gap-4'>
-                <ProductPrice
-                  value={Number(product.price)}
-                  className='text-4xl font-bold text-on-surface'
-                />
-                <span className="text-sm text-on-surface-variant font-medium">{t.product.inclusiveOfTaxes}</span>
-              </div>
-
-              {product.stock > 0 && (
-                <div className='flex items-center gap-3 w-full'>
-                  <div className="flex-1">
-                    <AddToCart
-                      cart={cart}
-                      sizes={product.sizes}
-                      sizeVariants={(product as any).sizeVariants}
-                      item={{
-                        productId: product.id,
-                        name: product.name,
-                        slug: product.slug,
-                        price: product.price,
-                        qty: 1,
-                        image: product.images![0],
-                      }}
-                    />
-                  </div>
-                  <WishlistButton 
-                    productId={product.id} 
-                    className="h-12 w-12 flex-shrink-0 bg-surface-container-low border border-outline-variant/30 hover:bg-surface-container rounded-lg shadow-sm active:scale-95 transition-all flex items-center justify-center text-on-surface-variant hover:text-secondary"
-                  />
-                </div>
-              )}
+              <AddToCart
+                cart={cart}
+                sizes={product.sizes}
+                sizeVariants={(product as any).sizeVariants}
+                basePrice={product.price}
+                baseOriginalPrice={product.originalPrice}
+                stock={product.stock}
+                item={{
+                  productId: product.id,
+                  name: product.name,
+                  slug: product.slug,
+                  price: product.price,
+                  qty: 1,
+                  image: product.images![0],
+                }}
+              />
             </div>
 
             {/* Trust Badges & Pincode Checker */}
@@ -209,7 +192,8 @@ const ProductDetailsPage = async (props: {
               <div className="mt-4">
                 <ProductTrustBadges 
                   isReturnable={product.isReturnable} 
-                  returnWindowDays={product.returnWindowDays} 
+                  returnWindowDays={product.returnWindowDays}
+                  returnPolicyText={product.returnPolicyText}
                 />
               </div>
             </div>
@@ -220,7 +204,10 @@ const ProductDetailsPage = async (props: {
                 <span className="material-symbols-outlined text-secondary">info</span>
                 {t.product.description}
               </p>
-              <p className='font-body-md text-body-md text-on-surface-variant leading-relaxed'>{product.description}</p>
+              <div 
+                className='font-body-md text-body-md text-on-surface-variant leading-relaxed prose prose-sm max-w-none [&_b]:font-bold [&_strong]:font-bold [&_b]:text-[#003020] [&_strong]:text-[#003020] [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2 [&_li]:my-0.5 [&_h3]:font-serif [&_h3]:font-bold [&_h3]:text-base [&_h3]:text-[#003020] [&_h3]:mt-3 [&_h3]:mb-1 [&_p]:mb-2.5 last:[&_p]:mb-0'
+                dangerouslySetInnerHTML={{ __html: product.description }}
+              />
             </div>
             
           </div>

@@ -7,11 +7,13 @@ import { useLanguage } from '@/lib/i18n/language-context';
 interface ProductTrustBadgesProps {
   isReturnable: boolean;
   returnWindowDays: number;
+  returnPolicyText?: string | null;
 }
 
 export default function ProductTrustBadges({
   isReturnable,
-  returnWindowDays
+  returnWindowDays,
+  returnPolicyText,
 }: ProductTrustBadgesProps) {
   const { language } = useLanguage();
   const isHindi = language === 'hi';
@@ -55,6 +57,18 @@ export default function ProductTrustBadges({
           </span>
         </Link>
       </div>
+
+      {returnPolicyText && (
+        <div className="mt-3.5 p-3 bg-amber-50/60 border border-amber-200/80 rounded-xl text-xs text-[#003020] flex items-start gap-2.5">
+          <RotateCcw className="w-4 h-4 text-[#C88A20] flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <span className="font-bold text-[#003020] block mb-0.5">
+              {isHindi ? 'वापसी एवं विनिमय नीति' : 'Return & Exchange Policy'}:
+            </span>
+            <p className="text-neutral-700 leading-relaxed font-normal">{returnPolicyText}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

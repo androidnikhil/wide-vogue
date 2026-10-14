@@ -159,52 +159,93 @@ export async function deleteProduct(id: string) {
     }
   }
   
+function normalizeProductPricing(product: any) {
+  if (product.sizeVariants && Array.isArray(product.sizeVariants) && product.sizeVariants.length > 0) {
+    const cleanedVariants = product.sizeVariants.map((v: any) => {
+      const p = Number(v.price) || 0;
+      const op = Number(v.originalPrice) || 0;
+      const effectivePrice = p > 0 ? String(v.price) : (op > 0 ? String(v.originalPrice) : '0');
+      const effectiveOriginalPrice = op > 0 ? String(v.originalPrice) : effectivePrice;
+      return {
+        ...v,
+        price: effectivePrice,
+        originalPrice: effectiveOriginalPrice,
+      };
+    });
+    product.sizeVariants = cleanedVariants;
+
+    const validPrices = cleanedVariants
+      .map((v: any) => Number(v.price))
+      .filter((n: number) => !isNaN(n) && n > 0);
+
+    if (validPrices.length > 0) {
+      const minPrice = Math.min(...validPrices);
+      const matchingVariant = cleanedVariants.find((v: any) => Number(v.price) === minPrice);
+      const minOriginalPrice = matchingVariant?.originalPrice ? Number(matchingVariant.originalPrice) : minPrice;
+
+      if (Number(product.price || 0) <= 0) {
+        product.price = minPrice.toFixed(2);
+        product.originalPrice = (minOriginalPrice || minPrice).toFixed(2);
+        if (minOriginalPrice > minPrice) {
+          product.discountPercent = Math.round(((minOriginalPrice - minPrice) / minOriginalPrice) * 100);
+        } else {
+          product.discountPercent = 0;
+        }
+      }
+    }
+  }
+  return product;
+}
+
 // Create a product
 export async function createProduct(data: z.infer<typeof insertProductSchema>) {
-    try {
-      const session = await auth();
-      if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
-      const product = insertProductSchema.parse(data);
-      await prisma.product.create({ data: product });
-  
-      revalidatePath('/admin/products');
-  
-      return {
-        success: true,
-        message: 'Product created successfully',
-      };
-    } catch (error) {
-      return { success: false, message: formatError(error) };
-    }
+  try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
+    const product = normalizeProductPricing(insertProductSchema.parse(data));
+    await prisma.product.create({ data: product });
+
+    revalidatePath('/admin/products');
+    revalidatePath('/');
+
+    return {
+      success: true,
+      message: 'Product created successfully',
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
   }
-  
-  // Update a product
+}
+
+// Update a product
 export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
-    try {
-      const session = await auth();
-      if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
-      const product = updateProductSchema.parse(data);
-      const productExists = await prisma.product.findFirst({
-        where: { id: product.id },
-      });
-  
-      if (!productExists) throw new Error('Product not found');
-  
-      await prisma.product.update({
-        where: { id: product.id },
-        data: product,
-      });
-  
-      revalidatePath('/admin/products');
-  
-      return {
-        success: true,
-        message: 'Product updated successfully',
-      };
-    } catch (error) {
-      return { success: false, message: formatError(error) };
-    }
+  try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized: Admin access required');
+    const product = normalizeProductPricing(updateProductSchema.parse(data));
+    const productExists = await prisma.product.findFirst({
+      where: { id: product.id },
+    });
+
+    if (!productExists) throw new Error('Product not found');
+
+    await prisma.product.update({
+      where: { id: product.id },
+      data: product,
+    });
+
+    revalidatePath('/admin/products');
+    revalidatePath(`/product/${product.slug}`);
+    revalidatePath('/');
+
+    return {
+      success: true,
+      message: 'Product updated successfully',
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
   }
+}
 
   // Get all categories
 export async function getAllCategories() {

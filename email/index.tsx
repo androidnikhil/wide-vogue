@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import { render } from '@react-email/components';
-import { SENDER_EMAIL, ADMIN_EMAIL, APP_NAME } from '@/lib/constants';
+import { SENDER_EMAIL, ADMIN_EMAIL, APP_NAME, isDummyPhoneEmail } from '@/lib/constants';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
@@ -42,12 +42,12 @@ const getLogoAttachment = () => {
 const getRecipientEmail = (order: any): string | null => {
   const email =
     (order.shippingAddress as any)?.guestEmail ||
-    (order.user?.email && !order.user.email.endsWith('@madhavshringaar.com')
+    (order.user?.email && !isDummyPhoneEmail(order.user.email)
       ? order.user.email
       : null) ||
     order.guestEmail;
 
-  if (!email || email.includes('@madhavshringaar.com')) {
+  if (!email || isDummyPhoneEmail(email)) {
     return null;
   }
   return email;
@@ -105,7 +105,7 @@ export const sendAdminNewOrderAlert = async ({ order }: { order: any }) => {
 // 3. Welcome Email
 export const sendWelcomeEmail = async ({ name, email }: { name: string; email: string }) => {
   try {
-    if (!email || email.includes('@madhavshringaar.com')) {
+    if (!email || isDummyPhoneEmail(email)) {
       return;
     }
 

@@ -20,6 +20,7 @@ import {
   Ruler,
   LogOut,
 } from 'lucide-react';
+import { isDummyPhoneEmail } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -175,7 +176,7 @@ export default function MobileMenu({ sessionUser }: MobileMenuProps) {
                       {isHindi ? 'हरे कृष्णा' : 'Hare Krishna'}, {sessionUser.name?.split(' ')[0] || t.header.devotee} 🙏
                     </p>
                     <p className="text-[11px] text-neutral-500 truncate">
-                      {sessionUser.email?.includes('@madhavshringaar.com')
+                      {isDummyPhoneEmail(sessionUser.email)
                         ? (isHindi ? 'पावन सेवा खाता' : 'Blessed Seva Account')
                         : sessionUser.email}
                     </p>

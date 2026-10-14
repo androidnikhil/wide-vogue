@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { productDefaultValues } from '@/lib/constants';
 import { insertProductSchema, updateProductSchema } from '@/lib/validators';
@@ -27,7 +27,8 @@ import { UploadButton } from '@/lib/uploadthing';
 import { Card, CardContent } from '../ui/card';
 import Image from 'next/image';
 import { Checkbox } from '../ui/checkbox';
-import { X } from 'lucide-react';
+import { X, Sparkles, Layers } from 'lucide-react';
+import RichTextEditor from './rich-text-editor';
 
 const ProductForm = ({
   type,
@@ -54,10 +55,50 @@ const ProductForm = ({
   const basePrice = form.watch('price') || '0';
   const baseOriginalPrice = form.watch('originalPrice') || '0';
   const baseStock = form.watch('stock') || 0;
+  const hasExistingVariants = (product && (product as any).sizeVariants && (product as any).sizeVariants.length > 0) || (product?.sizes && product.sizes.length > 0);
+  const [pricingMode, setPricingMode] = useState<'single' | 'size'>(hasExistingVariants ? 'size' : 'single');
+  const [syncSamePrice, setSyncSamePrice] = useState(false);
 
   const onSubmit: SubmitHandler<z.infer<typeof insertProductSchema>> = async (
     values
   ) => {
+    // If product has size variants, clean up pricing and auto-derive base price
+    if (selectedSizes.length > 0 && values.sizeVariants && values.sizeVariants.length > 0) {
+      const cleanedVariants = values.sizeVariants.map((v) => {
+        const p = Number(v.price) || 0;
+        const op = Number(v.originalPrice) || 0;
+        const effectivePrice = p > 0 ? String(v.price) : (op > 0 ? String(v.originalPrice) : '0');
+        const effectiveOriginalPrice = op > 0 ? String(v.originalPrice) : effectivePrice;
+        return {
+          ...v,
+          price: effectivePrice,
+          originalPrice: effectiveOriginalPrice,
+        };
+      });
+      values.sizeVariants = cleanedVariants;
+
+      // Extract valid non-zero prices to determine base starting price
+      const validPrices = cleanedVariants
+        .map((v) => Number(v.price))
+        .filter((n) => !isNaN(n) && n > 0);
+
+      if (validPrices.length > 0) {
+        const minPrice = Math.min(...validPrices);
+        const matchingVariant = cleanedVariants.find((v) => Number(v.price) === minPrice);
+        const minOriginalPrice = matchingVariant?.originalPrice ? Number(matchingVariant.originalPrice) : minPrice;
+
+        // Auto-assign base price if 0 or when using size-based matrix
+        if (Number(values.price || 0) <= 0 || pricingMode === 'size') {
+          values.price = minPrice.toFixed(2);
+          values.originalPrice = (minOriginalPrice || minPrice).toFixed(2);
+          if (minOriginalPrice > minPrice) {
+            values.discountPercent = Math.round(((minOriginalPrice - minPrice) / minOriginalPrice) * 100);
+          } else {
+            values.discountPercent = 0;
+          }
+        }
+      }
+    }
     // On Create
     if (type === 'Create') {
       const res = await createProduct(values);
@@ -230,16 +271,68 @@ const ProductForm = ({
             )}
           />
         </div>
-        <div className='flex flex-col md:flex-row gap-5'>
+
+        {/* Pricing Strategy Selector */}
+        <div className="p-4 bg-gradient-to-r from-amber-50/60 to-orange-50/40 rounded-2xl border border-amber-200/80 shadow-2xs space-y-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                Pricing Strategy
+              </span>
+              <p className="text-xs text-neutral-600 mt-0.5">
+                Choose whether this product has one uniform price or different prices for each size
+              </p>
+            </div>
+            <div className="inline-flex rounded-xl border border-amber-300/80 bg-white p-1 shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setPricingMode('single')}
+                className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                  pricingMode === 'single'
+                    ? 'bg-[#003020] text-[#E6C16A] shadow-xs'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                Single Fixed Price
+              </button>
+              <button
+                type="button"
+                onClick={() => setPricingMode('size')}
+                className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+                  pricingMode === 'size'
+                    ? 'bg-[#003020] text-[#E6C16A] shadow-xs'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" />
+                Size-Wise Pricing Matrix
+              </button>
+            </div>
+          </div>
+
+          {pricingMode === 'size' && (
+            <div className="p-3 bg-white/90 rounded-xl border border-amber-200/70 text-xs text-amber-950 flex items-center gap-2">
+              <span className="material-symbols-outlined text-amber-700 text-base">info</span>
+              <span>
+                <strong>Size-Wise Pricing Active:</strong> You can enter specific MRP and Selling Price for each size below. The base price will automatically be set to the starting/lowest size price.
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className={`flex flex-col md:flex-row gap-5 ${pricingMode === 'size' ? 'opacity-85' : ''}`}>
           {/* Original Price */}
           <FormField
             control={form.control}
             name='originalPrice'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Original Price (MRP)</FormLabel>
+                <FormLabel>
+                  {pricingMode === 'size' ? 'Base / Starting MRP (₹)' : 'Original Price (MRP)'}
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter actual price' {...field} />
+                  <Input placeholder={pricingMode === 'size' ? 'Auto-filled from lowest size' : 'Enter actual price'} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -271,7 +364,9 @@ const ProductForm = ({
             name='price'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Selling Price (Auto-calculated)</FormLabel>
+                <FormLabel>
+                  {pricingMode === 'size' ? 'Base Selling Price (Auto-set)' : 'Selling Price (Auto-calculated)'}
+                </FormLabel>
                 <FormControl>
                   <Input placeholder='Calculated selling price' readOnly className="bg-gray-100" {...field} />
                 </FormControl>
@@ -339,38 +434,81 @@ const ProductForm = ({
 
           {/* Dynamic Size-Wise Pricing & Inventory Matrix */}
           {selectedSizes.length > 0 && (
-            <div className="mt-2 p-4 rounded-xl border border-[#E6C16A]/50 bg-[#FAF7F0] space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="mt-2 p-4 rounded-xl border border-[#E6C16A]/60 bg-[#FAF7F0] space-y-3.5 shadow-2xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h4 className="font-semibold text-sm text-[#003020] flex items-center gap-1.5">
+                  <h4 className="font-bold text-sm text-[#003020] flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-[#C88A20] text-base">straighten</span>
                     Size-Specific Pricing &amp; Stock Matrix
                   </h4>
                   <p className="text-xs text-neutral-600">
-                    Set customized selling prices, original MRPs, and stock for each size. If left unchanged, the base price above applies.
+                    Set customized selling prices and original MRPs for each size.
                   </p>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="text-xs self-start sm:self-auto border-[#E6C16A] text-[#003020] hover:bg-[#F3E5AB]/40"
-                  onClick={() => {
-                    const updated = selectedSizes.map((s) => {
-                      const existing = sizeVariants.find((v) => v.size === s);
-                      return {
-                        size: s,
-                        price: existing?.price && Number(existing.price) > 0 ? existing.price : (basePrice || '0'),
-                        originalPrice: existing?.originalPrice && Number(existing.originalPrice) > 0 ? existing.originalPrice : (baseOriginalPrice || '0'),
-                        stock: existing?.stock !== undefined ? existing.stock : Number(baseStock || 0),
-                      };
-                    });
-                    form.setValue('sizeVariants', updated);
-                    toast.success("Applied base price and stock to all sizes");
-                  }}
-                >
-                  Auto-Fill from Base Values
-                </Button>
+                
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-xs bg-amber-100/70 hover:bg-amber-200 text-amber-950 border-amber-300 font-bold flex items-center gap-1"
+                    onClick={() => {
+                      const updated = selectedSizes.map((s) => {
+                        const existing = sizeVariants.find((v) => v.size === s);
+                        const mrp = existing?.originalPrice && Number(existing.originalPrice) > 0 
+                          ? String(existing.originalPrice) 
+                          : (baseOriginalPrice && Number(baseOriginalPrice) > 0 ? String(baseOriginalPrice) : (existing?.price || '0'));
+                        return {
+                          size: s,
+                          price: mrp,
+                          originalPrice: mrp,
+                          stock: existing?.stock !== undefined ? existing.stock : Number(baseStock || 0),
+                        };
+                      });
+                      form.setValue('sizeVariants', updated);
+                      setSyncSamePrice(true);
+                      toast.success("⚡ Selling Price set same as Original MRP for all sizes!");
+                    }}
+                  >
+                    ⚡ Same Price (Selling = MRP)
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-xs border-[#E6C16A] text-[#003020] hover:bg-[#F3E5AB]/40"
+                    onClick={() => {
+                      const updated = selectedSizes.map((s) => {
+                        const existing = sizeVariants.find((v) => v.size === s);
+                        return {
+                          size: s,
+                          price: existing?.price && Number(existing.price) > 0 ? existing.price : (basePrice || '0'),
+                          originalPrice: existing?.originalPrice && Number(existing.originalPrice) > 0 ? existing.originalPrice : (baseOriginalPrice || '0'),
+                          stock: existing?.stock !== undefined ? existing.stock : Number(baseStock || 0),
+                        };
+                      });
+                      form.setValue('sizeVariants', updated);
+                      toast.success("Applied base price and stock to all sizes");
+                    }}
+                  >
+                    Auto-Fill from Base Values
+                  </Button>
+                </div>
+              </div>
+
+              {/* Sync Toggle */}
+              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-amber-200/60">
+                <input
+                  type="checkbox"
+                  id="sync-same-price"
+                  checked={syncSamePrice}
+                  onChange={(e) => setSyncSamePrice(e.target.checked)}
+                  className="rounded text-[#0F6F74] focus:ring-[#0F6F74] h-4 w-4"
+                />
+                <label htmlFor="sync-same-price" className="text-xs font-semibold text-neutral-800 cursor-pointer select-none">
+                  Selling Price is same as Original MRP (Typing MRP will automatically fill Selling Price)
+                </label>
               </div>
 
               <div className="overflow-x-auto bg-white rounded-lg border border-neutral-200">
@@ -381,6 +519,7 @@ const ProductForm = ({
                       <th className="py-2.5 px-3 font-semibold">Selling Price (₹)</th>
                       <th className="py-2.5 px-3 font-semibold">Original MRP (₹)</th>
                       <th className="py-2.5 px-3 font-semibold">Stock Qty</th>
+                      <th className="py-2.5 px-3 font-semibold text-right">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-100">
@@ -399,7 +538,26 @@ const ProductForm = ({
                           size: sz,
                           [field]: val,
                         };
+                        // If syncSamePrice is true and originalPrice is updated, mirror to price
+                        if (syncSamePrice && field === 'originalPrice') {
+                          updatedVar.price = val;
+                        }
                         form.setValue('sizeVariants', [...others, updatedVar]);
+                      };
+
+                      const handleRowSamePrice = () => {
+                        const targetPrice = variant.originalPrice || variant.price || '0';
+                        const others = sizeVariants.filter((v) => v.size !== sz);
+                        form.setValue('sizeVariants', [
+                          ...others,
+                          {
+                            ...variant,
+                            size: sz,
+                            price: targetPrice,
+                            originalPrice: targetPrice,
+                          },
+                        ]);
+                        toast.success(`Size ${sz} Selling Price set same as MRP (₹${targetPrice})`);
                       };
 
                       return (
@@ -414,10 +572,10 @@ const ProductForm = ({
                               type="number"
                               step="0.01"
                               min="0"
-                              placeholder={basePrice || '0'}
+                              placeholder={variant.originalPrice || basePrice || '0'}
                               value={variant.price || ''}
                               onChange={(e) => updateVariant('price', e.target.value)}
-                              className="h-8 w-28 text-xs bg-white"
+                              className="h-8 w-28 text-xs bg-white font-semibold text-[#003020]"
                             />
                           </td>
                           <td className="py-2 px-3">
@@ -440,6 +598,16 @@ const ProductForm = ({
                               onChange={(e) => updateVariant('stock', Number(e.target.value || 0))}
                               className="h-8 w-24 text-xs bg-white"
                             />
+                          </td>
+                          <td className="py-2 px-3 text-right">
+                            <button
+                              type="button"
+                              onClick={handleRowSamePrice}
+                              className="text-[11px] font-semibold text-[#0F6F74] hover:underline"
+                              title="Copy MRP to Selling Price for this size"
+                            >
+                              Same as MRP
+                            </button>
                           </td>
                         </tr>
                       );
@@ -589,21 +757,19 @@ const ProductForm = ({
           <FormField
             control={form.control}
             name='description'
-            render={({
-              field,
-            }: {
-              field: ControllerRenderProps<
-                z.infer<typeof insertProductSchema>,
-                'description'
-              >;
-            }) => (
+            render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Description</FormLabel>
+                <FormLabel className="flex items-center justify-between">
+                  <span>Product Description (Rich Text &amp; Formatted Paste Supported)</span>
+                  <span className="text-[11px] text-neutral-500 font-normal">
+                    Supports Bold, Italic, Bullet Lists &amp; Formatting
+                  </span>
+                </FormLabel>
                 <FormControl>
-                  <Textarea
-                    placeholder='Enter product description'
-                    className='resize-none'
-                    {...field}
+                  <RichTextEditor
+                    value={field.value || ''}
+                    onChange={field.onChange}
+                    placeholder="Enter divine details, poshak fabric quality, embroidery style, seva recommendations..."
                   />
                 </FormControl>
                 <FormMessage />

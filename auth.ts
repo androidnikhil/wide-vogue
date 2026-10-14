@@ -7,6 +7,9 @@ import { cookies } from 'next/headers';
 import { compare } from './lib/encrypt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { sendWelcomeEmail } from '@/email';
+import { isDummyPhoneEmail } from '@/lib/constants';
+
+export { isDummyPhoneEmail };
 
 export const config = {
   pages: {
@@ -49,7 +52,7 @@ export const config = {
           let user: any = null;
 
           if (firebaseUser.phoneNumber) {
-            // PHONE AUTHENTICATION
+            // PHONE AUTHENTICATION - All normal users default to 'user' role
             const rawPhone = firebaseUser.phoneNumber.replace(/\D/g, '');
             const cleanPhone = rawPhone.length > 10 ? rawPhone.slice(-10) : rawPhone;
 
@@ -65,24 +68,28 @@ export const config = {
             });
 
             if (!user) {
-              // Create user without ANY fake email
+              // Create user without fake email. Role is always strictly 'user'
               user = await prisma.user.create({
                 data: {
                   phoneNumber: cleanPhone,
-                  email: null, // No fake placeholder email
+                  email: null,
                   name: 'NO_NAME',
                   password: '',
+                  role: 'user',
                 },
               });
-            } else if (user.email?.endsWith('@madhavshringaar.com') || !user.phoneNumber) {
-              // Clean up previous placeholder email if present
-              user = await prisma.user.update({
-                where: { id: user.id },
-                data: {
-                  phoneNumber: cleanPhone,
-                  email: user.email?.endsWith('@madhavshringaar.com') ? null : user.email,
-                },
-              });
+            } else {
+              const needsEmailCleanup = isDummyPhoneEmail(user.email);
+
+              if (needsEmailCleanup || !user.phoneNumber) {
+                user = await prisma.user.update({
+                  where: { id: user.id },
+                  data: {
+                    phoneNumber: cleanPhone,
+                    email: needsEmailCleanup ? null : user.email,
+                  },
+                });
+              }
             }
 
             const rawName = user.name?.trim();
@@ -99,8 +106,6 @@ export const config = {
             // GOOGLE / EMAIL AUTHENTICATION
             const email = firebaseUser.email;
             const name = firebaseUser.displayName || email.split('@')[0];
-            const designatedAdminEmail = (process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com').toLowerCase();
-            const isAdminEmail = email.toLowerCase() === designatedAdminEmail;
 
             user = await prisma.user.findFirst({
               where: { email },
@@ -113,7 +118,7 @@ export const config = {
                   name,
                   image: firebaseUser.photoURL || null,
                   password: '',
-                  role: isAdminEmail ? 'admin' : 'user',
+                  role: 'user',
                 },
               });
 
@@ -121,11 +126,6 @@ export const config = {
               sendWelcomeEmail({ name, email }).catch((err) =>
                 console.error("Welcome email failed:", err)
               );
-            } else if (isAdminEmail && user.role !== 'admin') {
-              user = await prisma.user.update({
-                where: { id: user.id },
-                data: { role: 'admin' },
-              });
             }
 
             return {
@@ -167,15 +167,6 @@ export const config = {
 
           // If password is correct, return user
           if (isMatch) {
-            const designatedAdminEmail = (process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com').toLowerCase();
-            if (user.email?.toLowerCase() === designatedAdminEmail && user.role !== 'admin') {
-              await prisma.user.update({
-                where: { id: user.id },
-                data: { role: 'admin' },
-              });
-              user.role = 'admin';
-            }
-
             return {
               id: user.id,
               name: user.name,
@@ -184,7 +175,6 @@ export const config = {
             };
           }
         }
-        // If user does not exist or password does not match return null
         return null;
       },
     }),
@@ -200,7 +190,7 @@ export const config = {
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.sub },
-            select: { name: true, email: true, phoneNumber: true, role: true },
+            select: { id: true, name: true, email: true, phoneNumber: true, role: true },
           });
 
           if (dbUser) {
@@ -263,7 +253,7 @@ export const config = {
       }
 
       // Handle session updates
-      if (session?.user?.name && trigger === 'update') {
+      if (session?.user.name && trigger === 'update') {
         token.name = session.user.name;
       }
 

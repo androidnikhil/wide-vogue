@@ -23,6 +23,21 @@ const categoryTranslations: Record<string, string> = {
 
 const ProductCard = async ({ product }: { product: Product }) => {
     const { t, lang } = await getServerTranslations();
+    const variants = Array.isArray((product as any).sizeVariants) ? (product as any).sizeVariants : [];
+    const validVariantPrices = variants
+      .map((v: any) => {
+        const p = Number(v.price);
+        const op = Number(v.originalPrice);
+        return p > 0 ? p : (op > 0 ? op : 0);
+      })
+      .filter((n: number) => n > 0);
+
+    const hasMultiPricing = validVariantPrices.length > 0;
+    const minVariantPrice = hasMultiPricing ? Math.min(...validVariantPrices) : Number(product.price);
+    const maxVariantPrice = hasMultiPricing ? Math.max(...validVariantPrices) : Number(product.price);
+    const isPriceRange = hasMultiPricing && minVariantPrice < maxVariantPrice;
+
+    const baseSellingPrice = minVariantPrice > 0 ? minVariantPrice : Number(product.price);
     const originalPrice = product.originalPrice ? product.originalPrice.toString() : product.price.toString();
     const discount = product.discountPercent || 0;
 
@@ -65,12 +80,27 @@ const ProductCard = async ({ product }: { product: Product }) => {
                     </div>
                 </div>
                 <div>
-                    <div className="flex items-baseline gap-2 my-1">
-                        <ProductPrice value={product.price.toString()} className="text-primary text-base md:text-lg" />
+                    <div className="flex items-baseline gap-2 my-1 flex-wrap">
+                        {isPriceRange ? (
+                            <div className="flex items-baseline gap-1.5 flex-wrap">
+                                <span className="text-primary text-base md:text-lg font-bold">₹{minVariantPrice} – ₹{maxVariantPrice}</span>
+                                {product.sizes && product.sizes.length > 0 && (
+                                    <span className="text-[10px] text-neutral-600 bg-amber-50/80 border border-amber-200/60 font-semibold px-1.5 py-0.5 rounded">
+                                        {lang === 'hi' ? `${product.sizes.length} साइज़` : `${product.sizes.length} sizes`}
+                                    </span>
+                                )}
+                            </div>
+                        ) : (
+                            <ProductPrice value={baseSellingPrice.toString()} className="text-primary text-base md:text-lg" />
+                        )}
                         {discount > 0 && (
                             <>
-                                <span className="font-body-sm text-body-sm text-on-surface-variant line-through text-xs opacity-70">₹{originalPrice}</span>
-                                <span className="font-label-sm text-label-sm text-emerald-800 text-[10px] font-bold bg-emerald-50 px-1.5 py-0.5 rounded-sm">{discount}% {t.common.off}</span>
+                                {!isPriceRange && (
+                                    <span className="font-body-sm text-body-sm text-on-surface-variant line-through text-xs opacity-70">₹{originalPrice}</span>
+                                )}
+                                <span className="font-label-sm text-label-sm text-emerald-800 text-[10px] font-bold bg-emerald-50 px-1.5 py-0.5 rounded-sm">
+                                    {isPriceRange ? `${lang === 'hi' ? 'तक' : 'Up to'} ${discount}% ${t.common.off}` : `${discount}% ${t.common.off}`}
+                                </span>
                             </>
                         )}
                     </div>

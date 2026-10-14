@@ -204,6 +204,7 @@ export const insertReviewSchema = z.object({
     .int()
     .min(1, 'Rating must be at least 1')
     .max(5, 'Rating must be at most 5'),
+  images: z.array(z.string()).optional().default([]),
 });
 
 // Schema for generating a Gift Card

@@ -85,7 +85,9 @@ export const USER_ROLES = process.env.USER_ROLES ? process.env.USER_ROLES.split(
 export const reviewFormDefaultValues = {
   title: '',
   comment: '',
+  description: '',
   rating: 0,
+  images: [] as string[],
 };
 
 export const SENDER_EMAIL = process.env.SENDER_EMAIL || 'info@madhavshringaar.com';

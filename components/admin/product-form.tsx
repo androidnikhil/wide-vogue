@@ -24,6 +24,7 @@ import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { createProduct, updateProduct } from '@/lib/actions/product.action';
 import { UploadButton } from '@/lib/uploadthing';
+import { convertFilesToWebP } from '@/lib/utils/image-converter';
 import { Card, CardContent } from '../ui/card';
 import Image from 'next/image';
 import { Checkbox } from '../ui/checkbox';
@@ -660,9 +661,16 @@ const ProductForm = ({
                             allowedContent: "text-on-surface-variant text-xs mt-1",
                             container: "w-max border border-outline-variant rounded-md p-4 bg-surface-container flex flex-col items-center justify-center",
                           }}
+                          onBeforeUploadBegin={async (files) => {
+                            toast.loading('Converting images to WebP...', { id: 'webp-convert' });
+                            const webpFiles = await convertFilesToWebP(files);
+                            toast.dismiss('webp-convert');
+                            return webpFiles;
+                          }}
                           onClientUploadComplete={(res: { url: string }[]) => {
                             const newUrls = res.map((file) => file.url);
                             form.setValue('images', [...images, ...newUrls]);
+                            toast.success('Images converted to WebP & uploaded!');
                           }}
                           onUploadError={(error: Error) => {
                             toast.error(`ERROR! ${error.message}`,{
@@ -736,8 +744,15 @@ const ProductForm = ({
                     allowedContent: "text-on-surface-variant text-xs mt-1",
                     container: "w-max border border-outline-variant rounded-md p-4 bg-surface-container flex flex-col items-center justify-center",
                   }}
+                  onBeforeUploadBegin={async (files) => {
+                    toast.loading('Converting banner to WebP...', { id: 'webp-banner' });
+                    const webpFiles = await convertFilesToWebP(files);
+                    toast.dismiss('webp-banner');
+                    return webpFiles;
+                  }}
                   onClientUploadComplete={(res: { url: string }[]) => {
                     form.setValue('banner', res[0].url);
+                    toast.success('Banner converted to WebP & uploaded!');
                   }}
                   onUploadError={(error: Error) => {
                     toast.error(`ERROR! ${error.message}`,{
@@ -805,43 +820,38 @@ const ProductForm = ({
           />
 
           {form.watch('isReturnable') && (
-            <div className='grid md:grid-cols-2 gap-5'>
-              <FormField
-                control={form.control}
-                name='returnWindowDays'
-                render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel>Return Window (Days)</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder='e.g., 7' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className='flex flex-col gap-5'>
+              <div className='max-w-xs'>
+                <FormField
+                  control={form.control}
+                  name='returnWindowDays'
+                  render={({ field }) => (
+                    <FormItem className='w-full'>
+                      <FormLabel className="font-semibold text-primary">Return Window (Days)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder='e.g., 7' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <FormField
                 control={form.control}
                 name='returnPolicyText'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Return Policy Text (Optional)</FormLabel>
+                    <FormLabel className="font-semibold text-primary">Return Policy Terms & Instructions (Rich Text)</FormLabel>
                     <FormControl>
-                      <div>
-                        <Input 
-                          placeholder='e.g., 7 Days Replacement Policy' 
-                          value={field.value || ''} 
-                          onChange={field.onChange}
-                          list="return-policy-options" 
-                        />
-                        <datalist id="return-policy-options">
-                          <option value="7 Days Replacement Policy" />
-                          <option value="7 Days Refund Policy" />
-                          <option value="14 Days Replacement Policy" />
-                          <option value="Replacement only on damaged item" />
-                          <option value="No questions asked returns" />
-                        </datalist>
-                      </div>
+                      <RichTextEditor
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        placeholder="Enter return and replacement terms (e.g. unboxing video requirements, size exchange conditions, sacred deity hygiene rules...)"
+                      />
                     </FormControl>
+                    <p className="text-xs text-on-surface-variant">
+                      Supports bold, italic, bullet lists, and clean copy-paste from Word/WhatsApp. Formatted HTML will be rendered on the product page.
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}

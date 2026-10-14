@@ -59,13 +59,16 @@ export default function ProductTrustBadges({
       </div>
 
       {returnPolicyText && (
-        <div className="mt-3.5 p-3 bg-amber-50/60 border border-amber-200/80 rounded-xl text-xs text-[#003020] flex items-start gap-2.5">
+        <div className="mt-3.5 p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs text-[#003020] flex items-start gap-2.5 shadow-2xs">
           <RotateCcw className="w-4 h-4 text-[#C88A20] flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <span className="font-bold text-[#003020] block mb-0.5">
+            <span className="font-bold text-[#003020] block mb-1">
               {isHindi ? 'वापसी एवं विनिमय नीति' : 'Return & Exchange Policy'}:
             </span>
-            <p className="text-neutral-700 leading-relaxed font-normal">{returnPolicyText}</p>
+            <div 
+              className="text-neutral-700 leading-relaxed font-normal prose prose-xs max-w-none [&_b]:font-bold [&_strong]:font-bold [&_b]:text-[#003020] [&_strong]:text-[#003020] [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:my-1.5 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:my-1.5 [&_li]:my-0.5 [&_p]:mb-1 last:[&_p]:mb-0"
+              dangerouslySetInnerHTML={{ __html: returnPolicyText }}
+            />
           </div>
         </div>
       )}

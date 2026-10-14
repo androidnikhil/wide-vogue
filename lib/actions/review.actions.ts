@@ -45,6 +45,7 @@ export async function createUpdateReview(
             title: review.title,
             description: review.description,
             rating: review.rating,
+            images: review.images || [],
           },
         });
       } else {

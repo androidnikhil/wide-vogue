@@ -2,10 +2,11 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShoppingBag, Loader2, X, Ruler, Check } from 'lucide-react';
+import { ShoppingBag, Loader2, X, Ruler } from 'lucide-react';
 import { toast } from 'sonner';
 import { addItemToCart } from '@/lib/actions/cart.action';
 import Link from 'next/link';
+import { useLanguage } from '@/lib/i18n/language-context';
 
 interface ProductCardCartButtonProps {
   product: {
@@ -22,10 +23,12 @@ interface ProductCardCartButtonProps {
 
 export default function ProductCardCartButton({ product }: ProductCardCartButtonProps) {
   const router = useRouter();
+  const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [loadingSize, setLoadingSize] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  const isHindi = language === 'hi';
   const hasSizes = product.sizes && product.sizes.length > 0;
 
   const getVariant = (sizeName: string) => {
@@ -43,7 +46,7 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
         disabled
         className="w-full py-2 bg-neutral-100 text-neutral-400 font-medium text-xs rounded-lg cursor-not-allowed flex items-center justify-center gap-1.5"
       >
-        Out of Stock
+        {t.product.outOfStock}
       </button>
     );
   }
@@ -74,9 +77,9 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
             style: { backgroundColor: '#DC2626', color: 'white' },
           });
         } else {
-          toast.success(res.message, {
+          toast.success(isHindi ? 'सेवा टोकरी में जोड़ा गया' : res.message, {
             action: {
-              label: 'Go To Cart',
+              label: isHindi ? 'टोकरी देखें' : 'Go To Cart',
               onClick: () => router.push('/cart'),
             },
           });
@@ -98,13 +101,13 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
       try {
         const formattedSize = size.toLowerCase().includes('no') ? size : `${size} No.`;
         const v = getVariant(size);
-        const sizePrice = v?.price ? String(v.price) : product.price.toString();
+        const finalPrice = v && Number(v.price) > 0 ? v.price.toString() : product.price.toString();
 
         const res = await addItemToCart({
           productId: product.id,
           name: product.name,
           slug: product.slug,
-          price: sizePrice,
+          price: finalPrice,
           qty: 1,
           image: product.images?.[0] || 'https://placehold.co/400x400/png',
           size: formattedSize,
@@ -115,16 +118,16 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
             style: { backgroundColor: '#DC2626', color: 'white' },
           });
         } else {
-          setIsOpen(false);
-          toast.success(`${product.name} (${formattedSize} • ₹${sizePrice}) added to Cart!`, {
+          toast.success(isHindi ? `साइज़ ${formattedSize} सेवा टोकरी में जोड़ा गया` : `Size ${formattedSize} added to cart`, {
             action: {
-              label: 'Go To Cart',
+              label: isHindi ? 'टोकरी देखें' : 'Go To Cart',
               onClick: () => router.push('/cart'),
             },
           });
+          setIsOpen(false);
         }
       } catch (err: any) {
-        toast.error(err.message || 'Failed to add size to cart');
+        toast.error(err.message || 'Failed to add item to cart');
       } finally {
         setLoadingSize(null);
       }
@@ -143,7 +146,7 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold text-[#003020] uppercase tracking-wider flex items-center gap-1">
             <span className="h-1.5 w-1.5 rounded-full bg-[#C88A20]"></span>
-            Select Size
+            {t.product.selectSize}
           </span>
           <button
             type="button"
@@ -162,7 +165,9 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
         <div className="flex flex-wrap gap-1.5">
           {product.sizes!.map((size) => {
             const isLoading = loadingSize === size && isPending;
-            const displayLabel = size.toLowerCase().includes('no') ? size : `${size} No.`;
+            const displayLabel = isHindi
+              ? (size.toLowerCase().includes('no') ? size.replace(/no\.?/i, 'नं.') : `${size} नं.`)
+              : (size.toLowerCase().includes('no') ? size : `${size} No.`);
             const v = getVariant(size);
 
             return (
@@ -201,9 +206,9 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
             className="text-[#0F6F74] hover:text-[#0a4b4e] font-medium flex items-center gap-1 hover:underline"
           >
             <Ruler className="w-3 h-3" />
-            Size Guide (0-6 No.)
+            {isHindi ? 'नाप तालिका (0-6 नं.)' : 'Size Guide (0-6 No.)'}
           </Link>
-          <span className="text-neutral-400">Tap size to add</span>
+          <span className="text-neutral-400">{t.product.tapSizeToAdd}</span>
         </div>
       </div>
     );
@@ -221,10 +226,10 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
       ) : (
         <ShoppingBag className="w-3.5 h-3.5" />
       )}
-      <span>Add to Cart</span>
+      <span>{t.product.addToCart}</span>
       {hasSizes && (
         <span className="text-[10px] opacity-80 font-normal">
-          ({product.sizes!.length} sizes)
+          ({product.sizes!.length} {t.product.sizesCount})
         </span>
       )}
     </button>

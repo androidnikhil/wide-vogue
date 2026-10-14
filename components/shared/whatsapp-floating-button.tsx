@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { WHATSAPP_NUMBER } from '@/lib/constants';
+import { useLanguage } from '@/lib/i18n/language-context';
 
 interface WhatsAppFloatingButtonProps {
   phoneNumber?: string;
@@ -10,13 +11,15 @@ interface WhatsAppFloatingButtonProps {
 
 export default function WhatsAppFloatingButton({
   phoneNumber = WHATSAPP_NUMBER || '7982160480',
-  defaultMessage = 'Radhe Radhe! I am visiting Madhav Shringaar and would like to inquire about Laddu Gopal Ji poshak and seva essentials.',
+  defaultMessage,
 }: WhatsAppFloatingButtonProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const { t } = useLanguage();
 
+  const msg = defaultMessage || t.common.whatsappDefaultMsg;
   const cleanPhone = phoneNumber.replace(/\D/g, '');
   const internationalPhone = cleanPhone.startsWith('91') ? cleanPhone : `91${cleanPhone}`;
-  const whatsappUrl = `https://wa.me/${internationalPhone}?text=${encodeURIComponent(defaultMessage)}`;
+  const whatsappUrl = `https://wa.me/${internationalPhone}?text=${encodeURIComponent(msg)}`;
 
   return (
     <div 
@@ -35,7 +38,7 @@ export default function WhatsAppFloatingButton({
         }`}
       >
         <span className="w-2 h-2 rounded-full bg-[#25D366] animate-ping" />
-        <span className="text-xs font-semibold">Radhe Radhe! Chat with us</span>
+        <span className="text-xs font-semibold">{t.common.whatsappPill}</span>
       </a>
 
       {/* Floating Action Button */}

@@ -10,15 +10,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { UserIcon } from 'lucide-react';
+import { getServerTranslations } from '@/lib/i18n/server';
 
 const UserButton = async () => {
   const session = await auth();
+  const { t } = await getServerTranslations();
 
   if (!session) {
     return (
       <Button asChild>
         <Link href='/sign-in'>
-          <UserIcon /> Sign In
+          <UserIcon /> {t.header.signIn}
         </Link>
       </Button>
     );
@@ -29,7 +31,7 @@ const UserButton = async () => {
   const hasRealName = Boolean(rawName && rawName !== 'NO_NAME' && !isNumeric);
 
   const firstInitial = hasRealName && rawName ? rawName.charAt(0).toUpperCase() : null;
-  const displayName = hasRealName ? rawName : 'Devotee';
+  const displayName = hasRealName ? rawName : t.header.devotee;
 
   const userEmail = session.user?.email && !session.user.email.endsWith('@madhavshringaar.com')
     ? session.user.email
@@ -67,7 +69,7 @@ const UserButton = async () => {
                 <span>{displayName}</span>
                 {isProfileComplete && (
                   <span className='text-[10px] bg-emerald-100 text-emerald-800 font-medium px-1.5 py-0.2 rounded-full'>
-                    Verified
+                    {t.header.verified}
                   </span>
                 )}
               </div>
@@ -90,7 +92,7 @@ const UserButton = async () => {
                     href='/user/profile' 
                     className='text-xs text-primary font-medium hover:underline inline-flex items-center gap-1'
                   >
-                    <span>Complete Profile</span>
+                    <span>{t.header.completeProfile}</span>
                     <span className="material-symbols-outlined text-[13px]">arrow_forward</span>
                   </Link>
                 </div>
@@ -102,40 +104,40 @@ const UserButton = async () => {
 
           <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
             <Link href='/user' className='w-full px-3 py-2 text-sm text-on-surface flex items-center justify-between'>
-              <span>My Account</span>
+              <span>{t.header.myAccount}</span>
               <span className="text-[10px] bg-[#E6C16A]/30 text-[#8A5A0A] font-semibold px-1.5 py-0.5 rounded">Hub</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
             <Link href='/user/orders' className='w-full px-3 py-2 text-sm text-on-surface'>
-              Orders & Tracking
+              {t.header.ordersTracking}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
             <Link href='/wishlist' className='w-full px-3 py-2 text-sm text-on-surface'>
-              Wishlist
+              {t.header.wishlist}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
             <Link href='/user/addresses' className='w-full px-3 py-2 text-sm text-on-surface'>
-              Saved Addresses
+              {t.header.savedAddresses}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
             <Link href='/user/gift-cards' className='w-full px-3 py-2 text-sm text-on-surface'>
-              Gift Cards & Rewards
+              {t.header.giftCardsRewards}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
             <Link href='/user/profile' className='w-full px-3 py-2 text-sm text-on-surface'>
-              Edit Profile
+              {t.header.editProfile}
             </Link>
           </DropdownMenuItem>
 
           {session?.user?.role === 'admin' && (
             <DropdownMenuItem className="p-0 cursor-pointer rounded-lg hover:bg-surface-container transition-colors outline-none focus:bg-surface-container">
               <Link href='/admin/overview' className='w-full px-3 py-2 text-sm text-on-surface'>
-                Admin Dashboard
+                {t.header.adminDashboard}
               </Link>
             </DropdownMenuItem>
           )}
@@ -148,7 +150,7 @@ const UserButton = async () => {
                 className='w-full py-2 px-3 h-auto justify-start text-sm font-normal text-error hover:text-on-error-container hover:bg-transparent'
                 variant='ghost'
               >
-                Sign Out
+                {t.header.signOut}
               </Button>
             </form>
           </DropdownMenuItem>

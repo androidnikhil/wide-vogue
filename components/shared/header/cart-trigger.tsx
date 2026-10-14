@@ -10,7 +10,7 @@ export default function CartTrigger({ cartItemCount, cartPrice }: { cartItemCoun
     <button 
       onClick={() => document.dispatchEvent(new CustomEvent('open-cart-drawer'))}
       className="flex items-center gap-2 p-2 max-sm:p-1.5 bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/50 rounded-lg text-primary transition-all duration-300 hover:-translate-y-1 hover:shadow-md active:scale-95"
-      aria-label="Open Seva Cart"
+      aria-label={t.cart.yourCart}
     >
       <div className="relative">
         <span className="material-symbols-outlined text-2xl max-sm:text-[22px] text-secondary transition-transform group-hover:scale-110">shopping_bag</span>

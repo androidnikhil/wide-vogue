@@ -1,9 +1,11 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useLanguage } from '@/lib/i18n/language-context';
 
 export default function CartDrawer({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handleOpen = () => setIsOpen(true);
@@ -30,7 +32,7 @@ export default function CartDrawer({ children }: { children: React.ReactNode }) 
       {/* Drawer */}
       <div className="relative w-full max-w-md h-full bg-[#FBF7EE] shadow-2xl animate-in slide-in-from-right duration-500 flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-[#0F6F74]/10 bg-white">
-          <h2 className="text-2xl font-serif font-bold text-[#003020]">Your Seva Cart</h2>
+          <h2 className="text-2xl font-serif font-bold text-[#003020]">{t.cart.yourCart}</h2>
           <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-[#E8F3EE] rounded-full transition-colors text-[#003020]">
             <span className="material-symbols-outlined">close</span>
           </button>
@@ -42,7 +44,7 @@ export default function CartDrawer({ children }: { children: React.ReactNode }) 
         
         <div className="p-6 bg-white border-t border-[#0F6F74]/10">
           <Link href="/cart" onClick={() => setIsOpen(false)} className="block w-full bg-[#003020] text-white text-center py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-            Review Cart
+            {t.cart.reviewCart}
           </Link>
         </div>
       </div>

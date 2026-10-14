@@ -4,16 +4,39 @@ import { Product } from "@/types";
 import ProductCardCartButton from "./product-card-cart-button";
 import WishlistButton from "./wishlist-button";
 import ProductPrice from "./product-price";
+import { getServerTranslations } from "@/lib/i18n/server";
 
-const ProductCard = ({ product }: { product: Product }) => {
+const categoryTranslations: Record<string, string> = {
+  'Poshak': 'पोशाक',
+  'Mukut & Pagdi': 'मुकुट एवं पगड़ी',
+  'Mukut': 'मुकुट',
+  'Mukut & Bansuri': 'मुकुट एवं बाँसुरी',
+  'Bansuri': 'बाँसुरी',
+  'Jewellery': 'आभूषण',
+  'Jewellery & Mala': 'आभूषण एवं माला',
+  'Mala': 'माला',
+  'Singhasan': 'सिंहासन',
+  'Seva Essentials': 'सेवा सामग्री',
+  'Festive Sets': 'उत्सव सेट',
+  'Complete Shringar': 'संपूर्ण शृंगार',
+};
+
+const ProductCard = async ({ product }: { product: Product }) => {
+    const { t, lang } = await getServerTranslations();
     const originalPrice = product.originalPrice ? product.originalPrice.toString() : product.price.toString();
     const discount = product.discountPercent || 0;
+
+    const displayCategory = lang === 'hi' 
+      ? (categoryTranslations[product.category] || product.category || t.common.featured)
+      : (product.category || t.common.featured);
+
+    const brandName = lang === 'hi' ? 'माधव शृंगार' : (product.brand || 'Madhav Shringaar');
 
     return (
         <div className="bg-white rounded-[1.5rem] border border-outline-variant/40 hover:border-secondary/50 shadow-sm hover:shadow-xl hover:-translate-y-2 active:scale-[0.99] transition-all duration-500 group-hover:rotate-1 flex flex-col justify-between overflow-hidden group">
             <div className="relative bg-surface-container p-2 aspect-square overflow-hidden flex items-center justify-center">
                 <span className="absolute top-2 left-2 z-10 px-2 py-0.5 bg-primary-container text-surface font-label-sm text-label-sm rounded text-[10px]">
-                    {product.category || "Featured"}
+                    {displayCategory}
                 </span>
                 <WishlistButton productId={product.id} />
                 <Link href={`/product/${product.slug}`} className="w-full h-full block">
@@ -29,7 +52,7 @@ const ProductCard = ({ product }: { product: Product }) => {
             </div>
             <div className="p-3 flex flex-col gap-1.5 flex-1 justify-between">
                 <div>
-                    <span className="font-body-sm text-body-sm text-secondary font-semibold">{product.brand || "Madhav Shringaar"}</span>
+                    <span className="font-body-sm text-body-sm text-secondary font-semibold">{brandName}</span>
                     <Link href={`/product/${product.slug}`}>
                         <h3 className="font-title-lg text-title-lg text-primary text-sm font-bold leading-tight group-hover:text-secondary transition-colors line-clamp-1">
                             {product.name}
@@ -47,7 +70,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                         {discount > 0 && (
                             <>
                                 <span className="font-body-sm text-body-sm text-on-surface-variant line-through text-xs opacity-70">₹{originalPrice}</span>
-                                <span className="font-label-sm text-label-sm text-emerald-800 text-[10px] font-bold bg-emerald-50 px-1.5 py-0.5 rounded-sm">{discount}% OFF</span>
+                                <span className="font-label-sm text-label-sm text-emerald-800 text-[10px] font-bold bg-emerald-50 px-1.5 py-0.5 rounded-sm">{discount}% {t.common.off}</span>
                             </>
                         )}
                     </div>

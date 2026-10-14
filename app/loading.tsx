@@ -62,7 +62,7 @@ const Loader = () => {
         {/* Center Glowing Divine Emblem with Larger Logo */}
         <div className="absolute w-28 h-28 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-[#FFFDF9] via-[#FAF3E0] to-[#F1E0B4] border-2 border-[#E6C16A] shadow-[0_0_40px_rgba(200,138,32,0.5)] flex items-center justify-center p-3 animate-pulse duration-1000">
           <Image 
-            src="/images/logo.png" 
+            src="/images/logo.webp" 
             alt="Madhav Shringaar" 
             width={120} 
             height={120} 

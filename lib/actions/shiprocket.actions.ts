@@ -65,7 +65,7 @@ export async function pushOrderToShiprocket(orderId: string) {
       dateObj.getDate()
     ).padStart(2, "0")} ${String(dateObj.getHours()).padStart(2, "0")}:${String(dateObj.getMinutes()).padStart(2, "0")}`;
 
-    const pickupLocation = process.env.SHIPROCKET_PICKUP_LOCATION || "Primary";
+    const pickupLocation = process.env.SHIPROCKET_PICKUP_LOCATION || "Noida";
 
     const payload = {
       order_id: order.id,

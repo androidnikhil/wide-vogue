@@ -271,7 +271,7 @@ const OrderTimeline = ({ order }: OrderTimelineProps) => {
         </a>
 
         <div className="text-[11px] text-neutral-500">
-          Need assistance? Call: <strong>+91 79821 60480</strong>
+          Need assistance? Call: <a href="tel:+917078211946" className="font-bold text-neutral-700 hover:text-[#0F6F74] hover:underline">+91 70782 11946</a>
         </div>
       </div>
 

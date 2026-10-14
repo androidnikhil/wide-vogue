@@ -4,6 +4,7 @@ import { APP_NAME, APP_URL, DEFAULT_SEO_TITLE, DEFAULT_SEO_DESCRIPTION, SEO_KEYW
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from "@/components/ui/sonner";
+import { LanguageProvider } from "@/lib/i18n/language-context";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
@@ -147,8 +148,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster />
+          <LanguageProvider>
+            {children}
+            <Toaster />
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

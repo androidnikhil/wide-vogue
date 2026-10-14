@@ -1,5 +1,4 @@
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { getProductBySlug } from '@/lib/actions/product.action';
 import { notFound } from 'next/navigation';
 import ProductPrice from '@/components/shared/product/product-price';
@@ -16,6 +15,7 @@ import { getRecommendedProducts } from '@/lib/actions/recommendations.actions';
 import ProductCard from '@/components/shared/product/product-card';
 import { Metadata } from 'next';
 import { APP_URL } from '@/lib/constants';
+import { getServerTranslations } from '@/lib/i18n/server';
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
@@ -86,8 +86,9 @@ const ProductDetailsPage = async (props: {
   const userId = session?.user?.id;
   
   const recommendedProducts = await getRecommendedProducts(product.id, product.category);
-
   const cart = await getMyCart();
+  const { t, lang } = await getServerTranslations();
+  const isHindi = lang === 'hi';
 
   const productJsonLd = {
     '@context': 'https://schema.org',
@@ -145,20 +146,24 @@ const ProductDetailsPage = async (props: {
             {/* Header / Title */}
             <div className='flex flex-col gap-3 pb-6 border-b border-outline-variant/30'>
               <p className='font-label-lg text-label-lg text-secondary uppercase tracking-widest font-bold'>
-                {product.brand} {product.category}
+                {isHindi ? 'माधव शृंगार' : product.brand} {product.category}
               </p>
               <h1 className='font-headline-lg text-headline-lg lg:text-4xl text-primary font-bold'>{product.name}</h1>
               
               <div className="flex items-center gap-4 mt-1">
                 <Rating value={Number(product.rating)} />
                 <span className="text-on-surface-variant font-body-sm">
-                  ({product.numReviews} reviews)
+                  ({product.numReviews} {isHindi ? 'समीक्षाएं' : 'reviews'})
                 </span>
                 <span className="text-outline-variant">|</span>
                 {product.stock > 0 ? (
-                  <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none font-semibold px-3">In Stock</Badge>
+                  <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none font-semibold px-3">
+                    {t.product.inStock}
+                  </Badge>
                 ) : (
-                  <Badge variant='destructive' className="font-semibold px-3">Out Of Stock</Badge>
+                  <Badge variant='destructive' className="font-semibold px-3">
+                    {t.product.outOfStock}
+                  </Badge>
                 )}
               </div>
             </div>
@@ -170,7 +175,7 @@ const ProductDetailsPage = async (props: {
                   value={Number(product.price)}
                   className='text-4xl font-bold text-on-surface'
                 />
-                <span className="text-sm text-on-surface-variant font-medium">(Inclusive of all taxes)</span>
+                <span className="text-sm text-on-surface-variant font-medium">{t.product.inclusiveOfTaxes}</span>
               </div>
 
               {product.stock > 0 && (
@@ -213,7 +218,7 @@ const ProductDetailsPage = async (props: {
             <div className='mt-8 bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 shadow-sm'>
               <p className='font-title-lg text-title-lg text-primary font-bold mb-4 flex items-center gap-2'>
                 <span className="material-symbols-outlined text-secondary">info</span>
-                Devotional Description
+                {t.product.description}
               </p>
               <p className='font-body-md text-body-md text-on-surface-variant leading-relaxed'>{product.description}</p>
             </div>
@@ -233,10 +238,10 @@ const ProductDetailsPage = async (props: {
                 <span className='h-px w-12 bg-secondary/40'></span>
               </div>
               <h2 className='font-headline-md text-headline-md text-primary font-bold'>
-                Divine Match Suggestions
+                {t.product.divineMatches}
               </h2>
               <p className='font-body-sm text-body-sm text-on-surface-variant'>
-                Products frequently brought together for complete shringaar
+                {isHindi ? 'कान्हा जी के संपूर्ण शृंगार हेतु सर्वाधिक पसंद किए जाने वाले संयोजन' : 'Products frequently brought together for complete shringaar'}
               </p>
             </div>
             
@@ -249,7 +254,7 @@ const ProductDetailsPage = async (props: {
         </section>
       )}
       <section className='mt-10 max-w-7xl mx-auto px-4 md:px-8'>
-        <h2 className='h2-bold mb-5'>Customer Reviews</h2>
+        <h2 className='h2-bold mb-5'>{isHindi ? 'भक्तों की समीक्षाएं एवं अनुभव' : 'Customer Reviews'}</h2>
         <ReviewList
           userId={userId || ''}
           productId={product.id}

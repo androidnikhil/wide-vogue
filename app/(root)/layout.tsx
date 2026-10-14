@@ -3,16 +3,17 @@ import Header from "@/components/shared/header";
 import Link from "next/link";
 import Image from "next/image";
 import { getMyCart } from "@/lib/actions/cart.action";
-import { formatCurrency } from "@/lib/utils";
 import CartDrawerWrapper from "@/components/shared/cart/cart-drawer-wrapper";
+import WhatsAppFloatingButton from "@/components/shared/whatsapp-floating-button";
+import { getServerTranslations } from "@/lib/i18n/server";
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
   const cart = await getMyCart();
+  const { t } = await getServerTranslations();
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -22,7 +23,7 @@ export default async function RootLayout({
            <Link href="/" className="hover:scale-105 transition-transform group" title="Madhav Shringaar">
              <div className="w-[66px] h-[66px] rounded-2xl bg-white shadow-xs border border-[#E6C16A]/50 p-1 flex items-center justify-center group-hover:shadow-md group-hover:border-[#C88A20] transition-all overflow-hidden">
                <Image 
-                 src="/images/icons/favicon.png" 
+                 src="/images/icons/favicon.webp" 
                  alt="Madhav Shringaar" 
                  width={72} 
                  height={72} 
@@ -35,44 +36,44 @@ export default async function RootLayout({
               <Link href="/search?category=Poshak" className="hover:text-secondary transition-colors flex flex-col items-center gap-1.5 group w-full py-1">
                  <div className="w-[64px] h-[64px] rounded-2xl bg-white shadow-xs border border-neutral-200/90 p-0.5 flex items-center justify-center group-hover:border-[#E6C16A] group-hover:shadow-md group-hover:scale-105 transition-all duration-300 overflow-hidden">
                    <Image 
-                     src="/images/icons/poshak-3d.png" 
-                     alt="Poshak" 
+                     src="/images/icons/poshak-3d.webp" 
+                     alt={t.header.sidebarPoshak} 
                      width={80} 
                      height={80} 
                      className="w-full h-full object-contain p-0.5 group-hover:scale-110 transition-transform duration-300" 
                    />
                  </div>
-                 <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 group-hover:text-[#003020] transition-colors">Poshak</span>
+                 <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 group-hover:text-[#003020] transition-colors">{t.header.sidebarPoshak}</span>
               </Link>
               <Link href="/search?category=Mukut%20%26%20Pagdi" className="hover:text-secondary transition-colors flex flex-col items-center gap-1.5 group w-full py-1">
                  <div className="w-[64px] h-[64px] rounded-2xl bg-white shadow-xs border border-neutral-200/90 p-0.5 flex items-center justify-center group-hover:border-[#E6C16A] group-hover:shadow-md group-hover:scale-105 transition-all duration-300 overflow-hidden">
                    <Image 
-                     src="/images/icons/mukut-3d.png" 
-                     alt="Mukut" 
+                     src="/images/icons/mukut-3d.webp" 
+                     alt={t.header.sidebarMukut} 
                      width={80} 
                      height={80} 
                      className="w-full h-full object-contain p-0.5 group-hover:scale-110 transition-transform duration-300" 
                    />
                  </div>
-                 <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 group-hover:text-[#003020] transition-colors">Mukut</span>
+                 <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 group-hover:text-[#003020] transition-colors">{t.header.sidebarMukut}</span>
               </Link>
               <Link href="/search?category=Bansuri" className="hover:text-secondary transition-colors flex flex-col items-center gap-1.5 group w-full py-1">
                  <div className="w-[64px] h-[64px] rounded-2xl bg-white shadow-xs border border-neutral-200/90 p-0.5 flex items-center justify-center group-hover:border-[#E6C16A] group-hover:shadow-md group-hover:scale-105 transition-all duration-300 overflow-hidden">
                    <Image 
-                     src="/images/icons/bansuri-3d.png" 
-                     alt="Bansuri" 
+                     src="/images/icons/bansuri-3d.webp" 
+                     alt={t.header.sidebarBansuri} 
                      width={80} 
                      height={80} 
                      className="w-full h-full object-contain p-0.5 group-hover:scale-110 transition-transform duration-300" 
                    />
                  </div>
-                 <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 group-hover:text-[#003020] transition-colors">Bansuri</span>
+                 <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 group-hover:text-[#003020] transition-colors">{t.header.sidebarBansuri}</span>
               </Link>
               <Link href="/cart" className="hover:text-secondary transition-colors flex flex-col items-center gap-1.5 group relative w-full py-1">
                  <div className="w-[64px] h-[64px] rounded-2xl bg-white shadow-xs border border-neutral-200/90 p-0.5 flex items-center justify-center group-hover:border-[#E6C16A] group-hover:shadow-md group-hover:scale-105 transition-all duration-300 relative overflow-hidden">
                    <Image 
-                     src="/images/icons/cart-3d.png" 
-                     alt="Cart" 
+                     src="/images/icons/cart-3d.webp" 
+                     alt={t.header.sidebarCart} 
                      width={80} 
                      height={80} 
                      className="w-full h-full object-contain p-0.5 group-hover:scale-110 transition-transform duration-300" 
@@ -83,7 +84,7 @@ export default async function RootLayout({
                      {cart.items.reduce((a, c) => a + c.qty, 0)}
                    </span>
                  )}
-                 <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 group-hover:text-[#003020] transition-colors">Cart</span>
+                 <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 group-hover:text-[#003020] transition-colors">{t.header.sidebarCart}</span>
               </Link>
            </nav>
         </div>
@@ -100,6 +101,9 @@ export default async function RootLayout({
 
       {/* RIGHT: Compact shopping/cart panel */}
       <CartDrawerWrapper cart={cart} />
+
+      {/* Floating WhatsApp Quick Connect Button */}
+      <WhatsAppFloatingButton />
     </div>
   );
 }

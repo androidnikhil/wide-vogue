@@ -85,9 +85,13 @@ export const config = {
               });
             }
 
+            const rawName = user.name?.trim();
+            const isNumeric = rawName && /^\+?\d{7,15}$/.test(rawName.replace(/\s+/g, ''));
+            const validName = rawName && rawName !== 'NO_NAME' && !isNumeric ? rawName : null;
+
             return {
               id: user.id,
-              name: user.name && user.name !== 'NO_NAME' ? user.name : cleanPhone,
+              name: validName,
               email: user.email || '',
               role: user.role,
             };
@@ -188,13 +192,35 @@ export const config = {
   callbacks: {
     ...authConfig.callbacks,
     async session({ session, user, trigger, token }: any) {
-      // Set the user ID from the token
-      session.user.id = token.sub;
-      session.user.role = token.role;
-      session.user.name = token.name;
+      if (token?.sub) {
+        session.user.id = token.sub;
+        session.user.role = token.role;
 
-      // If there is an update, set the user name
-      if (trigger === 'update') {
+        // Fetch fresh user fields from database so profile updates reflect in real-time
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.sub },
+            select: { name: true, email: true, phoneNumber: true, role: true },
+          });
+
+          if (dbUser) {
+            const rawName = dbUser.name?.trim();
+            const isNumeric = rawName && /^\+?\d{7,15}$/.test(rawName.replace(/\s+/g, ''));
+            const isRealName = Boolean(rawName && rawName !== 'NO_NAME' && !isNumeric);
+
+            session.user.name = isRealName ? rawName : null;
+            session.user.email = dbUser.email;
+            (session.user as any).phoneNumber = dbUser.phoneNumber;
+            session.user.role = dbUser.role;
+          } else {
+            session.user.name = token.name;
+          }
+        } catch {
+          session.user.name = token.name;
+        }
+      }
+
+      if (trigger === 'update' && user?.name) {
         session.user.name = user.name;
       }
 
@@ -206,26 +232,10 @@ export const config = {
         token.id = user.id;
         token.role = user.role;
 
-        // If user has no name, set clean name
-        if (user.name === 'NO_NAME' || !user.name) {
-          if ((user as any).phoneNumber) {
-            token.name = (user as any).phoneNumber;
-          } else if (user.email && !user.email.endsWith('@madhavshringaar.com')) {
-            token.name = user.email.split('@')[0];
-          } else {
-            token.name = 'User';
-          }
-
-          // Update database to reflect the token name safely
-          try {
-            await prisma.user.update({
-              where: { id: user.id },
-              data: { name: token.name },
-            });
-          } catch (updateErr) {
-            console.error("Failed to update user name in jwt callback:", updateErr);
-          }
-        }
+        const rawName = user.name?.trim();
+        const isNumeric = rawName && /^\+?\d{7,15}$/.test(rawName.replace(/\s+/g, ''));
+        const validName = rawName && rawName !== 'NO_NAME' && !isNumeric ? rawName : null;
+        token.name = validName;
 
         if (trigger === 'signIn' || trigger === 'signUp') {
           const cookiesObject = await cookies();
@@ -253,7 +263,7 @@ export const config = {
       }
 
       // Handle session updates
-      if (session?.user.name && trigger === 'update') {
+      if (session?.user?.name && trigger === 'update') {
         token.name = session.user.name;
       }
 

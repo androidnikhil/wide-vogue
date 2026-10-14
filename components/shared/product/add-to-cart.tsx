@@ -6,6 +6,7 @@ import { Plus, Minus, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useState, useTransition } from "react";
+import { useLanguage } from "@/lib/i18n/language-context";
 
 interface SizeVariantItem {
   size: string;
@@ -26,6 +27,7 @@ const AddToCart = ({
   sizeVariants?: SizeVariantItem[];
 }) => {
   const router = useRouter();
+  const { t, language } = useLanguage();
   const [isPending, startTransition] = useTransition();
   const [selectedSize, setSelectedSize] = useState(sizes && sizes.length > 0 ? sizes[0] : undefined);
 
@@ -63,7 +65,7 @@ const AddToCart = ({
       } else {
         toast.success(res.message, {
           action: {
-            label: "Go To Cart",
+            label: language === 'hi' ? "सेवा टोकरी देखें" : "Go To Cart",
             onClick: () => router.push("/cart"),
           },
         });
@@ -111,7 +113,7 @@ const AddToCart = ({
       {sizes && sizes.length > 0 && (
         <div className="flex flex-col gap-1.5 w-full">
           <div className="flex justify-between items-center text-xs">
-            <span className="font-semibold text-primary">Select Laddu Gopal Size</span>
+            <span className="font-semibold text-primary">{t.product.selectSize}</span>
             {activeVariant && Number(activeVariant.price) > 0 && (
               <span className="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                 ₹{activeVariant.price}
@@ -156,7 +158,7 @@ const AddToCart = ({
         ) : (
           <Plus className='w-4 h-4 mr-2' />
         )}
-        Add To Cart {activeVariant && Number(activeVariant.price) > 0 ? `• ₹${activeVariant.price}` : ''}
+        {t.product.addToCart} {activeVariant && Number(activeVariant.price) > 0 ? `• ₹${activeVariant.price}` : ''}
       </Button>
     </div>
   );

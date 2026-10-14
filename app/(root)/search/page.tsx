@@ -143,21 +143,25 @@ const SearchPage = async (props: {
                 Any
               </Link>
             </li>
-            {categories.map((x) => (
-              <li key={x.category}>
-                <Link
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
-                    category === x.category 
-                      ? 'bg-secondary/10 text-secondary font-bold border border-secondary/20 shadow-sm' 
-                      : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'
-                  }`}
-                  href={getFilterUrl({ c: x.category })}
-                >
-                  {category === x.category && <span className="material-symbols-outlined text-[16px]">check_circle</span>}
-                  {x.category}
-                </Link>
-              </li>
-            ))}
+            {categories.map((x) => {
+              const isMatch = category.toLowerCase() === x.category.toLowerCase() ||
+                (category.toLowerCase() === 'poshak' && x.category.toLowerCase().includes('poshak'));
+              return (
+                <li key={x.category}>
+                  <Link
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
+                      isMatch
+                        ? 'bg-secondary/10 text-secondary font-bold border border-secondary/20 shadow-sm' 
+                        : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'
+                    }`}
+                    href={getFilterUrl({ c: x.category })}
+                  >
+                    {isMatch && <span className="material-symbols-outlined text-[16px]">check_circle</span>}
+                    {x.category}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
 

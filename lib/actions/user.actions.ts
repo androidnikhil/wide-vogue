@@ -246,6 +246,7 @@ export async function updateProfile(user: {
 
     revalidatePath('/user/profile');
     revalidatePath('/user');
+    revalidatePath('/', 'layout');
 
     return {
       success: true,

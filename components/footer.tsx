@@ -11,21 +11,35 @@ export default function Footer() {
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 {/* Col 1: Brand Anchor Card */}
 <div className="space-y-4">
-<div className="bg-surface p-3 rounded-lg inline-block shadow-sm">
-<Image alt="Madhav Shringaar" width={180} height={70} className="h-16 w-auto object-contain" src="/images/logo.png" />
-</div>
+<Link href="/" className="inline-block group transition-transform hover:opacity-95">
+  <Image 
+    alt="Madhav Shringaar" 
+    width={260} 
+    height={85} 
+    className="h-16 w-auto object-contain drop-shadow-md group-hover:scale-102 transition-transform" 
+    src="/images/logo-footer.png" 
+    priority
+  />
+</Link>
 <p className="font-body-sm text-body-sm text-white/80 leading-relaxed">
-            Bringing divine adornments, authentic fabrics, and revered seva essentials to every Kanha devotee with eternal dedication.
-          </p>
+  Bringing divine adornments, authentic fabrics, and revered seva essentials to every Kanha devotee with eternal dedication.
+</p>
 <div className="flex items-center gap-3 pt-2">
-<a aria-label="WhatsApp" className="w-8 h-8 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="https://wa.me/917982160480" target="_blank" rel="noopener noreferrer">
-<span className="material-symbols-outlined text-sm">chat</span>
+<a 
+  aria-label="Direct WhatsApp Support" 
+  className="w-9 h-9 rounded-full bg-surface/10 hover:bg-[#25D366] text-surface flex items-center justify-center transition-all duration-300 shadow-xs" 
+  href="https://wa.me/917982160480?text=Radhe%20Radhe!%20I%20would%20like%20to%20inquire%20about%20Madhav%20Shringaar." 
+  target="_blank" 
+  rel="noopener noreferrer"
+  title="Chat on WhatsApp +91 79821 60480"
+>
+  <span className="material-symbols-outlined text-base">chat</span>
 </a>
-<a aria-label="YouTube" className="w-8 h-8 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="#">
-<span className="material-symbols-outlined text-sm">play_arrow</span>
+<a aria-label="YouTube" className="w-9 h-9 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="#">
+<span className="material-symbols-outlined text-base">play_arrow</span>
 </a>
-<a aria-label="Instagram" className="w-8 h-8 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="#">
-<span className="material-symbols-outlined text-sm">photo_camera</span>
+<a aria-label="Instagram" className="w-9 h-9 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="#">
+<span className="material-symbols-outlined text-base">photo_camera</span>
 </a>
 </div>
 </div>
@@ -61,9 +75,18 @@ export default function Footer() {
 <span className="material-symbols-outlined text-secondary-fixed text-lg mt-0.5">call</span>
 <div>
 <div className="font-bold text-surface">
-  <a href="tel:+917982160480" className="hover:text-secondary transition-colors">+91 79821 60480</a>
+  <a href="tel:+917078211946" className="hover:text-secondary transition-colors">+91 70782 11946</a>
 </div>
-<p className="text-xs">Mon-Sat (10:00 AM - 7:00 PM IST)</p>
+<p className="text-xs">Direct Calling (10:00 AM - 7:00 PM IST)</p>
+</div>
+</div>
+<div className="flex items-start gap-2.5">
+<span className="material-symbols-outlined text-[#25D366] text-lg mt-0.5">chat</span>
+<div>
+<div className="font-bold text-surface">
+  <a href="https://wa.me/917982160480?text=Radhe%20Radhe!%20I%20would%20like%20to%20inquire%20about%20Madhav%20Shringaar." target="_blank" rel="noopener noreferrer" className="hover:text-[#25D366] transition-colors">+91 79821 60480</a>
+</div>
+<p className="text-xs">WhatsApp Seva &amp; Custom Orders</p>
 </div>
 </div>
 <div className="flex items-start gap-2.5">

@@ -24,7 +24,21 @@ const UserButton = async () => {
     );
   }
 
-  const firstInitial = session.user?.name?.charAt(0).toUpperCase() ?? 'U';
+  const rawName = session.user?.name?.trim();
+  const isNumeric = Boolean(rawName && /^\+?\d{7,15}$/.test(rawName.replace(/\s+/g, '')));
+  const hasRealName = Boolean(rawName && rawName !== 'NO_NAME' && !isNumeric);
+
+  const firstInitial = hasRealName && rawName ? rawName.charAt(0).toUpperCase() : null;
+  const displayName = hasRealName ? rawName : 'Devotee';
+
+  const userEmail = session.user?.email && !session.user.email.endsWith('@madhavshringaar.com')
+    ? session.user.email
+    : null;
+
+  const userPhone = (session.user as any)?.phoneNumber as string | undefined;
+
+  // Profile is complete if devotee has a real name and at least one contact channel (phone or email)
+  const isProfileComplete = hasRealName && Boolean(userPhone || userEmail);
 
   return (
     <div className='flex gap-2 items-center'>
@@ -32,26 +46,45 @@ const UserButton = async () => {
         <DropdownMenuTrigger asChild>
           <Button
             variant='ghost'
+            aria-label='User account menu'
             className='relative w-9 h-9 rounded-full flex items-center justify-center bg-primary text-on-primary hover:bg-primary/90 transition shadow-sm outline-none'
           >
-            {firstInitial}
+            {firstInitial ? (
+              <span className='font-semibold text-sm'>{firstInitial}</span>
+            ) : (
+              <UserIcon className='w-4 h-4 text-on-primary' />
+            )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent 
-          className='w-56 bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-lg mt-2 p-1 z-50' 
+          className='w-60 bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-lg mt-2 p-1 z-50' 
           align='end' 
           forceMount
         >
-          <DropdownMenuLabel className='font-normal p-2'>
+          <DropdownMenuLabel className='font-normal p-2.5'>
             <div className='flex flex-col space-y-1'>
-              <div className='text-sm font-semibold text-on-surface'>
-                {session.user?.name || 'My Account'}
+              <div className='text-sm font-semibold text-on-surface flex items-center gap-1.5'>
+                <span>{displayName}</span>
+                {isProfileComplete && (
+                  <span className='text-[10px] bg-emerald-100 text-emerald-800 font-medium px-1.5 py-0.2 rounded-full'>
+                    Verified
+                  </span>
+                )}
               </div>
-              {session.user?.email && !session.user.email.endsWith('@madhavshringaar.com') ? (
-                <div className='text-xs text-on-surface-variant leading-none'>
-                  {session.user.email}
+              
+              {userEmail && (
+                <div className='text-xs text-on-surface-variant leading-none truncate'>
+                  {userEmail}
                 </div>
-              ) : (
+              )}
+
+              {userPhone && (
+                <div className='text-xs text-on-surface-variant leading-none font-sans'>
+                  +91 {userPhone.length === 10 ? `${userPhone.slice(0, 5)} ${userPhone.slice(5)}` : userPhone}
+                </div>
+              )}
+
+              {!isProfileComplete && (
                 <div className='pt-1'>
                   <Link 
                     href='/user/profile' 

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { getMyCart } from "@/lib/actions/cart.action";
 import { formatCurrency } from "@/lib/utils";
 import CartDrawerWrapper from "@/components/shared/cart/cart-drawer-wrapper";
+import WhatsAppFloatingButton from "@/components/shared/whatsapp-floating-button";
 
 export default async function RootLayout({
   children,
@@ -100,6 +101,9 @@ export default async function RootLayout({
 
       {/* RIGHT: Compact shopping/cart panel */}
       <CartDrawerWrapper cart={cart} />
+
+      {/* Floating WhatsApp Quick Connect Button */}
+      <WhatsAppFloatingButton />
     </div>
   );
 }

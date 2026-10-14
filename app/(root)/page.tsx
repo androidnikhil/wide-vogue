@@ -326,39 +326,116 @@ export default async function Homepage({
         </div>
       </section>
 
-      {/* 9. WHY YOU'LL LOVE US — PLAYFUL BENEFITS */}
-      <section className="py-24 bg-[#FBF7EE]">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow text-center border-b-4 border-[#0F6F74]">
-            <div className="w-20 h-20 mx-auto bg-[#E8F3EE] rounded-full flex items-center justify-center text-[#0F6F74] mb-6 shadow-inner">
-               <span className="material-symbols-outlined text-4xl">local_shipping</span>
-            </div>
-            <h4 className="font-bold text-[#003020] font-serif text-2xl mb-2">Fast & Secure</h4>
-            <p className="text-[#003020]/70 font-light">Safe delivery right to your doorstep</p>
+      {/* 9. WHY DEVOTEES CHOOSE US — HANDCRAFTED SEVA COMMITMENT */}
+      <section className="py-24 bg-gradient-to-b from-[#FBF7EE] via-[#F8F2E2]/60 to-[#FBF7EE] relative overflow-hidden border-y border-[#E6C16A]/20">
+        <div className="max-w-7xl mx-auto px-6">
+          {/* Section Heading with Human/Devotional Warmth */}
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#0F6F74]/10 text-[#0F6F74] mb-3 uppercase tracking-widest font-sans">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0F6F74]"></span>
+              पवित्र सेवा संकल्प • Our Devotional Promise
+            </span>
+            <h2 className="text-3xl md:text-5xl font-serif text-[#003020] font-bold tracking-tight mb-4">
+              Handcrafted in Braj, Adorned with Love
+            </h2>
+            <p className="text-[#003020]/75 text-base md:text-lg font-light leading-relaxed">
+              Every poshak, mukut, and shringaar essential is crafted just as we would prepare it for Thakur Ji in our own home temple — with pure devotion, gentle deity-safe fabrics, and attentive devotee care.
+            </p>
           </div>
-          
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow text-center border-b-4 border-[#C88A20]">
-            <div className="w-20 h-20 mx-auto bg-[#FDFBF7] rounded-full flex items-center justify-center text-[#C88A20] mb-6 shadow-inner">
-               <span className="material-symbols-outlined text-4xl">workspace_premium</span>
+
+          {/* 4 Human-Crafted Seva Pillars */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7">
+            {/* Card 1: Braj Dhām Karigari */}
+            <div className="bg-white/95 rounded-[2rem] p-7 shadow-xs hover:shadow-xl transition-all duration-300 border border-[#E6C16A]/30 flex flex-col justify-between group hover:-translate-y-1 relative">
+              <div className="absolute top-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-[#C88A20] to-transparent rounded-full opacity-60 group-hover:opacity-100 transition-opacity" />
+              <div>
+                <div className="w-16 h-16 rounded-2xl bg-[#FDF8EC] border border-[#E6C16A]/40 flex items-center justify-center text-[#C88A20] mb-5 shadow-xs group-hover:scale-105 transition-transform">
+                   <span className="material-symbols-outlined text-3xl">workspace_premium</span>
+                </div>
+                <div className="inline-block text-[11px] font-bold text-[#8A5A0A] bg-[#FAF3E0] px-2.5 py-0.5 rounded-full mb-2 tracking-wide uppercase font-sans">
+                  Braj Dhām Karigari
+                </div>
+                <h3 className="font-bold text-[#003020] font-serif text-xl mb-2.5">
+                  Authentic Braj Artistry
+                </h3>
+                <p className="text-[#003020]/75 text-sm leading-relaxed font-light mb-4">
+                  Hand-tailored by generational Mathura & Vrindavan karigars using pure brocades, soft silks, and velvet with feather-soft linings that gently caress Thakur Ji.
+                </p>
+              </div>
+              <div className="pt-3 border-t border-[#E6C16A]/20 flex items-center gap-1.5 text-xs text-[#0F6F74] font-medium font-sans">
+                <span className="material-symbols-outlined text-sm">verified</span>
+                <span>100% Deity-Safe, Pure Fabrics</span>
+              </div>
             </div>
-            <h4 className="font-bold text-[#003020] font-serif text-2xl mb-2">Authentic Quality</h4>
-            <p className="text-[#003020]/70 font-light">Premium craftsmanship you can trust</p>
-          </div>
-          
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow text-center border-b-4 border-[#E6C16A]">
-            <div className="w-20 h-20 mx-auto bg-[#FDE8DF] rounded-full flex items-center justify-center text-[#E6C16A] mb-6 shadow-inner">
-               <span className="material-symbols-outlined text-4xl">favorite</span>
+
+            {/* Card 2: Pavitra Surakshit Packaging */}
+            <div className="bg-white/95 rounded-[2rem] p-7 shadow-xs hover:shadow-xl transition-all duration-300 border border-[#0F6F74]/20 flex flex-col justify-between group hover:-translate-y-1 relative">
+              <div className="absolute top-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-[#0F6F74] to-transparent rounded-full opacity-60 group-hover:opacity-100 transition-opacity" />
+              <div>
+                <div className="w-16 h-16 rounded-2xl bg-[#E8F3EE] border border-[#0F6F74]/30 flex items-center justify-center text-[#0F6F74] mb-5 shadow-xs group-hover:scale-105 transition-transform">
+                   <span className="material-symbols-outlined text-3xl">local_shipping</span>
+                </div>
+                <div className="inline-block text-[11px] font-bold text-[#0F6F74] bg-[#E8F3EE] px-2.5 py-0.5 rounded-full mb-2 tracking-wide uppercase font-sans">
+                  Express Pan-India
+                </div>
+                <h3 className="font-bold text-[#003020] font-serif text-xl mb-2.5">
+                  Pavitra Safe Packaging
+                </h3>
+                <p className="text-[#003020]/75 text-sm leading-relaxed font-light mb-4">
+                  Sealed in clean, sacred multi-layer protective packaging and sturdy gift boxes so intricate crowns, delicate pearls, and flutes arrive spotless and unbent.
+                </p>
+              </div>
+              <div className="pt-3 border-t border-[#0F6F74]/20 flex items-center gap-1.5 text-xs text-[#0F6F74] font-medium font-sans">
+                <span className="material-symbols-outlined text-sm">inventory_2</span>
+                <span>Air Dispatch with Live Tracking</span>
+              </div>
             </div>
-            <h4 className="font-bold text-[#003020] font-serif text-2xl mb-2">Made With Love</h4>
-            <p className="text-[#003020]/70 font-light">Created with devotion for Kanha</p>
-          </div>
-          
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow text-center border-b-4 border-[#003020]">
-            <div className="w-20 h-20 mx-auto bg-gray-50 rounded-full flex items-center justify-center text-[#003020] mb-6 shadow-inner">
-               <span className="material-symbols-outlined text-4xl">support_agent</span>
+
+            {/* Card 3: Size Fit Guarantee (0 to 6 No.) */}
+            <div className="bg-white/95 rounded-[2rem] p-7 shadow-xs hover:shadow-xl transition-all duration-300 border border-[#E6C16A]/30 flex flex-col justify-between group hover:-translate-y-1 relative">
+              <div className="absolute top-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-[#E6C16A] to-transparent rounded-full opacity-60 group-hover:opacity-100 transition-opacity" />
+              <div>
+                <div className="w-16 h-16 rounded-2xl bg-[#FDF2E9] border border-[#E6C16A]/40 flex items-center justify-center text-[#C88A20] mb-5 shadow-xs group-hover:scale-105 transition-transform">
+                   <span className="material-symbols-outlined text-3xl">favorite</span>
+                </div>
+                <div className="inline-block text-[11px] font-bold text-[#8A5A0A] bg-[#FAF3E0] px-2.5 py-0.5 rounded-full mb-2 tracking-wide uppercase font-sans">
+                  0 to 6 No. Vigrah Fit
+                </div>
+                <h3 className="font-bold text-[#003020] font-serif text-xl mb-2.5">
+                  Size Fit Guarantee
+                </h3>
+                <p className="text-[#003020]/75 text-sm leading-relaxed font-light mb-4">
+                  Unsure whether size 2 or 3 suits your Laddu Gopal Ji? Share a photo on WhatsApp for instant sizing guidance, with prompt 7-day hassle-free exchange if needed.
+                </p>
+              </div>
+              <div className="pt-3 border-t border-[#E6C16A]/20 flex items-center gap-1.5 text-xs text-[#0F6F74] font-medium font-sans">
+                <span className="material-symbols-outlined text-sm">published_with_changes</span>
+                <span>7-Day Easy Exchange Policy</span>
+              </div>
             </div>
-            <h4 className="font-bold text-[#003020] font-serif text-2xl mb-2">Devotee Care</h4>
-            <p className="text-[#003020]/70 font-light">We are always here to help you</p>
+
+            {/* Card 4: Devotee Care on Call & WhatsApp */}
+            <div className="bg-white/95 rounded-[2rem] p-7 shadow-xs hover:shadow-xl transition-all duration-300 border border-[#003020]/20 flex flex-col justify-between group hover:-translate-y-1 relative">
+              <div className="absolute top-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-[#003020] to-transparent rounded-full opacity-60 group-hover:opacity-100 transition-opacity" />
+              <div>
+                <div className="w-16 h-16 rounded-2xl bg-[#F5F5F3] border border-[#003020]/20 flex items-center justify-center text-[#003020] mb-5 shadow-xs group-hover:scale-105 transition-transform">
+                   <span className="material-symbols-outlined text-3xl">support_agent</span>
+                </div>
+                <div className="inline-block text-[11px] font-bold text-[#003020] bg-neutral-100 px-2.5 py-0.5 rounded-full mb-2 tracking-wide uppercase font-sans">
+                  Real Devotees, Not Bots
+                </div>
+                <h3 className="font-bold text-[#003020] font-serif text-xl mb-2.5">
+                  Direct Devotee Seva
+                </h3>
+                <p className="text-[#003020]/75 text-sm leading-relaxed font-light mb-4">
+                  Speak directly with fellow bhakts on call (+91 70782 11946) or WhatsApp (+91 79821 60480) for festival color combinations, custom requests, and order assistance.
+                </p>
+              </div>
+              <div className="pt-3 border-t border-[#003020]/15 flex items-center gap-1.5 text-xs text-[#003020] font-medium font-sans">
+                <span className="material-symbols-outlined text-sm text-[#25D366]">chat</span>
+                <span>Call &amp; WhatsApp 10 AM – 7 PM</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>

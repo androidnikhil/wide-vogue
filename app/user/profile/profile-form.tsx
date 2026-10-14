@@ -1,6 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -29,6 +30,7 @@ interface ProfileFormProps {
 }
 
 const ProfileForm = ({ initialUser }: ProfileFormProps) => {
+  const router = useRouter();
   const { data: session, update } = useSession();
 
   const currentEmail = initialUser?.email || (
@@ -65,6 +67,7 @@ const ProfileForm = ({ initialUser }: ProfileFormProps) => {
 
     await update(newSession);
     toast.success('Personal information updated successfully');
+    router.refresh();
   };
 
   return (

@@ -10,6 +10,7 @@ import { getWishlist } from '@/lib/actions/wishlist.actions';
 import UserButton from './user-button';
 import MobileMenu from './mobile-menu';
 import MobileSearch from './mobile-search';
+import LanguageSwitcher from './language-switcher';
 
 export default async function Header() {
   const session = await auth();
@@ -30,10 +31,13 @@ export default async function Header() {
 <div className="font-headline-sm text-secondary-fixed text-sm md:text-base tracking-widest font-bold animate-pulse max-sm:whitespace-nowrap max-sm:text-[9px] max-sm:tracking-normal max-sm:text-[#E6C16A] max-sm:[animation:none]">
         ॥ Radhe Radhe ॥
       </div>
-<div className="flex min-w-0 items-center gap-1 text-primary-fixed max-sm:justify-self-end max-sm:gap-0.5 max-sm:-translate-x-1 max-sm:text-[#F7EAC7]">
-<span className="material-symbols-outlined shrink-0 text-secondary-fixed text-base max-sm:hidden" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
-<span className="hidden md:inline">Trusted by 10,000+ Happy Devotees</span>
-<span className="md:hidden max-sm:whitespace-nowrap max-sm:text-[7px] max-sm:font-semibold max-sm:leading-tight max-sm:tracking-tight">10,000+ Devotees</span>
+<div className="flex min-w-0 items-center gap-2.5 sm:gap-4 text-primary-fixed max-sm:justify-self-end max-sm:gap-1 max-sm:-translate-x-1 max-sm:text-[#F7EAC7]">
+  <div className="flex items-center gap-1">
+    <span className="material-symbols-outlined shrink-0 text-secondary-fixed text-base max-sm:hidden" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+    <span className="hidden md:inline">Trusted by 10,000+ Happy Devotees</span>
+    <span className="md:hidden max-sm:whitespace-nowrap max-sm:text-[7px] max-sm:font-semibold max-sm:leading-tight max-sm:tracking-tight">10,000+ Devotees</span>
+  </div>
+  <LanguageSwitcher variant="topbar" />
 </div>
 </div>
 </div>

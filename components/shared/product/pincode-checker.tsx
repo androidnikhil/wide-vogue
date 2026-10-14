@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { checkDeliveryPincode } from '@/lib/actions/pincode.actions';
+import { useLanguage } from '@/lib/i18n/language-context';
 
 export default function PincodeChecker() {
+  const { t, language } = useLanguage();
   const [pincode, setPincode] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
@@ -61,10 +63,10 @@ export default function PincodeChecker() {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4 text-secondary" />
-          <h3 className="font-semibold text-sm text-primary">Check Delivery &amp; COD Availability</h3>
+          <h3 className="font-semibold text-sm text-primary">{t.product.checkDelivery}</h3>
         </div>
         <span className="text-[10px] text-emerald-800 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-          Pan-India Express
+          {language === 'hi' ? 'अखिल भारतीय एक्सप्रेस' : 'Pan-India Express'}
         </span>
       </div>
       
@@ -72,7 +74,7 @@ export default function PincodeChecker() {
         <Input 
           type="text" 
           maxLength={6}
-          placeholder="Enter 6-digit delivery pincode" 
+          placeholder={t.product.enterPincode}
           value={pincode}
           onChange={(e) => {
             const val = e.target.value.replace(/\D/g, '').slice(0, 6);
@@ -92,10 +94,10 @@ export default function PincodeChecker() {
         >
           {loading ? (
             <span className="flex items-center gap-1.5">
-              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Checking...
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t.product.checking}
             </span>
           ) : (
-            'Check'
+            t.product.checkBtn
           )}
         </Button>
       </div>
@@ -106,10 +108,10 @@ export default function PincodeChecker() {
             <Truck className="w-4 h-4 mt-0.5 shrink-0 text-emerald-700" />
             <div>
               <p className="font-bold text-sm text-emerald-900">
-                Estimated Delivery by {result.deliveryDate}
+                {t.product.estimatedDelivery} {result.deliveryDate}
               </p>
               <p className="text-emerald-800 text-[11px] mt-0.5">
-                Delivering to <strong>{result.district ? `${result.district}, ` : ''}{result.state}</strong> ({pincode})
+                {t.product.deliveredTo} <strong>{result.district ? `${result.district}, ` : ''}{result.state}</strong> ({pincode})
               </p>
             </div>
           </div>
@@ -117,11 +119,11 @@ export default function PincodeChecker() {
           <div className="flex items-center justify-between pt-1 border-t border-emerald-200/60 text-[11px]">
             <div className="flex items-center gap-1.5 text-emerald-900">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Cash on Delivery: <strong>{result.codAvailable ? 'Available' : 'Prepaid Only'}</strong></span>
+              <span>{t.product.cashOnDelivery}: <strong>{result.codAvailable ? t.product.available : t.product.prepaidOnly}</strong></span>
             </div>
             <div className="flex items-center gap-1 text-emerald-800">
               <Sparkles className="w-3 h-3 text-[#C88A20]" />
-              <span>Free Delivery on ₹999+</span>
+              <span>{language === 'hi' ? '₹999+ पर मुफ़्त डिलीवरी' : 'Free Delivery on ₹999+'}</span>
             </div>
           </div>
         </div>

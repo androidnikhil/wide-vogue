@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation';
 import { addItemToCart, removeItemFromCart } from '@/lib/actions/cart.action';
 import { toast } from 'sonner';
 import { Minus, Plus, Trash2, Loader2, ShoppingBag } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n/language-context';
 
 export default function CartDrawerWrapper({ cart }: { cart: any }) {
+  const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
@@ -77,9 +79,9 @@ export default function CartDrawerWrapper({ cart }: { cart: any }) {
       <aside className="fixed top-0 right-0 z-[110] h-full w-full max-w-sm bg-surface shadow-2xl flex flex-col p-6 animate-in slide-in-from-right duration-300">
          <div className="flex items-center justify-between mb-5 border-b border-outline/10 pb-4">
              <div>
-               <h2 className="text-xl font-bold font-serif text-primary">Your Devotional Cart</h2>
+               <h2 className="text-xl font-bold font-serif text-primary">{t.cart.devotionalCart}</h2>
                <p className="text-xs text-on-surface-variant font-medium">
-                 {totalItemCount} {totalItemCount === 1 ? 'item' : 'items'} in your seva cart
+                 {totalItemCount} {language === 'hi' ? 'सामग्री' : (totalItemCount === 1 ? 'item' : 'items')} {language === 'hi' ? 'सेवा टोकरी में' : 'in your seva cart'}
                </p>
              </div>
              <button 
@@ -176,12 +178,12 @@ export default function CartDrawerWrapper({ cart }: { cart: any }) {
             ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center py-12 opacity-75">
                     <ShoppingBag className="w-14 h-14 text-outline/60 mb-3" />
-                    <p className="text-on-surface-variant text-sm font-medium font-sans">Your seva cart is empty.</p>
+                    <p className="text-on-surface-variant text-sm font-medium font-sans">{t.cart.emptyCartTitle}</p>
                     <button 
                       onClick={() => setIsOpen(false)}
                       className="mt-4 text-xs font-semibold text-primary hover:underline"
                     >
-                      Continue Shopping →
+                      {t.cart.exploreBtn} →
                     </button>
                 </div>
             )}
@@ -190,8 +192,8 @@ export default function CartDrawerWrapper({ cart }: { cart: any }) {
          <div className="mt-4 pt-4 border-t border-outline/20">
             <div className="flex justify-between items-center mb-4">
                <div>
-                 <span className="text-xs text-on-surface-variant font-medium block">Total Seva Value</span>
-                 <span className="text-xs text-emerald-700 font-medium">Free Delivery Eligible</span>
+                 <span className="text-xs text-on-surface-variant font-medium block">{t.cart.subtotal}</span>
+                 <span className="text-xs text-emerald-700 font-medium">{t.cart.freeDeliveryEligible}</span>
                </div>
                <span className="font-bold text-primary text-xl font-sans">₹{cart ? cart.itemsPrice : '0'}</span>
             </div>
@@ -201,7 +203,7 @@ export default function CartDrawerWrapper({ cart }: { cart: any }) {
                 onClick={() => setIsOpen(false)} 
                 className="w-full block text-center gold-gradient-btn text-primary-container font-bold py-3 rounded-xl shadow-md hover:-translate-y-0.5 transition-transform uppercase tracking-wider text-xs font-sans"
               >
-                 Review Cart & Checkout
+                 {t.cart.reviewCart}
               </Link>
             </div>
          </div>

@@ -31,6 +31,7 @@ import {
   SheetClose,
 } from '@/components/ui/sheet';
 import { signOutUser } from '@/lib/actions/user.actions';
+import LanguageSwitcher from './language-switcher';
 
 interface MobileMenuProps {
   sessionUser?: {
@@ -126,7 +127,7 @@ export default function MobileMenu({ sessionUser }: MobileMenuProps) {
             <div className="flex items-center justify-between gap-2">
               <Link href="/" onClick={closeMenu} className="inline-block transition-opacity hover:opacity-95">
                 <Image
-                  src="/images/logo.png"
+                  src="/images/logo.webp"
                   alt="Madhav Shringaar"
                   width={190}
                   height={68}
@@ -153,6 +154,11 @@ export default function MobileMenu({ sessionUser }: MobileMenuProps) {
                 ॥ Radhe Radhe ॥
               </span>
             </div>
+          </div>
+
+          {/* Language Switcher in Mobile Menu */}
+          <div className="px-3 pt-2.5 shrink-0">
+            <LanguageSwitcher variant="mobile" />
           </div>
 
           {/* Devotee Account Card */}

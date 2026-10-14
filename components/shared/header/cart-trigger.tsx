@@ -1,7 +1,11 @@
 "use client";
 import React from 'react';
 
+import { useLanguage } from '@/lib/i18n/language-context';
+
 export default function CartTrigger({ cartItemCount, cartPrice }: { cartItemCount: number, cartPrice: string }) {
+  const { t } = useLanguage();
+
   return (
     <button 
       onClick={() => document.dispatchEvent(new CustomEvent('open-cart-drawer'))}
@@ -17,7 +21,7 @@ export default function CartTrigger({ cartItemCount, cartPrice }: { cartItemCoun
         )}
       </div>
       <div className="hidden sm:flex flex-col text-left pr-1">
-        <span className="text-[10px] uppercase tracking-wider font-bold text-on-surface-variant">Seva Cart</span>
+        <span className="text-[10px] uppercase tracking-wider font-bold text-on-surface-variant">{t.common.cart}</span>
         <span className="font-sans text-sm font-bold text-secondary leading-tight">₹{cartPrice}</span>
       </div>
     </button>

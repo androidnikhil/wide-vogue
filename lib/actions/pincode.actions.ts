@@ -50,7 +50,7 @@ export async function checkDeliveryPincode(pincode: string): Promise<PincodeChec
     let codAvailable = true;
 
     try {
-      const pickupPin = process.env.DISPATCH_PINCODE || "282001"; // Agra central hub
+      const pickupPin = process.env.DISPATCH_PINCODE || "201301"; // Noida dispatch hub
       const shiprocketRes = await checkShiprocketServiceability(pickupPin, cleanPin, true, 0.5);
 
       if (shiprocketRes && shiprocketRes.data?.available_courier_companies?.length > 0) {

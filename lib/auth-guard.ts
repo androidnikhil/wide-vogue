@@ -9,7 +9,7 @@ export async function requireAdmin() {
     redirect('/sign-in')
   }
 
-  const isAdmin = session.user.role === 'admin' || isDesignatedAdmin(session.user.email, (session.user as any)?.phoneNumber)
+  const isAdmin = session.user.role === 'admin' || isDesignatedAdmin(session.user.email)
 
   if (!isAdmin) {
     redirect('/unauthorized')

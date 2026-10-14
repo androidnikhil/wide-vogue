@@ -97,24 +97,26 @@ export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '7982160480';
 export const COMPANY_GSTIN = process.env.COMPANY_GSTIN || '09EHFPP7126A1ZE';
 export const COMPANY_MSME = process.env.COMPANY_MSME || 'UDYAM-UP-01-0152376';
 
-export const isDesignatedAdmin = (email?: string | null, phone?: string | null): boolean => {
-  const adminEmails = [
-    (process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com').toLowerCase(),
-    'nikhil.pandey@madhavshringaar.com',
-    'nikhilpandey00999@gmail.com',
-  ];
-  const adminPhones = [
-    '9876543210',
-    '7078211946',
-    '7982160480',
-    SUPPORT_PHONE.replace(/\D/g, ''),
-    WHATSAPP_NUMBER.replace(/\D/g, ''),
-  ].filter(Boolean);
+/**
+ * Strict check: ONLY the store owner's exact email address can ever be an admin.
+ * All regular users and customers are ALWAYS strictly 'user'.
+ */
+export const isDesignatedAdmin = (email?: string | null): boolean => {
+  if (!email) return false;
+  const adminEmail = (process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com').toLowerCase().trim();
+  const cleanEmail = email.trim().toLowerCase();
+  return cleanEmail === adminEmail || cleanEmail === 'nikhil.pandey@madhavshringaar.com';
+};
 
-  const emailLower = email?.trim().toLowerCase();
-  const phoneClean = phone?.replace(/\D/g, '');
-
-  if (emailLower && adminEmails.includes(emailLower)) return true;
-  if (phoneClean && adminPhones.some((p) => p && (phoneClean === p || phoneClean.endsWith(p)))) return true;
-  return false;
+/**
+ * Checks if an email is an old auto-generated dummy phone email (e.g. 9876543210@madhavshringaar.com)
+ * Real store email addresses (like nikhil.pandey@madhavshringaar.com or info@madhavshringaar.com) are NEVER dummy emails.
+ */
+export const isDummyPhoneEmail = (email?: string | null): boolean => {
+  if (!email) return false;
+  const trimmed = email.trim().toLowerCase();
+  if (trimmed === 'nikhil.pandey@madhavshringaar.com' || trimmed === 'info@madhavshringaar.com') {
+    return false;
+  }
+  return /^\+?\d+@madhavshringaar\.com$/i.test(trimmed);
 };

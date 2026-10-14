@@ -16,7 +16,7 @@ import { getMyCart } from './cart.action';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
-import { PAGE_SIZE, isDesignatedAdmin } from '../constants';
+import { PAGE_SIZE, isDesignatedAdmin, isDummyPhoneEmail } from '../constants';
 import { revalidatePath } from 'next/cache';
 import { sendWelcomeEmail } from '@/email';
 
@@ -135,7 +135,7 @@ export async function updateUserAddress(data: ShippingAddress, saveAddress: bool
         userDataToUpdate.addresses = newAddresses;
       }
 
-      if (address.guestEmail && (!currentUser.email || currentUser.email.endsWith('@madhavshringaar.com'))) {
+      if (address.guestEmail && (!currentUser.email || isDummyPhoneEmail(currentUser.email))) {
         userDataToUpdate.email = address.guestEmail;
       }
       if (address.fullName && (!currentUser.name || currentUser.name === 'NO_NAME')) {
@@ -229,8 +229,8 @@ export async function updateProfile(user: {
       name: user.name,
     };
 
-    if (user.email && user.email.includes('@') && !user.email.endsWith('@madhavshringaar.com')) {
-      updateData.email = user.email;
+    if (user.email && user.email.includes('@') && !isDummyPhoneEmail(user.email)) {
+      updateData.email = user.email.trim();
     }
 
     if (user.phoneNumber !== undefined) {
@@ -238,8 +238,7 @@ export async function updateProfile(user: {
     }
 
     const finalEmail = updateData.email !== undefined ? updateData.email : currentUser.email;
-    const finalPhone = updateData.phoneNumber !== undefined ? updateData.phoneNumber : currentUser.phoneNumber;
-    if (isDesignatedAdmin(finalEmail, finalPhone)) {
+    if (isDesignatedAdmin(finalEmail)) {
       updateData.role = 'admin';
     }
 

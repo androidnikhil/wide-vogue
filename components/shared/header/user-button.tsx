@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UserIcon } from 'lucide-react';
 import { getServerTranslations } from '@/lib/i18n/server';
+import { isDummyPhoneEmail } from '@/lib/constants';
 
 const UserButton = async () => {
   const session = await auth();
@@ -33,7 +34,7 @@ const UserButton = async () => {
   const firstInitial = hasRealName && rawName ? rawName.charAt(0).toUpperCase() : null;
   const displayName = hasRealName ? rawName : t.header.devotee;
 
-  const userEmail = session.user?.email && !session.user.email.endsWith('@madhavshringaar.com')
+  const userEmail = session.user?.email && !isDummyPhoneEmail(session.user.email)
     ? session.user.email
     : null;
 

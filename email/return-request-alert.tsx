@@ -9,12 +9,12 @@ import {
   Tailwind,
   Text,
   Button,
-  Hr,
   Row,
   Column,
 } from '@react-email/components';
 import * as React from 'react';
 import { formatCurrency } from '@/lib/utils';
+import { EmailHeader, EmailContactFooter, BRAND_COLORS } from './email-components';
 
 interface ReturnRequestAlertEmailProps {
   order: any;
@@ -33,118 +33,85 @@ export default function ReturnRequestAlertEmail({
     order.user?.name ||
     (order.shippingAddress as any)?.fullName ||
     'Devotee Customer';
+  const cleanOrderId = `OD${(order.id || '').replace(/-/g, '').slice(0, 16).toUpperCase()}`;
+  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'https://www.madhavshringaar.com';
 
   return (
     <Html>
       <Head />
       <Preview>
         {isAdminNotification
-          ? `⚠️ Return Request for Order #${order.id?.slice(0, 8).toUpperCase()}`
-          : `Return Request Received for Order #${order.id?.slice(0, 8).toUpperCase()}`}
+          ? `⚠️ Return Request for Order #${cleanOrderId} (${reason})`
+          : `7-Day Return Request Received for Order #${cleanOrderId}`}
       </Preview>
       <Tailwind>
-        <Body className="bg-[#FAF7F0] font-sans py-8">
-          <Container className="bg-white border border-[#E6C16A]/40 rounded-2xl max-w-[580px] mx-auto p-8 shadow-sm">
-            {/* Header */}
-            <Section className="text-center mb-6">
-              <Heading className="text-2xl font-bold text-[#003020] m-0">
-                Madhav Shringaar
+        <Body style={{ backgroundColor: BRAND_COLORS.cream, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", margin: 0, padding: '24px 0' }}>
+          <Container style={{ backgroundColor: BRAND_COLORS.white, border: `1px solid ${BRAND_COLORS.border}`, borderRadius: '16px', maxWidth: '600px', margin: '0 auto', padding: '32px 24px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}>
+            
+            <EmailHeader 
+              title="Madhav Shringaar" 
+              subtitle="7-Day Return / Exchange Service" 
+            />
+
+            <Section style={{ margin: '16px 0 20px 0' }}>
+              <Heading style={{ fontSize: '20px', fontWeight: 700, color: BRAND_COLORS.primary, margin: '0 0 8px 0' }}>
+                {isAdminNotification ? `⚠️ Return Request Alert` : `Radhe Radhe, ${customerName}! 🙏`}
               </Heading>
-              <Text className="text-xs text-[#C88A20] tracking-widest uppercase font-semibold mt-1">
-                7-Day Return Request
-              </Text>
-            </Section>
-
-            <Hr className="border-[#F0EAE1] my-4" />
-
-            <Section className="my-4">
-              <Text className="text-lg font-semibold text-[#003020] mb-2">
+              <Text style={{ fontSize: '13px', color: BRAND_COLORS.textMuted, lineHeight: '1.6', margin: 0 }}>
                 {isAdminNotification
-                  ? `Return Request for Order #${order.id}`
-                  : `Radhe Radhe, ${customerName}! 🙏`}
-              </Text>
-              <Text className="text-sm text-neutral-700 leading-relaxed m-0">
-                {isAdminNotification
-                  ? `Customer ${customerName} has submitted a 7-day return request for Order #${order.id}. Please review in the Admin panel.`
-                  : `We have received your return request for Order #${order.id}. Our team is reviewing the details and will update you within 24 hours.`}
+                  ? `Customer ${customerName} has requested a return for Order #${cleanOrderId}. Please review and update in the admin dashboard.`
+                  : `We have received your 7-day return request for Order #${cleanOrderId}. Our team is reviewing the details with care.`}
               </Text>
             </Section>
 
             {/* Return Details Box */}
-            <Section className="bg-[#FAF7F0] border border-[#E6C16A] rounded-xl p-5 my-5">
-              <Row>
-                <Column className="w-1/2">
-                  <Text className="text-xs text-neutral-500 m-0">Return Reason</Text>
-                  <Text className="text-sm font-bold text-neutral-800 m-0 mt-1">
-                    {reason}
-                  </Text>
-                </Column>
-                <Column className="w-1/2 text-right">
-                  <Text className="text-xs text-neutral-500 m-0">Order Total</Text>
-                  <Text className="text-sm font-bold text-[#003020] m-0 mt-1">
-                    {formatCurrency(order.totalPrice)}
-                  </Text>
-                </Column>
-              </Row>
+            <Section style={{ backgroundColor: '#FEF3C7', border: '1px solid #FCD34D', borderRadius: '12px', padding: '16px 20px', margin: '20px 0' }}>
+              <Text style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', color: '#B45309', fontWeight: 700, margin: '0 0 6px 0' }}>
+                Return Request Summary
+              </Text>
+              <Text style={{ fontSize: '13px', color: '#78350F', margin: '0 0 4px 0' }}>
+                Order ID: <strong>{cleanOrderId}</strong>
+              </Text>
+              <Text style={{ fontSize: '13px', color: '#78350F', margin: '0 0 4px 0' }}>
+                Reason: <strong>{reason}</strong>
+              </Text>
               {comments && (
-                <Section className="mt-3 pt-3 border-t border-[#E6C16A]/40">
-                  <Text className="text-xs text-neutral-500 m-0">Customer Comments:</Text>
-                  <Text className="text-xs text-neutral-800 m-0 mt-1 italic">
-                    &ldquo;{comments}&rdquo;
-                  </Text>
-                </Section>
+                <Text style={{ fontSize: '12px', color: '#92400E', margin: '6px 0 0 0', fontStyle: 'italic' }}>
+                  Note / Comments: &ldquo;{comments}&rdquo;
+                </Text>
               )}
             </Section>
 
-            {/* Items */}
-            <Section className="my-4">
-              <Text className="text-xs uppercase tracking-wider font-bold text-neutral-500 m-0 mb-3">
-                Order Items ({order.orderitems?.length || 0})
+            {/* Next Steps */}
+            <Section style={{ backgroundColor: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '12px', padding: '16px 20px', margin: '20px 0' }}>
+              <Text style={{ fontSize: '12px', fontWeight: 700, color: BRAND_COLORS.primary, margin: '0 0 6px 0' }}>
+                What happens next?
               </Text>
-              {order.orderitems?.map((item: any, idx: number) => (
-                <Row key={idx} className="border-b border-neutral-100 py-2">
-                  <Column className="w-3/4">
-                    <Text className="text-sm font-medium text-neutral-800 m-0">
-                      {item.name}
-                    </Text>
-                    <Text className="text-xs text-neutral-500 m-0">
-                      Qty: {item.qty} {item.size ? `• ${item.size}` : ''}
-                    </Text>
-                  </Column>
-                  <Column className="w-1/4 text-right">
-                    <Text className="text-sm font-bold text-neutral-800 m-0">
-                      {formatCurrency(Number(item.price) * item.qty)}
-                    </Text>
-                  </Column>
-                </Row>
-              ))}
+              <Text style={{ fontSize: '12px', color: BRAND_COLORS.textMuted, lineHeight: '1.5', margin: 0 }}>
+                Our team reviews return requests within 24 business hours. Once approved, reverse courier pickup will be scheduled. Please keep the sacred poshak in its original packing.
+              </Text>
             </Section>
 
-            <Section className="text-center my-6">
+            <Section style={{ textAlign: 'center', margin: '24px 0 16px 0' }}>
               <Button
-                className="bg-[#003020] text-[#F3D98F] px-6 py-3 rounded-xl font-bold text-sm no-underline inline-block shadow-sm"
-                href={`https://www.madhavshringaar.com/order/${order.id}`}
+                href={isAdminNotification ? `${serverUrl}/admin/orders` : `${serverUrl}/user/orders`}
+                style={{
+                  backgroundColor: BRAND_COLORS.primary,
+                  color: BRAND_COLORS.goldLight,
+                  padding: '12px 28px',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                }}
               >
-                {isAdminNotification ? 'Review & Approve / Reject in Admin Panel' : 'View Order Details'} &rarr;
+                {isAdminNotification ? 'Review in Admin Panel &rarr;' : 'View My Orders &rarr;'}
               </Button>
             </Section>
 
-            <Hr className="border-[#F0EAE1] my-4" />
+            <EmailContactFooter />
 
-            <Section className="text-center mt-4">
-              <Text className="text-xs text-neutral-500 m-0 mb-1">
-                Support email:{' '}
-                <a
-                  href="mailto:info@madhavshringaar.com"
-                  className="text-[#C88A20] font-semibold underline"
-                >
-                  info@madhavshringaar.com
-                </a>
-              </Text>
-              <Text className="text-[11px] text-neutral-400 m-0">
-                © {new Date().getFullYear()} Madhav Shringaar. All rights reserved.
-              </Text>
-            </Section>
           </Container>
         </Body>
       </Tailwind>

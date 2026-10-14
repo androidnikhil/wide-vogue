@@ -95,6 +95,8 @@ export const config = {
             // GOOGLE / EMAIL AUTHENTICATION
             const email = firebaseUser.email;
             const name = firebaseUser.displayName || email.split('@')[0];
+            const designatedAdminEmail = (process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com').toLowerCase();
+            const isAdminEmail = email.toLowerCase() === designatedAdminEmail;
 
             user = await prisma.user.findFirst({
               where: { email },
@@ -107,6 +109,7 @@ export const config = {
                   name,
                   image: firebaseUser.photoURL || null,
                   password: '',
+                  role: isAdminEmail ? 'admin' : 'user',
                 },
               });
 
@@ -114,6 +117,11 @@ export const config = {
               sendWelcomeEmail({ name, email }).catch((err) =>
                 console.error("Welcome email failed:", err)
               );
+            } else if (isAdminEmail && user.role !== 'admin') {
+              user = await prisma.user.update({
+                where: { id: user.id },
+                data: { role: 'admin' },
+              });
             }
 
             return {
@@ -155,6 +163,15 @@ export const config = {
 
           // If password is correct, return user
           if (isMatch) {
+            const designatedAdminEmail = (process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com').toLowerCase();
+            if (user.email?.toLowerCase() === designatedAdminEmail && user.role !== 'admin') {
+              await prisma.user.update({
+                where: { id: user.id },
+                data: { role: 'admin' },
+              });
+              user.role = 'admin';
+            }
+
             return {
               id: user.id,
               name: user.name,

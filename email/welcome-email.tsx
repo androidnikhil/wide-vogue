@@ -9,9 +9,9 @@ import {
   Tailwind,
   Text,
   Button,
-  Hr,
 } from '@react-email/components';
 import * as React from 'react';
+import { EmailHeader, EmailContactFooter, BRAND_COLORS } from './email-components';
 
 interface WelcomeEmailProps {
   name: string;
@@ -19,79 +19,72 @@ interface WelcomeEmailProps {
 
 export default function WelcomeEmail({ name }: WelcomeEmailProps) {
   const displayName = name && name !== 'NO_NAME' ? name : 'Beloved Devotee';
+  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'https://www.madhavshringaar.com';
 
   return (
     <Html>
       <Head />
-      <Preview>Welcome to Madhav Shringaar - Discover Divine Essentials</Preview>
+      <Preview>Welcome to Madhav Shringaar - Divine Essentials For Your Beloved Kanha</Preview>
       <Tailwind>
-        <Body className="bg-[#fcfaf7] font-sans py-8">
-          <Container className="bg-white border border-[#e8dfd8] rounded-2xl max-w-[560px] mx-auto p-8 shadow-sm">
-            {/* Header */}
-            <Section className="text-center mb-6">
-              <Heading className="text-2xl font-bold text-[#1b3b22] m-0">
-                Madhav Shringaar
-              </Heading>
-              <Text className="text-xs text-[#a07855] tracking-widest uppercase mt-1">
-                Divine Essentials For Your Beloved Kanha
-              </Text>
-            </Section>
+        <Body style={{ backgroundColor: BRAND_COLORS.cream, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", margin: 0, padding: '24px 0' }}>
+          <Container style={{ backgroundColor: BRAND_COLORS.white, border: `1px solid ${BRAND_COLORS.border}`, borderRadius: '16px', maxWidth: '600px', margin: '0 auto', padding: '32px 24px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}>
+            
+            <EmailHeader 
+              title="Madhav Shringaar" 
+              subtitle="Welcome To Our Devotional Family" 
+            />
 
-            <Hr className="border-[#f0eae1] my-4" />
-
-            {/* Content */}
-            <Section className="my-6">
-              <Text className="text-lg font-semibold text-[#2c2b29] mb-3">
+            <Section style={{ margin: '16px 0 20px 0' }}>
+              <Heading style={{ fontSize: '20px', fontWeight: 700, color: BRAND_COLORS.primary, margin: '0 0 8px 0' }}>
                 Radhe Radhe, {displayName}! 🙏
+              </Heading>
+              <Text style={{ fontSize: '13px', color: BRAND_COLORS.textMuted, lineHeight: '1.6', margin: '0 0 12px 0' }}>
+                We are blessed to welcome you to the <strong>Madhav Shringaar</strong> family. Thank you for joining us on this sacred path of seva and devotion to Shri Radha Krishna.
               </Text>
-              <Text className="text-sm text-[#5a5752] leading-relaxed mb-4">
-                Thank you for joining the <strong>Madhav Shringaar</strong> family. We are blessed to have you with us on this sacred journey of devotion.
-              </Text>
-              <Text className="text-sm text-[#5a5752] leading-relaxed mb-6">
-                Explore our handpicked collection of Laddu Gopal dresses, shringaar jewellery, mukuts, bansuris, and authentic temple accessories crafted with utmost love and reverence.
-              </Text>
-
-              {/* Benefits Box */}
-              <Section className="bg-[#fdf8f3] border border-[#f3e6d8] rounded-xl p-4 mb-6">
-                <Text className="text-sm font-semibold text-[#8b5a2b] m-0 mb-2">
-                  ✨ Member Privileges:
-                </Text>
-                <Text className="text-xs text-[#6b625b] m-0 mb-1">
-                  • <strong>Bhakti Points:</strong> Earn points on every order to redeem for future divine items.
-                </Text>
-                <Text className="text-xs text-[#6b625b] m-0 mb-1">
-                  • <strong>Fast Express Shipping:</strong> Dedicated tracking with Shiprocket straight to your doorstep.
-                </Text>
-                <Text className="text-xs text-[#6b625b] m-0">
-                  • <strong>Handcrafted Quality:</strong> Sanctified items made with pure devotion.
-                </Text>
-              </Section>
-
-              {/* Call to Action */}
-              <Section className="text-center my-6">
-                <Button
-                  className="bg-[#1b3b22] text-white px-6 py-3 rounded-xl font-medium text-sm no-underline inline-block shadow"
-                  href="https://www.madhavshringaar.com"
-                >
-                  Explore Collection
-                </Button>
-              </Section>
-            </Section>
-
-            <Hr className="border-[#f0eae1] my-4" />
-
-            {/* Footer */}
-            <Section className="text-center mt-4">
-              <Text className="text-xs text-[#8c8881] m-0 mb-1">
-                Need assistance? We are always here for you.
-              </Text>
-              <Text className="text-xs text-[#8c8881] m-0 mb-2">
-                Email us at <a href="mailto:info@madhavshringaar.com" className="text-[#8b5a2b] underline">info@madhavshringaar.com</a>
-              </Text>
-              <Text className="text-[11px] text-[#aba69f] m-0">
-                © {new Date().getFullYear()} Madhav Shringaar. All rights reserved.
+              <Text style={{ fontSize: '13px', color: BRAND_COLORS.textMuted, lineHeight: '1.6', margin: 0 }}>
+                Explore our handpicked collection of Laddu Gopal poshak, designer mukuts, bansuris, singhasan, and authentic temple seva accessories crafted with love by traditional Vrindavan artisans.
               </Text>
             </Section>
+
+            {/* Member Benefits Box */}
+            <Section style={{ backgroundColor: BRAND_COLORS.cream, border: `1px solid ${BRAND_COLORS.border}`, borderRadius: '12px', padding: '16px 20px', margin: '20px 0' }}>
+              <Text style={{ fontSize: '12px', fontWeight: 700, color: BRAND_COLORS.secondary, textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 10px 0' }}>
+                ✨ Your Devotee Privileges:
+              </Text>
+              <Text style={{ fontSize: '12px', color: BRAND_COLORS.textDark, margin: '0 0 6px 0' }}>
+                • <strong>Bhakti Loyalty Points:</strong> Earn points on every divine purchase to redeem for future seva items.
+              </Text>
+              <Text style={{ fontSize: '12px', color: BRAND_COLORS.textDark, margin: '0 0 6px 0' }}>
+                • <strong>Pan-India Express Delivery:</strong> Real-time shipment tracking with Shiprocket straight to your doorstep.
+              </Text>
+              <Text style={{ fontSize: '12px', color: BRAND_COLORS.textDark, margin: '0 0 6px 0' }}>
+                • <strong>7-Day Devotional Return Policy:</strong> 100% peace of mind with our flexible size exchange guarantee.
+              </Text>
+              <Text style={{ fontSize: '12px', color: BRAND_COLORS.textDark, margin: 0 }}>
+                • <strong>Authentic Vrindavan Sanctity:</strong> Pure handcrafted devotion in every single thread.
+              </Text>
+            </Section>
+
+            <Section style={{ textAlign: 'center', margin: '24px 0 16px 0' }}>
+              <Button
+                href={serverUrl}
+                style={{
+                  backgroundColor: BRAND_COLORS.primary,
+                  color: BRAND_COLORS.goldLight,
+                  padding: '12px 28px',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                }}
+              >
+                Explore Sacred Collections &rarr;
+              </Button>
+            </Section>
+
+            <EmailContactFooter />
+
           </Container>
         </Body>
       </Tailwind>

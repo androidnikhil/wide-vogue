@@ -272,7 +272,7 @@ export default function SizeChartPage() {
           </div>
           <div className="flex gap-3 flex-shrink-0">
             <a
-              href="https://wa.me/917078211946?text=Radhe%20Radhe!%20Need%20help%20with%20Laddu%20Gopal%20Ji%20size"
+              href="https://wa.me/917982160480?text=Radhe%20Radhe!%20Need%20help%20with%20Laddu%20Gopal%20Ji%20size"
               target="_blank"
               rel="noopener noreferrer"
               className="px-5 py-2.5 gold-gradient-btn text-primary-container font-bold text-xs rounded-xl shadow hover:brightness-105 transition-all flex items-center gap-1.5"

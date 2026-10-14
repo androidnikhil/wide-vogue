@@ -57,11 +57,11 @@ export async function getShiprocketToken(): Promise<string> {
     return cachedToken;
   }
 
-  const email = process.env.SHIPROCKET_EMAIL || process.env.EMAIL_USER || 'info@madhavshringaar.com';
+  const email = process.env.SHIPROCKET_EMAIL || process.env.EMAIL_USER;
   const password = process.env.SHIPROCKET_PASSWORD || process.env.SHIPROCKET_API_KEY;
 
-  if (!password) {
-    throw new Error('Shiprocket API credentials missing: SHIPROCKET_API_KEY is not defined.');
+  if (!email || !password) {
+    throw new Error('Shiprocket API credentials not configured in .env (SHIPROCKET_EMAIL / SHIPROCKET_PASSWORD). Please configure your Shiprocket API credentials or dispatch the order using Manual Courier & AWB.');
   }
 
   try {
@@ -79,6 +79,9 @@ export async function getShiprocketToken(): Promise<string> {
       // If direct password login fails but user passed token directly
       if (process.env.SHIPROCKET_TOKEN) {
         return process.env.SHIPROCKET_TOKEN;
+      }
+      if (data.message === 'Invalid email and password combination' || res.status === 401) {
+        throw new Error('Shiprocket Login Failed: Invalid email and password combination. Please check your SHIPROCKET_EMAIL and SHIPROCKET_PASSWORD in .env (or Shiprocket Dashboard > Settings > API > Configure API User), or dispatch the order using Manual Courier & AWB.');
       }
       throw new Error(data.message || `Failed to authenticate with Shiprocket (HTTP ${res.status}). Verify API User email: ${email}`);
     }

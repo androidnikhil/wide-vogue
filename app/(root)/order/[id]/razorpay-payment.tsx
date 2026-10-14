@@ -8,14 +8,23 @@ import { toast } from 'sonner';
 export default function RazorpayPayment({
   orderId,
   amount,
+  customer,
 }: {
   orderId: string;
   amount: number;
+  customer?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+  };
 }) {
   const [loading, setLoading] = useState(false);
 
   const loadScript = (src: string) => {
     return new Promise((resolve) => {
+      if (document.querySelector(`script[src="${src}"]`)) {
+        return resolve(true);
+      }
       const script = document.createElement('script');
       script.src = src;
       script.onload = () => resolve(true);
@@ -44,57 +53,76 @@ export default function RazorpayPayment({
     }
 
     const rzpOrderId = createOrderResult.data;
+    const rzpKeyId = (createOrderResult as any).keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_Tky1mPj28GZWtr';
 
     // 3. Initialize Razorpay Checkout
     const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_YOUR_KEY', // Enter the Key ID generated from the Dashboard
-      amount: amount * 100,
+      key: rzpKeyId,
+      amount: Math.round(amount * 100),
       currency: 'INR',
       name: 'Madhav Shringaar',
       description: 'Devotional Purchase',
-      image: '/images/logo.png', // Replace with your logo path
-      order_id: rzpOrderId, // This is the order_id created in the backend
+      image: '/images/logo.png',
+      order_id: rzpOrderId,
       handler: async function (response: any) {
         // 4. Verify payment on backend
-        toast('Processing payment...', { duration: 2000 });
+        toast.loading('Confirming your payment...', { id: 'approve-payment' });
         
-        const verificationResult = await approveRazorpayOrder(orderId, {
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_signature: response.razorpay_signature,
-        });
+        try {
+          const verificationResult = await approveRazorpayOrder(orderId, {
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+          });
 
-        if (verificationResult.success) {
-          toast.success(verificationResult.message);
-        } else {
-          toast.error(verificationResult.message);
+          toast.dismiss('approve-payment');
+
+          if (verificationResult.success) {
+            toast.success(verificationResult.message || 'Payment confirmed successfully!');
+            // Refresh server state immediately
+            setTimeout(() => {
+              window.location.reload();
+            }, 600);
+          } else {
+            toast.error(verificationResult.message || 'Payment verification failed');
+            setLoading(false);
+          }
+        } catch (err: any) {
+          toast.dismiss('approve-payment');
+          toast.error(err.message || 'An error occurred while verifying payment');
+          setLoading(false);
         }
       },
       prefill: {
-        name: 'Devotee',
-        email: 'devotee@example.com',
-        contact: '9999999999',
+        name: customer?.name || 'Devotee',
+        email: customer?.email || '',
+        contact: customer?.phone ? customer.phone.replace(/\D/g, '').slice(-10) : '',
       },
       theme: {
-        color: '#ffb300', // Matches secondary brand color
+        color: '#083329',
+      },
+      modal: {
+        ondismiss: function () {
+          setLoading(false);
+        },
       },
     };
 
     const paymentObject = new (window as any).Razorpay(options);
     paymentObject.on('payment.failed', function (response: any) {
-      toast.error(response.error.description);
+      toast.error(response.error?.description || 'Payment failed');
+      setLoading(false);
     });
     paymentObject.open();
-    setLoading(false);
   };
 
   return (
     <Button 
       onClick={handlePayment} 
       disabled={loading} 
-      className="w-full gold-gradient-btn text-primary-container font-bold text-label-lg"
+      className="w-full bg-[#083329] hover:bg-[#002518] text-[#F3D98F] font-bold text-sm py-3 rounded-xl shadow-md border border-[#D4AF37]/30 transition-all"
     >
-      {loading ? 'Processing...' : 'Pay Securely with Razorpay'}
+      {loading ? 'Processing Payment...' : 'Pay Securely with Razorpay'}
     </Button>
   );
 }

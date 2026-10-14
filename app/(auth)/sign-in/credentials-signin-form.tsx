@@ -39,7 +39,28 @@ const CredentialsSignInForm = () => {
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(30);
+  const [canResend, setCanResend] = useState(false);
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+
+  // Countdown timer for Resend OTP (Flipkart style)
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (confirmationResult && resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [confirmationResult, resendTimer]);
 
   // Fully automatic silent reCAPTCHA refresher
   const initOrRefreshRecaptcha = () => {
@@ -104,8 +125,8 @@ const CredentialsSignInForm = () => {
     };
   }, []);
 
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!phoneNumber || phoneNumber.length < 10) {
       return toast.error("Please enter a valid 10-digit Indian mobile number");
     }
@@ -131,6 +152,8 @@ const CredentialsSignInForm = () => {
       
       const confirmation = await signInWithPhoneNumber(firebaseAuth, formattedPhone, appVerifier);
       setConfirmationResult(confirmation);
+      setResendTimer(30);
+      setCanResend(false);
       toast.success("OTP sent to your phone!");
     } catch (error: any) {
       console.error('Phone OTP error:', error);
@@ -154,6 +177,14 @@ const CredentialsSignInForm = () => {
     } finally {
       setIsSendingOtp(false);
     }
+  };
+
+  const handleResendOtp = async () => {
+    if (!canResend || isSendingOtp) return;
+    setCanResend(false);
+    setResendTimer(30);
+    initOrRefreshRecaptcha();
+    await handleSendOtp();
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -290,33 +321,64 @@ const CredentialsSignInForm = () => {
               </Button>
             </form>
           ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
+            <form onSubmit={handleVerifyOtp} className="space-y-5">
+              <div className="space-y-1 text-center sm:text-left">
+                <p className="text-sm text-on-surface-variant leading-relaxed">
+                  Please enter the verification code we&apos;ve sent you on{' '}
+                  <span className="font-bold text-primary">+91 {phoneNumber}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setConfirmationResult(null);
+                      setOtp('');
+                      initOrRefreshRecaptcha();
+                    }}
+                    className="ml-2 text-xs font-bold text-secondary hover:underline cursor-pointer inline-flex items-center"
+                  >
+                    Edit
+                  </button>
+                </p>
+              </div>
+
               <div>
-                <Label htmlFor='otp'>Enter OTP</Label>
                 <Input
                   id='otp'
                   type='text'
-                  placeholder="123456"
+                  inputMode='numeric'
+                  placeholder="• • • • • •"
                   maxLength={6}
                   value={otp}
+                  autoFocus
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                  className="text-center font-mono text-2xl font-bold tracking-[0.4em] h-13 rounded-xl border-outline-variant/60 focus-visible:ring-secondary focus-visible:border-secondary shadow-sm"
                   required
                 />
+                
+                {/* Flipkart-Style Resend Code Timer */}
+                <div className="flex justify-end mt-2">
+                  {!canResend ? (
+                    <span className="text-xs text-on-surface-variant font-medium">
+                      Resend code in <span className="font-bold text-primary">{resendTimer}s</span>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResendOtp}
+                      disabled={isSendingOtp}
+                      className="text-xs font-bold text-secondary hover:underline cursor-pointer disabled:opacity-50"
+                    >
+                      {isSendingOtp ? 'Resending...' : 'Resend code'}
+                    </button>
+                  )}
+                </div>
               </div>
-              <Button type="submit" disabled={isVerifyingOtp} className='w-full'>
-                {isVerifyingOtp ? 'Verifying...' : 'Verify OTP'}
-              </Button>
+
               <Button 
-                type="button" 
-                variant="ghost" 
-                onClick={() => {
-                  setConfirmationResult(null);
-                  setOtp('');
-                  initOrRefreshRecaptcha();
-                }} 
-                className='w-full'
+                type="submit" 
+                disabled={isVerifyingOtp || otp.length < 6} 
+                className='w-full h-12 rounded-xl gold-gradient-btn text-primary-container font-label-lg font-bold shadow-md hover:scale-[1.01] transition-all disabled:opacity-50'
               >
-                Use a different number
+                {isVerifyingOtp ? 'Verifying Code...' : 'Verify'}
               </Button>
             </form>
           )}

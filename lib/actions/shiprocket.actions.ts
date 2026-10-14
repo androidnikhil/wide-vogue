@@ -130,6 +130,7 @@ export async function pushOrderToShiprocket(orderId: string) {
     });
 
     revalidatePath(`/order/${orderId}`);
+    revalidatePath(`/admin/orders/${orderId}`);
     revalidatePath("/admin/orders");
 
     return {
@@ -142,7 +143,7 @@ export async function pushOrderToShiprocket(orderId: string) {
     console.error("Error creating Shiprocket order:", error);
     return {
       success: false,
-      message: formatError(error),
+      message: error.message || formatError(error),
     };
   }
 }

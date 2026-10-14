@@ -17,11 +17,12 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Loader, MapPin, User, Building, Map, Navigation, Phone, Mail } from 'lucide-react';
+import { ArrowRight, Loader, MapPin, User, Building, Map, Navigation, Phone, Mail, CheckCircle2, Plus } from 'lucide-react';
 import { shippingAddressDefaultValues } from '@/lib/constants';
 import { toast } from 'sonner';
 import { updateUserAddress } from '@/lib/actions/user.actions';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const ShippingAddressForm = ({ 
   address, 
@@ -34,6 +35,10 @@ const ShippingAddressForm = ({
 }) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [selectedAddressIndex, setSelectedAddressIndex] = useState<number | null>(
+    savedAddresses.length > 0 ? 0 : null
+  );
+  const [saveAddressToAccount, setSaveAddressToAccount] = useState(true);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
   const [isFetchingCity, setIsFetchingCity] = useState(false);
 
@@ -47,13 +52,14 @@ const ShippingAddressForm = ({
     values
   ) => {
     startTransition(async () => {
-      const res = await updateUserAddress(values);
+      const res = await updateUserAddress(values, saveAddressToAccount);
 
       if (!res.success) {
         toast.error(res.message);
         return;
       }
 
+      toast.success('Address confirmed! Proceeding to Payment...');
       router.push('/payment-method');
     });
   };
@@ -170,24 +176,84 @@ const ShippingAddressForm = ({
         <CardContent className="pt-6">
           {!isGuest && savedAddresses && savedAddresses.length > 0 && (
             <div className="mb-8">
-              <h3 className="font-semibold text-on-surface mb-3 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-secondary" />
-                Saved Addresses
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {savedAddresses.map((addr, idx) => (
-                  <div 
-                    key={idx} 
-                    onClick={() => form.reset(addr)}
-                    className="p-3 border border-outline-variant/30 rounded-xl cursor-pointer hover:border-secondary transition-colors bg-surface-container-low"
-                  >
-                    <p className="font-semibold text-sm text-on-surface">{addr.fullName}</p>
-                    <p className="text-xs text-on-surface-variant mt-1 truncate">{addr.streetAddress}, {addr.city}</p>
-                  </div>
-                ))}
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold text-on-surface flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-secondary" />
+                  Saved Delivery Addresses ({savedAddresses.length})
+                </h3>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedAddressIndex(null);
+                    form.reset({
+                      ...shippingAddressDefaultValues,
+                      fullName: address.fullName || '',
+                      guestEmail: address.guestEmail || '',
+                      contactNumber: address.contactNumber || '',
+                    });
+                  }}
+                  className="text-xs text-secondary hover:text-primary font-semibold flex items-center gap-1"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Enter New Address
+                </Button>
               </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {savedAddresses.map((addr, idx) => {
+                  const isSelected = selectedAddressIndex === idx;
+                  return (
+                    <div 
+                      key={idx} 
+                      onClick={() => {
+                        setSelectedAddressIndex(idx);
+                        form.reset(addr);
+                        toast.info(`Selected ${addr.fullName}'s address`);
+                      }}
+                      className={`p-4 border rounded-2xl cursor-pointer transition-all duration-200 relative ${
+                        isSelected 
+                          ? 'border-secondary bg-secondary/10 shadow-sm ring-1 ring-secondary' 
+                          : 'border-outline-variant/30 hover:border-secondary/60 bg-surface-container-low'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="pr-6">
+                          <p className="font-bold text-sm text-primary flex items-center gap-1.5">
+                            {addr.fullName}
+                            {idx === 0 && (
+                              <span className="text-[10px] bg-secondary/20 text-secondary font-semibold px-2 py-0.5 rounded-full">
+                                Default
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-xs text-on-surface mt-1 leading-relaxed">
+                            {addr.streetAddress}
+                          </p>
+                          <p className="text-xs text-on-surface-variant font-medium mt-0.5">
+                            {addr.city}, {addr.state} - {addr.postalCode}
+                          </p>
+                          <p className="text-xs text-secondary font-semibold mt-1">
+                            📞 +91 {addr.contactNumber}
+                          </p>
+                        </div>
+                        <div className="shrink-0 mt-0.5">
+                          {isSelected ? (
+                            <CheckCircle2 className="w-5 h-5 text-secondary" />
+                          ) : (
+                            <div className="w-5 h-5 rounded-full border-2 border-outline-variant/50" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
               <div className="my-6 border-b border-outline-variant/20 relative">
-                <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface-container-lowest px-2 text-xs text-on-surface-variant">OR ENTER NEW</span>
+                <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface-container-lowest px-3 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                  {selectedAddressIndex !== null ? 'Delivery Address Selected Below' : 'Or Enter Address Details'}
+                </span>
               </div>
             </div>
           )}
@@ -401,7 +467,23 @@ const ShippingAddressForm = ({
                 Use Current Location
               </Button>
 
-              <div className='pt-4'>
+              {!isGuest && (
+                <div className="flex items-center space-x-2.5 p-3 rounded-xl bg-surface-container-low border border-outline-variant/30">
+                  <Checkbox 
+                    id="saveAddressToAccount" 
+                    checked={saveAddressToAccount}
+                    onCheckedChange={(checked) => setSaveAddressToAccount(Boolean(checked))}
+                  />
+                  <label
+                    htmlFor="saveAddressToAccount"
+                    className="text-xs font-medium text-on-surface cursor-pointer select-none"
+                  >
+                    Save this address to my account for faster checkout in future orders
+                  </label>
+                </div>
+              )}
+
+              <div className='pt-2'>
                 <Button 
                   type='submit' 
                   disabled={isPending || !form.formState.isValid}

@@ -68,8 +68,9 @@ const jsonLdLocalBusiness = {
   url: APP_URL,
   logo: `${APP_URL}/images/logo.png`,
   image: `${APP_URL}/images/devotional/complete_shringar.webp`,
-  telephone: '+917078211946',
+  telephone: '+917982160480',
   email: 'info@madhavshringaar.com',
+  taxID: '09EHFPP7126A1ZE',
   priceRange: '₹₹',
   currenciesAccepted: 'INR',
   paymentAccepted: 'Cash on Delivery, UPI, Credit Card, Debit Card, Net Banking',
@@ -99,7 +100,7 @@ const jsonLdLocalBusiness = {
       addressCountry: 'IN',
     },
   ],
-  sameAs: ['https://wa.me/919410048805'],
+  sameAs: ['https://wa.me/917982160480'],
 };
 
 const jsonLdWebSite = {

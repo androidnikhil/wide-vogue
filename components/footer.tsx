@@ -18,7 +18,7 @@ export default function Footer() {
             Bringing divine adornments, authentic fabrics, and revered seva essentials to every Kanha devotee with eternal dedication.
           </p>
 <div className="flex items-center gap-3 pt-2">
-<a aria-label="WhatsApp" className="w-8 h-8 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="https://wa.me/919410048805" target="_blank" rel="noopener noreferrer">
+<a aria-label="WhatsApp" className="w-8 h-8 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="https://wa.me/917982160480" target="_blank" rel="noopener noreferrer">
 <span className="material-symbols-outlined text-sm">chat</span>
 </a>
 <a aria-label="YouTube" className="w-8 h-8 rounded-full bg-surface/10 hover:bg-secondary text-surface flex items-center justify-center transition-colors" href="#">
@@ -60,9 +60,7 @@ export default function Footer() {
 <div className="flex items-start gap-2.5">
 <span className="material-symbols-outlined text-secondary-fixed text-lg mt-0.5">call</span>
 <div>
-<div className="font-bold text-surface flex flex-col md:flex-row md:gap-2">
-  <a href="tel:+917078211946" className="hover:text-secondary transition-colors">+91 70782 11946</a>
-  <span className="hidden md:inline">/</span>
+<div className="font-bold text-surface">
   <a href="tel:+917982160480" className="hover:text-secondary transition-colors">+91 79821 60480</a>
 </div>
 <p className="text-xs">Mon-Sat (10:00 AM - 7:00 PM IST)</p>

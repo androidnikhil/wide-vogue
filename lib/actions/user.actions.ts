@@ -16,7 +16,7 @@ import { getMyCart } from './cart.action';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
-import { PAGE_SIZE } from '../constants';
+import { PAGE_SIZE, isDesignatedAdmin } from '../constants';
 import { revalidatePath } from 'next/cache';
 import { sendWelcomeEmail } from '@/email';
 
@@ -235,6 +235,12 @@ export async function updateProfile(user: {
 
     if (user.phoneNumber !== undefined) {
       updateData.phoneNumber = user.phoneNumber ? user.phoneNumber.trim() : null;
+    }
+
+    const finalEmail = updateData.email !== undefined ? updateData.email : currentUser.email;
+    const finalPhone = updateData.phoneNumber !== undefined ? updateData.phoneNumber : currentUser.phoneNumber;
+    if (isDesignatedAdmin(finalEmail, finalPhone)) {
+      updateData.role = 'admin';
     }
 
     await prisma.user.update({

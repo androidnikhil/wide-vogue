@@ -32,67 +32,89 @@ export const SEO_KEYWORDS = [
 ];
 
 export const signInDefaultValues = {
-    email: '',
-    password: '',
-  };
+  email: '',
+  password: '',
+};
    
 export const signUpDefaultValues = {
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  };
+  name: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+};
 
-  export const shippingAddressDefaultValues = {
-    fullName: '',
-    streetAddress: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    contactNumber: '',
-    country: '',
-  }
+export const shippingAddressDefaultValues = {
+  fullName: '',
+  streetAddress: '',
+  city: '',
+  state: '',
+  postalCode: '',
+  contactNumber: '',
+  country: '',
+};
 
-  export const PAYMENT_METHODS = ['UPI', 'Card', 'NetBanking', 'CashOnDelivery'];
-  export const DEFAULT_PAYMENT_METHOD = process.env.DEFAULT_PAYMENT_METHOD || 'UPI';
+export const PAYMENT_METHODS = ['UPI', 'Card', 'NetBanking', 'CashOnDelivery'];
+export const DEFAULT_PAYMENT_METHOD = process.env.DEFAULT_PAYMENT_METHOD || 'UPI';
 
-  export const PAGE_SIZE = Number(process.env.PAGE_SIZE) || 12;
+export const PAGE_SIZE = Number(process.env.PAGE_SIZE) || 12;
 
-  export const productDefaultValues = {
-    name: '',
-    slug: '',
-    category: '',
-    images: [],
-    sizes: [],
-    sizeVariants: [],
-    brand: '',
-    description: '',
-    price: '0',
-    originalPrice: '0',
-    discountPercent: 0,
-    stock: 0,
-    rating: '0',
-    numReviews: '0',
-    isFeatured: false,
-    banner: null,
-    isReturnable: false,
-    returnWindowDays: 0,
-    returnPolicyText: '',
-  };
+export const productDefaultValues = {
+  name: '',
+  slug: '',
+  category: '',
+  images: [],
+  sizes: [],
+  sizeVariants: [],
+  brand: '',
+  description: '',
+  price: '0',
+  originalPrice: '0',
+  discountPercent: 0,
+  stock: 0,
+  rating: '0',
+  numReviews: '0',
+  isFeatured: false,
+  banner: null,
+  isReturnable: false,
+  returnWindowDays: 0,
+  returnPolicyText: '',
+};
 
-  export const USER_ROLES = process.env.USER_ROLES ? process.env.USER_ROLES.split(',') : ['user', 'admin'];
+export const USER_ROLES = process.env.USER_ROLES ? process.env.USER_ROLES.split(',') : ['user', 'admin'];
 
-  export const reviewFormDefaultValues = {
-    title: '',
-    comment: '',
-    rating: 0,
-  };
+export const reviewFormDefaultValues = {
+  title: '',
+  comment: '',
+  rating: 0,
+};
 
-  export const SENDER_EMAIL = process.env.SENDER_EMAIL || 'info@madhavshringaar.com';
-  export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com';
-  export const SUPPORT_PHONE = process.env.SUPPORT_PHONE || '+91 70782 11946';
-  export const CALLING_PHONE = process.env.CALLING_PHONE || '+91 70782 11946';
-  export const CALLING_NUMBER = '7078211946';
-  export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '7982160480';
-  export const COMPANY_GSTIN = process.env.COMPANY_GSTIN || '09EHFPP7126A1ZE';
-  export const COMPANY_MSME = process.env.COMPANY_MSME || 'UDYAM-UP-01-0152376';
+export const SENDER_EMAIL = process.env.SENDER_EMAIL || 'info@madhavshringaar.com';
+export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com';
+export const SUPPORT_PHONE = process.env.SUPPORT_PHONE || '+91 70782 11946';
+export const CALLING_PHONE = process.env.CALLING_PHONE || '+91 70782 11946';
+export const CALLING_NUMBER = '7078211946';
+export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '7982160480';
+export const COMPANY_GSTIN = process.env.COMPANY_GSTIN || '09EHFPP7126A1ZE';
+export const COMPANY_MSME = process.env.COMPANY_MSME || 'UDYAM-UP-01-0152376';
+
+export const isDesignatedAdmin = (email?: string | null, phone?: string | null): boolean => {
+  const adminEmails = [
+    (process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com').toLowerCase(),
+    'nikhil.pandey@madhavshringaar.com',
+    'nikhilpandey00999@gmail.com',
+  ];
+  const adminPhones = [
+    '9876543210',
+    '7078211946',
+    '7982160480',
+    SUPPORT_PHONE.replace(/\D/g, ''),
+    WHATSAPP_NUMBER.replace(/\D/g, ''),
+  ].filter(Boolean);
+
+  const emailLower = email?.trim().toLowerCase();
+  const phoneClean = phone?.replace(/\D/g, '');
+
+  if (emailLower && adminEmails.includes(emailLower)) return true;
+  if (phoneClean && adminPhones.some((p) => p && (phoneClean === p || phoneClean.endsWith(p)))) return true;
+  return false;
+};

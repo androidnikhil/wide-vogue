@@ -182,6 +182,23 @@ export default function UserSidebar({
         </div>
       ))}
 
+      {/* Admin Portal Quick Access */}
+      {(userRole === 'admin' || userEmail?.toLowerCase() === 'nikhil.pandey@madhavshringaar.com') && (
+        <div className="pt-2">
+          <Link
+            href="/admin/overview"
+            onClick={onItemClick}
+            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-bold bg-amber-50 text-amber-900 border border-amber-300 hover:bg-amber-100 transition-colors shadow-2xs"
+          >
+            <div className="flex items-center gap-3">
+              <ShieldCheck className="w-4 h-4 text-amber-700" />
+              <span>Admin Dashboard</span>
+            </div>
+            <ChevronRight className="w-3.5 h-3.5 text-amber-700" />
+          </Link>
+        </div>
+      )}
+
       {/* Return to Temple Store link */}
       <div className="pt-4 border-t border-neutral-200/70">
         <Link

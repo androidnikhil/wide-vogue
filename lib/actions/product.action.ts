@@ -72,8 +72,63 @@ export async function getProductById(productId: string) {
           }
         : {};
   
-    // Category filter
-    const categoryFilter = category && category !== 'all' ? { category } : {};
+    // Category filter with parent-category / family matching
+    let categoryFilter: Prisma.ProductWhereInput = {};
+    if (category && category !== 'all') {
+      const catLower = category.toLowerCase().trim();
+      if (catLower === 'poshak') {
+        categoryFilter = {
+          OR: [
+            { category: { equals: 'Poshak', mode: 'insensitive' } },
+            { category: { contains: 'Poshak', mode: 'insensitive' } },
+          ],
+        };
+      } else if (catLower === 'mukut & bansuri' || catLower === 'mukut & pagdi') {
+        categoryFilter = {
+          OR: [
+            { category: { contains: 'Mukut', mode: 'insensitive' } },
+            { category: { contains: 'Pagdi', mode: 'insensitive' } },
+            { category: { contains: 'Bansuri', mode: 'insensitive' } },
+          ],
+        };
+      } else if (catLower === 'jewellery & mala') {
+        categoryFilter = {
+          OR: [
+            { category: { contains: 'Jewellery', mode: 'insensitive' } },
+            { category: { contains: 'Mala', mode: 'insensitive' } },
+            { category: { contains: 'Haar', mode: 'insensitive' } },
+          ],
+        };
+      } else if (catLower === 'festive sets') {
+        categoryFilter = {
+          OR: [
+            { category: { contains: 'Festive', mode: 'insensitive' } },
+            { category: { contains: 'Combo', mode: 'insensitive' } },
+            { category: { contains: 'Shringar', mode: 'insensitive' } },
+          ],
+        };
+      } else if (catLower === 'seva essentials') {
+        categoryFilter = {
+          OR: [
+            { category: { contains: 'Seva', mode: 'insensitive' } },
+            { category: { contains: 'Essentials', mode: 'insensitive' } },
+            { category: { contains: 'Attar', mode: 'insensitive' } },
+            { category: { contains: 'Itra', mode: 'insensitive' } },
+            { category: { contains: 'Puja', mode: 'insensitive' } },
+          ],
+        };
+      } else if (catLower === 'singhasan') {
+        categoryFilter = {
+          OR: [
+            { category: { contains: 'Singhasan', mode: 'insensitive' } },
+            { category: { contains: 'Jhula', mode: 'insensitive' } },
+            { category: { contains: 'Bed', mode: 'insensitive' } },
+          ],
+        };
+      } else {
+        categoryFilter = { category: { equals: category, mode: 'insensitive' } };
+      }
+    }
   
     // Price filter
     const priceFilter: Prisma.ProductWhereInput =

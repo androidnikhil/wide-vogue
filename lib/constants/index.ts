@@ -80,6 +80,31 @@ export const productDefaultValues = {
   returnPolicyText: '',
 };
 
+export const PRODUCT_CATEGORIES = [
+  'Designer Poshak',
+  'Special / Festival Poshak',
+  'Poshak',
+  'Winter Woolen Poshak',
+  'Cotton Summer Poshak',
+  'Mukut & Bansuri',
+  'Mukut & Pagdi',
+  'Bansuri',
+  'Jewellery & Mala',
+  'Moti Mala',
+  'Kangan & Payal',
+  'Singhasan',
+  'Jhula',
+  'Seva Essentials',
+  'Festive Sets',
+  'Complete Shringar',
+] as const;
+
+export const DEFAULT_RETURN_POLICY_TEXT = `Returns are accepted only for size issues or defective products. Customers must report the issue within 48 hours of delivery and provide clear photos or an unboxing video as proof. Products must be unused and returned in their original packaging. Return approval is subject to verification.
+
+Returns are not accepted for change of mind, colour preference, or minor variations in handmade designs.`;
+
+export const DEFAULT_RETURN_POLICY_HTML = `<p>Returns are accepted only for size issues or defective products. Customers must report the issue within 48 hours of delivery and provide clear photos or an unboxing video as proof. Products must be unused and returned in their original packaging. Return approval is subject to verification.</p><p>Returns are not accepted for change of mind, colour preference, or minor variations in handmade designs.</p>`;
+
 export const USER_ROLES = process.env.USER_ROLES ? process.env.USER_ROLES.split(',') : ['user', 'admin'];
 
 export const reviewFormDefaultValues = {

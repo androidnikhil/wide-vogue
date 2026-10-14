@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from 'react';
 
-import { productDefaultValues } from '@/lib/constants';
+import { productDefaultValues, PRODUCT_CATEGORIES, DEFAULT_RETURN_POLICY_HTML } from '@/lib/constants';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 import { insertProductSchema, updateProductSchema } from '@/lib/validators';
 import { Product } from '@/types';
 import { toast } from 'sonner';
@@ -59,6 +68,10 @@ const ProductForm = ({
   const hasExistingVariants = (product && (product as any).sizeVariants && (product as any).sizeVariants.length > 0) || (product?.sizes && product.sizes.length > 0);
   const [pricingMode, setPricingMode] = useState<'single' | 'size'>(hasExistingVariants ? 'size' : 'single');
   const [syncSamePrice, setSyncSamePrice] = useState(false);
+  const initialCategory = product?.category || form.getValues('category') || '';
+  const [isCustomCategory, setIsCustomCategory] = useState<boolean>(
+    Boolean(initialCategory && !PRODUCT_CATEGORIES.includes(initialCategory as any))
+  );
 
   const onSubmit: SubmitHandler<z.infer<typeof insertProductSchema>> = async (
     values
@@ -226,29 +239,109 @@ const ProductForm = ({
           <FormField
             control={form.control}
             name='category'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>Category</FormLabel>
-                <FormControl>
-                  <div>
-                    <Input 
-                      placeholder='Select or type a category' 
-                      list="category-options" 
-                      {...field} 
-                    />
-                    <datalist id="category-options">
-                      <option value="Laddu Gopal" />
-                      <option value="Mukut & Pagdi" />
-                      <option value="Moti Mala" />
-                      <option value="Bansuri" />
-                      <option value="Singhasan" />
-                      <option value="Combos" />
-                    </datalist>
+            render={({ field }) => {
+              const isPredefined = PRODUCT_CATEGORIES.includes(field.value as any);
+              const selectValue = isPredefined ? field.value : (field.value || isCustomCategory ? '__custom__' : '');
+
+              return (
+                <FormItem className='w-full'>
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Category</FormLabel>
+                    {isCustomCategory && (
+                      <span className="text-[11px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                        Custom Category Mode
+                      </span>
+                    )}
                   </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+                  <FormControl>
+                    <div className="space-y-2">
+                      <Select
+                        value={selectValue}
+                        onValueChange={(val) => {
+                          if (val === '__custom__') {
+                            setIsCustomCategory(true);
+                          } else {
+                            setIsCustomCategory(false);
+                            field.onChange(val);
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-full bg-white border-outline-variant/60 shadow-xs">
+                          <SelectValue placeholder="Select deity product category..." />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-80 bg-white">
+                          <SelectGroup>
+                            <SelectLabel className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
+                              👗 Poshak & Vastras
+                            </SelectLabel>
+                            <SelectItem value="Designer Poshak">Designer Poshak</SelectItem>
+                            <SelectItem value="Special / Festival Poshak">Special / Festival Poshak</SelectItem>
+                            <SelectItem value="Winter Woolen Poshak">Winter Woolen Poshak</SelectItem>
+                            <SelectItem value="Cotton Summer Poshak">Cotton Summer Poshak</SelectItem>
+                            <SelectItem value="Poshak">Poshak (All / General)</SelectItem>
+                          </SelectGroup>
+
+                          <SelectGroup>
+                            <SelectLabel className="text-[11px] font-bold text-amber-800 uppercase tracking-wider pt-2">
+                              👑 Mukut, Bansuri & Shringar
+                            </SelectLabel>
+                            <SelectItem value="Mukut & Pagdi">Mukut & Pagdi</SelectItem>
+                            <SelectItem value="Mukut & Bansuri">Mukut & Bansuri</SelectItem>
+                            <SelectItem value="Bansuri">Bansuri</SelectItem>
+                            <SelectItem value="Jewellery & Mala">Jewellery & Mala</SelectItem>
+                            <SelectItem value="Moti Mala">Moti Mala</SelectItem>
+                            <SelectItem value="Kangan & Payal">Kangan & Payal</SelectItem>
+                          </SelectGroup>
+
+                          <SelectGroup>
+                            <SelectLabel className="text-[11px] font-bold text-amber-900 uppercase tracking-wider pt-2">
+                              🪑 Sinhasan, Seva & Combos
+                            </SelectLabel>
+                            <SelectItem value="Singhasan">Singhasan</SelectItem>
+                            <SelectItem value="Jhula">Jhula</SelectItem>
+                            <SelectItem value="Seva Essentials">Seva Essentials</SelectItem>
+                            <SelectItem value="Festive Sets">Festive Sets</SelectItem>
+                            <SelectItem value="Complete Shringar">Complete Shringar</SelectItem>
+                          </SelectGroup>
+
+                          <SelectGroup>
+                            <SelectLabel className="text-[11px] font-bold text-stone-600 uppercase tracking-wider pt-2">
+                              ➕ Custom
+                            </SelectLabel>
+                            <SelectItem value="__custom__">➕ Custom / Type New Category...</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+
+                      {(isCustomCategory || (!isPredefined && field.value)) && (
+                        <div className="flex items-center gap-2 pt-1 animate-in fade-in-50">
+                          <Input
+                            placeholder="Enter custom category name (e.g. Laddu Gopal Vigrah)"
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(e.target.value)}
+                            className="bg-amber-50/50 border-amber-300 focus-visible:ring-amber-500"
+                            autoFocus
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setIsCustomCategory(false);
+                              field.onChange('Designer Poshak');
+                            }}
+                            className="text-xs text-muted-foreground hover:text-foreground shrink-0"
+                          >
+                            Reset
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
           {/* Brand */}
           <FormField
@@ -811,7 +904,17 @@ const ProductForm = ({
                 <FormControl>
                   <Checkbox
                     checked={field.value}
-                    onCheckedChange={field.onChange}
+                    onCheckedChange={(checked) => {
+                      field.onChange(checked);
+                      if (checked) {
+                        if (!form.getValues('returnPolicyText')) {
+                          form.setValue('returnPolicyText', DEFAULT_RETURN_POLICY_HTML, { shouldDirty: true });
+                        }
+                        if (!form.getValues('returnWindowDays')) {
+                          form.setValue('returnWindowDays', 7, { shouldDirty: true });
+                        }
+                      }
+                    }}
                     className="h-5 w-5"
                   />
                 </FormControl>
@@ -840,17 +943,61 @@ const ProductForm = ({
                 control={form.control}
                 name='returnPolicyText'
                 render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel className="font-semibold text-primary">Return Policy Terms & Instructions (Rich Text)</FormLabel>
+                  <FormItem className='w-full space-y-3'>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <FormLabel className="font-semibold text-primary">Return Policy Terms & Instructions (Rich Text)</FormLabel>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          field.onChange(DEFAULT_RETURN_POLICY_HTML);
+                          toast.success('Suggested return policy loaded!');
+                        }}
+                        className="h-8 text-xs font-semibold text-amber-900 bg-amber-50 hover:bg-amber-100 border-amber-300 gap-1.5 self-start sm:self-auto shadow-xs"
+                      >
+                        <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+                        ⚡ Use Suggested Return Policy
+                      </Button>
+                    </div>
+
+                    {/* Suggested Policy Banner / Card */}
+                    <div className="rounded-xl border border-amber-200/90 bg-linear-to-br from-amber-50/70 via-[#FFFDF5] to-orange-50/40 p-4 text-xs text-stone-700 shadow-xs space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-amber-900 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                          <span className="material-symbols-outlined text-sm text-amber-600">verified</span>
+                          Suggested Standard Return Policy
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            field.onChange(DEFAULT_RETURN_POLICY_HTML);
+                            toast.success('Suggested return policy applied to editor!');
+                          }}
+                          className="text-[11px] font-bold text-amber-800 hover:text-amber-950 underline underline-offset-2 transition-colors cursor-pointer flex items-center gap-1"
+                        >
+                          Fill into Editor ↵
+                        </button>
+                      </div>
+                      <div className="space-y-2 text-stone-700 leading-relaxed font-sans bg-white/90 p-3 rounded-lg border border-amber-100 shadow-2xs">
+                        <p>
+                          Returns are accepted only for size issues or defective products. Customers must report the issue within 48 hours of delivery and provide clear photos or an unboxing video as proof. Products must be unused and returned in their original packaging. Return approval is subject to verification.
+                        </p>
+                        <p className="pt-2 text-stone-600 border-t border-amber-100/70">
+                          Returns are not accepted for change of mind, colour preference, or minor variations in handmade designs.
+                        </p>
+                      </div>
+                    </div>
+
                     <FormControl>
                       <RichTextEditor
                         value={field.value || ''}
                         onChange={field.onChange}
-                        placeholder="Enter return and replacement terms (e.g. unboxing video requirements, size exchange conditions, sacred deity hygiene rules...)"
+                        placeholder="Enter return and replacement terms..."
                       />
                     </FormControl>
                     <p className="text-xs text-on-surface-variant">
-                      Supports bold, italic, bullet lists, and clean copy-paste from Word/WhatsApp. Formatted HTML will be rendered on the product page.
+                      Supports bold, italic, bullet lists, and clean copy-paste. Click <b>Use Suggested Return Policy</b> above to auto-fill anytime without typing manually.
                     </p>
                     <FormMessage />
                   </FormItem>

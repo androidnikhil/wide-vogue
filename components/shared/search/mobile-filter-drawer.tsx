@@ -105,20 +105,24 @@ export default function MobileFilterDrawer({
               >
                 All Categories
               </Link>
-              {categories.map((c) => (
-                <Link
-                  key={c.category}
-                  href={getFilterUrl({ c: c.category })}
-                  onClick={() => setOpen(false)}
-                  className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                    category === c.category
-                      ? "bg-[#176B55] text-white border-[#176B55] font-bold shadow-sm"
-                      : "bg-white text-gray-700 border-outline-variant/30"
-                  }`}
-                >
-                  {c.category}
-                </Link>
-              ))}
+              {categories.map((c) => {
+                const isMatch = category.toLowerCase() === c.category.toLowerCase() ||
+                  (category.toLowerCase() === 'poshak' && c.category.toLowerCase().includes('poshak'));
+                return (
+                  <Link
+                    key={c.category}
+                    href={getFilterUrl({ c: c.category })}
+                    onClick={() => setOpen(false)}
+                    className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                      isMatch
+                        ? "bg-[#176B55] text-white border-[#176B55] font-bold shadow-sm"
+                        : "bg-white text-gray-700 border-outline-variant/30"
+                    }`}
+                  >
+                    {c.category}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 

@@ -92,6 +92,20 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
     });
   };
 
+  const getEffectiveVariantPrice = (sizeName: string) => {
+    const v = getVariant(sizeName);
+    if (v && Number(v.price) > 0) return Number(v.price);
+    if (v && Number((v as any).originalPrice) > 0) return Number((v as any).originalPrice);
+    if (Number(product.price) > 0) return Number(product.price);
+    if (product.sizeVariants && product.sizeVariants.length > 0) {
+      const valid = product.sizeVariants
+        .map((x: any) => Number(x.price) > 0 ? Number(x.price) : (Number(x.originalPrice) || 0))
+        .filter((n: number) => n > 0);
+      if (valid.length > 0) return Math.min(...valid);
+    }
+    return 0;
+  };
+
   const handleSelectSize = async (e: React.MouseEvent, size: string) => {
     e.preventDefault();
     e.stopPropagation();
@@ -100,8 +114,8 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
     startTransition(async () => {
       try {
         const formattedSize = size.toLowerCase().includes('no') ? size : `${size} No.`;
-        const v = getVariant(size);
-        const finalPrice = v && Number(v.price) > 0 ? v.price.toString() : product.price.toString();
+        const effectivePriceNum = getEffectiveVariantPrice(size);
+        const finalPrice = effectivePriceNum > 0 ? effectivePriceNum.toString() : product.price.toString();
 
         const res = await addItemToCart({
           productId: product.id,
@@ -168,7 +182,7 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
             const displayLabel = isHindi
               ? (size.toLowerCase().includes('no') ? size.replace(/no\.?/i, 'नं.') : `${size} नं.`)
               : (size.toLowerCase().includes('no') ? size : `${size} No.`);
-            const v = getVariant(size);
+            const vPrice = getEffectiveVariantPrice(size);
 
             return (
               <button
@@ -176,23 +190,23 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
                 type="button"
                 disabled={isPending}
                 onClick={(e) => handleSelectSize(e, size)}
-                className={`px-2.5 py-1 text-xs font-semibold rounded-md border transition-all active:scale-95 flex items-center justify-center gap-1 ${
+                className={`px-2.5 py-1 text-xs font-semibold rounded-md border transition-all active:scale-95 flex items-center justify-center gap-1.5 ${
                   isLoading
                     ? 'bg-[#0F6F74] text-white border-[#0F6F74]'
-                    : 'bg-white hover:bg-[#F3E5C8] text-[#003020] border-[#E6C16A]/50 hover:border-[#C88A20] shadow-2xs'
+                    : 'bg-white hover:bg-[#F3E5C8] text-[#003020] border-[#E6C16A]/60 hover:border-[#C88A20] shadow-2xs'
                 }`}
               >
                 {isLoading ? (
                   <Loader2 className="w-3 h-3 animate-spin" />
                 ) : (
-                  <span>
-                    {displayLabel}
-                    {v && Number(v.price) > 0 && (
-                      <span className="ml-1 text-[10px] text-emerald-700 font-bold">
-                        ₹{v.price}
+                  <>
+                    <span>{displayLabel}</span>
+                    {vPrice > 0 && (
+                      <span className="text-[10px] text-emerald-800 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/80">
+                        ₹{vPrice}
                       </span>
                     )}
-                  </span>
+                  </>
                 )}
               </button>
             );

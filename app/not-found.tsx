@@ -15,7 +15,7 @@ const NotFoundPage = () => {
       {/* Main Brand Logo */}
       <Link href="/" className="mb-6 z-10 transition-transform duration-300 hover:scale-105" title="Go to Madhav Shringaar">
         <Image
-          src="/images/logo.png"
+          src="/images/logo.webp"
           alt={`${APP_NAME} logo`}
           width={220}
           height={80}
@@ -49,7 +49,7 @@ const NotFoundPage = () => {
             
             {/* Full Body Little Krishna Image Waving Hello */}
             <Image
-              src="/images/kanha-waving.png"
+              src="/images/kanha-waving.webp"
               alt="Cute Little Kanha Ji Waving Hello"
               width={280}
               height={380}

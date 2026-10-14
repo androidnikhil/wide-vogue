@@ -23,7 +23,7 @@ export default async function RootLayout({
            <Link href="/" className="hover:scale-105 transition-transform group" title="Madhav Shringaar">
              <div className="w-[66px] h-[66px] rounded-2xl bg-white shadow-xs border border-[#E6C16A]/50 p-1 flex items-center justify-center group-hover:shadow-md group-hover:border-[#C88A20] transition-all overflow-hidden">
                <Image 
-                 src="/images/icons/favicon.png" 
+                 src="/images/icons/favicon.webp" 
                  alt="Madhav Shringaar" 
                  width={72} 
                  height={72} 
@@ -36,7 +36,7 @@ export default async function RootLayout({
               <Link href="/search?category=Poshak" className="hover:text-secondary transition-colors flex flex-col items-center gap-1.5 group w-full py-1">
                  <div className="w-[64px] h-[64px] rounded-2xl bg-white shadow-xs border border-neutral-200/90 p-0.5 flex items-center justify-center group-hover:border-[#E6C16A] group-hover:shadow-md group-hover:scale-105 transition-all duration-300 overflow-hidden">
                    <Image 
-                     src="/images/icons/poshak-3d.png" 
+                     src="/images/icons/poshak-3d.webp" 
                      alt="Poshak" 
                      width={80} 
                      height={80} 
@@ -48,7 +48,7 @@ export default async function RootLayout({
               <Link href="/search?category=Mukut%20%26%20Pagdi" className="hover:text-secondary transition-colors flex flex-col items-center gap-1.5 group w-full py-1">
                  <div className="w-[64px] h-[64px] rounded-2xl bg-white shadow-xs border border-neutral-200/90 p-0.5 flex items-center justify-center group-hover:border-[#E6C16A] group-hover:shadow-md group-hover:scale-105 transition-all duration-300 overflow-hidden">
                    <Image 
-                     src="/images/icons/mukut-3d.png" 
+                     src="/images/icons/mukut-3d.webp" 
                      alt="Mukut" 
                      width={80} 
                      height={80} 
@@ -60,7 +60,7 @@ export default async function RootLayout({
               <Link href="/search?category=Bansuri" className="hover:text-secondary transition-colors flex flex-col items-center gap-1.5 group w-full py-1">
                  <div className="w-[64px] h-[64px] rounded-2xl bg-white shadow-xs border border-neutral-200/90 p-0.5 flex items-center justify-center group-hover:border-[#E6C16A] group-hover:shadow-md group-hover:scale-105 transition-all duration-300 overflow-hidden">
                    <Image 
-                     src="/images/icons/bansuri-3d.png" 
+                     src="/images/icons/bansuri-3d.webp" 
                      alt="Bansuri" 
                      width={80} 
                      height={80} 
@@ -72,7 +72,7 @@ export default async function RootLayout({
               <Link href="/cart" className="hover:text-secondary transition-colors flex flex-col items-center gap-1.5 group relative w-full py-1">
                  <div className="w-[64px] h-[64px] rounded-2xl bg-white shadow-xs border border-neutral-200/90 p-0.5 flex items-center justify-center group-hover:border-[#E6C16A] group-hover:shadow-md group-hover:scale-105 transition-all duration-300 relative overflow-hidden">
                    <Image 
-                     src="/images/icons/cart-3d.png" 
+                     src="/images/icons/cart-3d.webp" 
                      alt="Cart" 
                      width={80} 
                      height={80} 

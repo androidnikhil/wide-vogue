@@ -48,7 +48,7 @@ export default async function Header() {
 <Image
   alt="Madhav Shringaar"
   className="h-9 sm:h-10 md:h-11 lg:h-13 xl:h-14 w-auto object-contain shrink-0"
-  src="/images/logo.png"
+  src="/images/logo.webp"
   width={220}
   height={75}
   quality={90}

@@ -17,7 +17,7 @@ export default function Footer() {
     width={260} 
     height={85} 
     className="h-16 w-auto object-contain drop-shadow-md group-hover:scale-102 transition-transform" 
-    src="/images/logo-footer.png" 
+    src="/images/logo-footer.webp" 
     priority
   />
 </Link>

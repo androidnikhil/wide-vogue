@@ -1,94 +1,136 @@
 'use client';
 
 import { useState } from 'react';
-import { MapPin, Truck, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { MapPin, Truck, AlertCircle, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { checkDeliveryPincode } from '@/lib/actions/pincode.actions';
 
 export default function PincodeChecker() {
   const [pincode, setPincode] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [deliveryInfo, setDeliveryInfo] = useState<{ date: string; cod: boolean } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{
+    city?: string;
+    district?: string;
+    state?: string;
+    deliveryDate?: string;
+    codAvailable?: boolean;
+    courierName?: string;
+    estimatedDays?: number;
+  } | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleCheck = () => {
-    if (pincode.length !== 6 || !/^\d+$/.test(pincode)) {
+  const handleCheck = async () => {
+    const cleanPin = pincode.trim().replace(/\D/g, '');
+    if (cleanPin.length !== 6) {
       toast.error('Please enter a valid 6-digit Pincode');
       return;
     }
 
-    setStatus('loading');
+    setLoading(true);
+    setErrorMessage(null);
+    setResult(null);
 
-    // Simulate API call
-    setTimeout(() => {
-      const firstDigit = pincode.charAt(0);
-      
-      // Simulate unserviceable area
-      if (firstDigit === '8' || firstDigit === '9') {
-        setStatus('error');
-        setDeliveryInfo(null);
+    try {
+      const res = await checkDeliveryPincode(cleanPin);
+
+      if (!res.success) {
+        setErrorMessage(res.message || 'Pincode not serviceable.');
         return;
       }
 
-      // Simulate delivery calculation
-      const days = (firstDigit === '1' || firstDigit === '2') ? 2 : (firstDigit === '3' || firstDigit === '4') ? 3 : 5;
-      
-      const deliveryDate = new Date();
-      deliveryDate.setDate(deliveryDate.getDate() + days);
-      
-      const formattedDate = deliveryDate.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
-      
-      setDeliveryInfo({
-        date: formattedDate,
-        cod: firstDigit !== '7' // Simulate COD unavailable for some regions
+      setResult({
+        city: res.city,
+        district: res.district,
+        state: res.state,
+        deliveryDate: res.deliveryDate,
+        codAvailable: res.codAvailable,
+        courierName: res.courierName,
+        estimatedDays: res.estimatedDays,
       });
-      setStatus('success');
-    }, 800);
+    } catch {
+      setErrorMessage('Could not verify delivery options right now. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant/30 p-4 rounded-xl shadow-sm mt-6">
-      <div className="flex items-center gap-2 mb-3">
-        <MapPin className="w-5 h-5 text-secondary" />
-        <h3 className="font-semibold text-primary">Check Delivery Options</h3>
+    <div className="bg-surface-container-lowest border border-outline-variant/30 p-4 rounded-2xl shadow-xs mt-6">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4 text-secondary" />
+          <h3 className="font-semibold text-sm text-primary">Check Delivery &amp; COD Availability</h3>
+        </div>
+        <span className="text-[10px] text-emerald-800 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+          Pan-India Express
+        </span>
       </div>
       
       <div className="flex gap-2">
         <Input 
           type="text" 
           maxLength={6}
-          placeholder="Enter Pincode" 
+          placeholder="Enter 6-digit delivery pincode" 
           value={pincode}
-          onChange={(e) => setPincode(e.target.value)}
+          onChange={(e) => {
+            const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+            setPincode(val);
+            if (errorMessage) setErrorMessage(null);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleCheck();
+          }}
           className="font-mono text-sm border-outline-variant/50 focus-visible:ring-secondary/20"
         />
         <Button 
           variant="outline" 
           onClick={handleCheck}
-          disabled={status === 'loading'}
-          className="border-secondary text-secondary hover:bg-secondary/10"
+          disabled={loading || pincode.length !== 6}
+          className="border-[#003020] text-[#003020] hover:bg-[#003020] hover:text-[#F3D98F] transition-all font-semibold shrink-0"
         >
-          {status === 'loading' ? 'Checking...' : 'Check'}
+          {loading ? (
+            <span className="flex items-center gap-1.5">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Checking...
+            </span>
+          ) : (
+            'Check'
+          )}
         </Button>
       </div>
 
-      {status === 'success' && deliveryInfo && (
-        <div className="mt-4 space-y-2 text-sm bg-emerald-50 border border-emerald-100 p-3 rounded-lg">
-          <div className="flex items-start gap-2 text-emerald-800">
-            <Truck className="w-4 h-4 mt-0.5 shrink-0" />
-            <p><span className="font-semibold">Get it by {deliveryInfo.date}</span></p>
+      {result && (
+        <div className="mt-4 space-y-2.5 text-xs bg-emerald-50/70 border border-emerald-200/80 p-3.5 rounded-xl animate-in fade-in-50 duration-300">
+          <div className="flex items-start gap-2 text-emerald-950">
+            <Truck className="w-4 h-4 mt-0.5 shrink-0 text-emerald-700" />
+            <div>
+              <p className="font-bold text-sm text-emerald-900">
+                Estimated Delivery by {result.deliveryDate}
+              </p>
+              <p className="text-emerald-800 text-[11px] mt-0.5">
+                Delivering to <strong>{result.district ? `${result.district}, ` : ''}{result.state}</strong> ({pincode})
+              </p>
+            </div>
           </div>
-          <div className="flex items-start gap-2 text-emerald-800">
-            <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-            <p>Cash on Delivery is <b>{deliveryInfo.cod ? 'Available' : 'Unavailable'}</b></p>
+
+          <div className="flex items-center justify-between pt-1 border-t border-emerald-200/60 text-[11px]">
+            <div className="flex items-center gap-1.5 text-emerald-900">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Cash on Delivery: <strong>{result.codAvailable ? 'Available' : 'Prepaid Only'}</strong></span>
+            </div>
+            <div className="flex items-center gap-1 text-emerald-800">
+              <Sparkles className="w-3 h-3 text-[#C88A20]" />
+              <span>Free Delivery on ₹999+</span>
+            </div>
           </div>
         </div>
       )}
 
-      {status === 'error' && (
-        <div className="mt-4 flex items-start gap-2 text-error text-sm bg-error/10 p-3 rounded-lg border border-error/20">
+      {errorMessage && (
+        <div className="mt-4 flex items-start gap-2 text-error text-xs bg-error/10 p-3 rounded-xl border border-error/20">
           <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-          <p>Sorry, we do not deliver to this pincode at the moment.</p>
+          <p>{errorMessage}</p>
         </div>
       )}
     </div>

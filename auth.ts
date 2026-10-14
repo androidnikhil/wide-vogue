@@ -7,9 +7,9 @@ import { cookies } from 'next/headers';
 import { compare } from './lib/encrypt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { sendWelcomeEmail } from '@/email';
-import { isDesignatedAdmin, isDummyPhoneEmail } from '@/lib/constants';
+import { isDummyPhoneEmail } from '@/lib/constants';
 
-export { isDesignatedAdmin, isDummyPhoneEmail };
+export { isDummyPhoneEmail };
 
 export const config = {
   pages: {
@@ -79,17 +79,14 @@ export const config = {
                 },
               });
             } else {
-              const isAdmin = isDesignatedAdmin(user.email);
               const needsEmailCleanup = isDummyPhoneEmail(user.email);
-              const needsRoleUpgrade = isAdmin && user.role !== 'admin';
 
-              if (needsEmailCleanup || !user.phoneNumber || needsRoleUpgrade) {
+              if (needsEmailCleanup || !user.phoneNumber) {
                 user = await prisma.user.update({
                   where: { id: user.id },
                   data: {
                     phoneNumber: cleanPhone,
                     email: needsEmailCleanup ? null : user.email,
-                    ...(needsRoleUpgrade ? { role: 'admin' } : {}),
                   },
                 });
               }
@@ -103,13 +100,12 @@ export const config = {
               id: user.id,
               name: validName,
               email: user.email || '',
-              role: isDesignatedAdmin(user.email) ? 'admin' : user.role,
+              role: user.role,
             };
           } else if (firebaseUser.email) {
             // GOOGLE / EMAIL AUTHENTICATION
             const email = firebaseUser.email;
             const name = firebaseUser.displayName || email.split('@')[0];
-            const isAdmin = isDesignatedAdmin(email);
 
             user = await prisma.user.findFirst({
               where: { email },
@@ -122,7 +118,7 @@ export const config = {
                   name,
                   image: firebaseUser.photoURL || null,
                   password: '',
-                  role: isAdmin ? 'admin' : 'user',
+                  role: 'user',
                 },
               });
 
@@ -130,18 +126,13 @@ export const config = {
               sendWelcomeEmail({ name, email }).catch((err) =>
                 console.error("Welcome email failed:", err)
               );
-            } else if (isAdmin && user.role !== 'admin') {
-              user = await prisma.user.update({
-                where: { id: user.id },
-                data: { role: 'admin' },
-              });
             }
 
             return {
               id: user.id,
               name: user.name,
               email: user.email,
-              role: isAdmin ? 'admin' : user.role,
+              role: user.role,
             };
           }
 
@@ -176,20 +167,11 @@ export const config = {
 
           // If password is correct, return user
           if (isMatch) {
-            const isAdmin = isDesignatedAdmin(user.email);
-            if (isAdmin && user.role !== 'admin') {
-              await prisma.user.update({
-                where: { id: user.id },
-                data: { role: 'admin' },
-              });
-              user.role = 'admin';
-            }
-
             return {
               id: user.id,
               name: user.name,
               email: user.email,
-              role: isAdmin ? 'admin' : user.role,
+              role: user.role,
             };
           }
         }
@@ -216,20 +198,10 @@ export const config = {
             const isNumeric = rawName && /^\+?\d{7,15}$/.test(rawName.replace(/\s+/g, ''));
             const isRealName = Boolean(rawName && rawName !== 'NO_NAME' && !isNumeric);
 
-            // Strictly check if email matches store owner's admin email
-            const isAdmin = isDesignatedAdmin(dbUser.email);
-            if (isAdmin && dbUser.role !== 'admin') {
-              await prisma.user.update({
-                where: { id: dbUser.id },
-                data: { role: 'admin' },
-              });
-              dbUser.role = 'admin';
-            }
-
             session.user.name = isRealName ? rawName : null;
             session.user.email = dbUser.email;
             (session.user as any).phoneNumber = dbUser.phoneNumber;
-            session.user.role = isAdmin ? 'admin' : dbUser.role;
+            session.user.role = dbUser.role;
           } else {
             session.user.name = token.name;
           }
@@ -247,9 +219,8 @@ export const config = {
     async jwt({ token, user, trigger, session }: any) {
       // Assign user fields to token
       if (user) {
-        const isAdmin = isDesignatedAdmin(user.email);
         token.id = user.id;
-        token.role = isAdmin ? 'admin' : user.role;
+        token.role = user.role;
 
         const rawName = user.name?.trim();
         const isNumeric = rawName && /^\+?\d{7,15}$/.test(rawName.replace(/\s+/g, ''));

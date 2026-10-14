@@ -18,7 +18,6 @@ import {
   Sparkles,
   ShieldCheck
 } from 'lucide-react';
-import { isDesignatedAdmin } from '@/lib/constants';
 import {
   Sheet,
   SheetContent,
@@ -184,7 +183,7 @@ export default function UserSidebar({
       ))}
 
       {/* Admin Portal Quick Access */}
-      {(userRole === 'admin' || isDesignatedAdmin(userEmail)) && (
+      {userRole === 'admin' && (
         <div className="pt-2">
           <Link
             href="/admin/overview"

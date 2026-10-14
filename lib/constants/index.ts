@@ -97,16 +97,6 @@ export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '7982160480';
 export const COMPANY_GSTIN = process.env.COMPANY_GSTIN || '09EHFPP7126A1ZE';
 export const COMPANY_MSME = process.env.COMPANY_MSME || 'UDYAM-UP-01-0152376';
 
-/**
- * Strict check: ONLY the store owner's exact email address can ever be an admin.
- * All regular users and customers are ALWAYS strictly 'user'.
- */
-export const isDesignatedAdmin = (email?: string | null): boolean => {
-  if (!email) return false;
-  const adminEmail = (process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com').toLowerCase().trim();
-  const cleanEmail = email.trim().toLowerCase();
-  return cleanEmail === adminEmail || cleanEmail === 'nikhil.pandey@madhavshringaar.com';
-};
 
 /**
  * Checks if an email is an old auto-generated dummy phone email (e.g. 9876543210@madhavshringaar.com)

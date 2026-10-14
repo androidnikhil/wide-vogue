@@ -83,7 +83,12 @@ const ReviewList = ({
           </div>
         ) : (
           reviews.map((review) => {
-            const reviewImages: string[] = (review as any).images || [];
+            const rawImages = (review as any).images;
+            const reviewImages: string[] = Array.isArray(rawImages)
+              ? rawImages
+              : (typeof rawImages === 'string'
+                  ? (() => { try { return JSON.parse(rawImages); } catch { return []; } })()
+                  : []);
 
             return (
               <Card key={review.id} className="border border-outline-variant/30 shadow-2xs overflow-hidden">

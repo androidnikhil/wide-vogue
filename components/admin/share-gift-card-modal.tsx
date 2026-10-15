@@ -79,13 +79,12 @@ export default function ShareGiftCardModal({ giftCard }: ShareGiftCardModalProps
             {/* Header: Logo and Value */}
             <div className='relative z-10 flex justify-between items-start'>
               <div>
-                <Image
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ" 
+                <img 
+                  src="/images/logo.png" 
                   alt={APP_NAME} 
-                  className="h-16 w-auto object-contain drop-shadow-md bg-white/90 p-1.5 rounded-lg" // Larger logo, added white backdrop so it pops on dark green
+                  className="h-16 w-auto object-contain drop-shadow-md bg-white/90 p-1.5 rounded-lg"
                   width={192}
                   height={64}
-                  sizes="192px"
                 />
                 <p className='text-xs mt-2 text-[#e6e2d9]/80 font-medium'>info@madhavshringaar.com</p>
               </div>

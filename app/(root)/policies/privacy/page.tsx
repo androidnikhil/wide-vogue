@@ -1,7 +1,11 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy',
+  title: 'Privacy Policy | Madhav Shringaar',
+  description: 'Privacy Policy for Madhav Shringaar. Learn how we collect, protect, and handle devotee personal information across our website and services.',
+  alternates: {
+    canonical: '/policies/privacy',
+  },
 };
 
 export default function PrivacyPolicyPage() {

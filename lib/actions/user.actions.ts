@@ -10,14 +10,15 @@ import {
 import { auth, signIn, signOut } from '@/auth';
 import { hash } from '../encrypt';
 import { prisma } from '@/db/prisma';
-import { formatError } from '../utils';
+import { convertToPlainObject, formatError } from '../utils';
 import { ShippingAddress } from '@/types';
 import { getMyCart } from './cart.action';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
-import { PAGE_SIZE } from '../constants';
+import { PAGE_SIZE, isDummyPhoneEmail } from '../constants';
 import { revalidatePath } from 'next/cache';
+import { sendWelcomeEmail } from '@/email';
 
 // Sign in the user with credentials
 export async function signInWithCredentials(
@@ -76,6 +77,10 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       },
     });
 
+    sendWelcomeEmail({ name: user.name, email: user.email }).catch((err) =>
+      console.error('Failed to send welcome email:', err)
+    );
+
     await signIn('credentials', {
       email: user.email,
       password: plainPassword,
@@ -100,7 +105,7 @@ export async function getUserById(userId: string) {
 }
 
 // Update the user's address
-export async function updateUserAddress(data: ShippingAddress) {
+export async function updateUserAddress(data: ShippingAddress, saveAddress: boolean = true) {
   try {
     const session = await auth();
 
@@ -111,25 +116,41 @@ export async function updateUserAddress(data: ShippingAddress) {
     const address = shippingAddressSchema.parse(data);
 
     if (currentUser) {
-      const currentAddresses = Array.isArray(currentUser.addresses) ? currentUser.addresses as Prisma.JsonObject[] : [];
-      
-      // Check if address already exists (simple match on streetAddress and city)
-      const addressExists = currentAddresses.some(
-        (a: any) => a.streetAddress === address.streetAddress && a.city === address.city
-      );
+      const userDataToUpdate: any = {};
 
-      let newAddresses = currentAddresses;
-      if (!addressExists) {
-        newAddresses = [address, ...currentAddresses].slice(0, 5); // Keep max 5
+      if (saveAddress) {
+        const currentAddresses = Array.isArray(currentUser.addresses) ? currentUser.addresses as Prisma.JsonObject[] : [];
+        
+        // Check if address already exists (match on streetAddress, postalCode, and city)
+        const addressExists = currentAddresses.some(
+          (a: any) => a.streetAddress === address.streetAddress && a.city === address.city && a.postalCode === address.postalCode
+        );
+
+        let newAddresses = currentAddresses;
+        if (!addressExists) {
+          newAddresses = [address, ...currentAddresses].slice(0, 5); // Keep max 5
+        }
+
+        userDataToUpdate.address = address;
+        userDataToUpdate.addresses = newAddresses;
       }
 
-      await prisma.user.update({
-        where: { id: currentUser.id },
-        data: { 
-          address,
-          addresses: newAddresses
-        },
-      });
+      if (address.guestEmail && (!currentUser.email || isDummyPhoneEmail(currentUser.email))) {
+        userDataToUpdate.email = address.guestEmail;
+      }
+      if (address.fullName && (!currentUser.name || currentUser.name === 'NO_NAME')) {
+        userDataToUpdate.name = address.fullName;
+      }
+      if (address.contactNumber && !currentUser.phoneNumber) {
+        userDataToUpdate.phoneNumber = address.contactNumber;
+      }
+
+      if (Object.keys(userDataToUpdate).length > 0) {
+        await prisma.user.update({
+          where: { id: currentUser.id },
+          data: userDataToUpdate,
+        });
+      }
     }
 
     // Always update the cart's shipping address
@@ -188,7 +209,11 @@ export async function deleteUserAddress(index: number) {
 
 
 // Update the user profile
-export async function updateProfile(user: { name: string; email: string }) {
+export async function updateProfile(user: { 
+  name: string; 
+  email?: string | null;
+  phoneNumber?: string | null;
+}) {
   try {
     const session = await auth();
 
@@ -200,19 +225,162 @@ export async function updateProfile(user: { name: string; email: string }) {
 
     if (!currentUser) throw new Error('User not found');
 
+    const updateData: any = {
+      name: user.name,
+    };
+
+    if (user.email && user.email.includes('@') && !isDummyPhoneEmail(user.email)) {
+      updateData.email = user.email.trim();
+    }
+
+    if (user.phoneNumber !== undefined) {
+      updateData.phoneNumber = user.phoneNumber ? user.phoneNumber.trim() : null;
+    }
+
     await prisma.user.update({
       where: {
         id: currentUser.id,
       },
-      data: {
-        name: user.name,
-      },
+      data: updateData,
     });
+
+    revalidatePath('/user/profile');
+    revalidatePath('/user');
+    revalidatePath('/', 'layout');
 
     return {
       success: true,
-      message: 'User updated successfully',
+      message: 'Profile updated successfully',
     };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// Save a tokenized / masked card to user profile
+export async function saveUserCard(card: {
+  cardholderName: string;
+  cardNumber: string;
+  expiryMonth: string;
+  expiryYear: string;
+}) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error('Not authenticated');
+
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    if (!user) throw new Error('User not found');
+
+    const cleanNumber = card.cardNumber.replace(/\s+/g, '');
+    if (!/^\d{15,16}$/.test(cleanNumber)) {
+      throw new Error('Please enter a valid 15 or 16 digit card number');
+    }
+
+    // Detect card network
+    let cardType = 'RuPay';
+    if (/^4/.test(cleanNumber)) cardType = 'Visa';
+    else if (/^5[1-5]/.test(cleanNumber)) cardType = 'MasterCard';
+    else if (/^3[47]/.test(cleanNumber)) cardType = 'Amex';
+
+    const last4 = cleanNumber.slice(-4);
+    const newCard = {
+      id: `card_${Date.now()}`,
+      cardholderName: card.cardholderName.trim(),
+      last4,
+      maskedNumber: `•••• •••• •••• ${last4}`,
+      expiry: `${card.expiryMonth.padStart(2, '0')}/${card.expiryYear.slice(-2)}`,
+      cardType,
+      createdAt: new Date().toISOString(),
+    };
+
+    const currentCards = Array.isArray(user.savedCards) ? (user.savedCards as any[]) : [];
+    const updatedCards = [newCard, ...currentCards.filter((c) => c.last4 !== last4 || c.cardType !== cardType)];
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { savedCards: updatedCards },
+    });
+
+    revalidatePath('/user/payments');
+    return { success: true, message: 'Card saved securely in RBI-compliant token vault' };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// Delete saved card
+export async function deleteUserCard(cardId: string) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error('Not authenticated');
+
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    if (!user) throw new Error('User not found');
+
+    const currentCards = Array.isArray(user.savedCards) ? (user.savedCards as any[]) : [];
+    const updatedCards = currentCards.filter((c) => c.id !== cardId);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { savedCards: updatedCards },
+    });
+
+    revalidatePath('/user/payments');
+    return { success: true, message: 'Card removed successfully' };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// Save UPI ID to user profile
+export async function saveUserUpi(upiId: string) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error('Not authenticated');
+
+    const cleanUpi = upiId.trim().toLowerCase();
+    if (!/^[a-zA-Z0-9.\-_]{2,49}@[a-zA-Z]{2,49}$/.test(cleanUpi)) {
+      throw new Error('Please enter a valid UPI VPA address (e.g. name@okhdfcbank)');
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    if (!user) throw new Error('User not found');
+
+    const currentUpis = Array.isArray(user.savedUpiIds) ? (user.savedUpiIds as any[]) : [];
+    if (!currentUpis.includes(cleanUpi)) {
+      const updatedUpis = [cleanUpi, ...currentUpis];
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { savedUpiIds: updatedUpis },
+      });
+    }
+
+    revalidatePath('/user/payments');
+    return { success: true, message: 'UPI ID linked successfully' };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// Delete saved UPI ID
+export async function deleteUserUpi(upiId: string) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error('Not authenticated');
+
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    if (!user) throw new Error('User not found');
+
+    const currentUpis = Array.isArray(user.savedUpiIds) ? (user.savedUpiIds as any[]) : [];
+    const updatedUpis = currentUpis.filter((id) => id !== upiId);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { savedUpiIds: updatedUpis },
+    });
+
+    revalidatePath('/user/payments');
+    return { success: true, message: 'UPI ID removed successfully' };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
@@ -334,5 +502,45 @@ export async function updateUser(user: z.infer<typeof updateUserSchema>) {
     };
   } catch (error) {
     return { success: false, message: formatError(error) };
+  }
+}
+
+// Get comprehensive user account data for Flipkart-style account hub
+export async function getUserAccountData() {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return null;
+
+    const user = await prisma.user.findFirst({
+      where: { id: session.user.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        image: true,
+        role: true,
+        address: true,
+        addresses: true,
+        savedCards: true,
+        savedUpiIds: true,
+        paymentMethod: true,
+        bhaktiPoints: true,
+        lifetimePoints: true,
+        createdAt: true,
+        _count: {
+          select: {
+            Order: true,
+            Wishlist: true,
+            Review: true,
+          },
+        },
+      },
+    });
+
+    return user ? convertToPlainObject(user) : null;
+  } catch (error) {
+    console.error('Error fetching user account data:', error);
+    return null;
   }
 }

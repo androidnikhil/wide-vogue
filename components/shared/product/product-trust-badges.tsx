@@ -1,95 +1,77 @@
 'use client';
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { MapPin, ShieldCheck, Truck, RotateCcw, PackageCheck } from 'lucide-react';
-import { toast } from 'sonner';
+import Link from 'next/link';
+import { ShieldCheck, Truck, RotateCcw, PackageCheck } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n/language-context';
 
 interface ProductTrustBadgesProps {
   isReturnable: boolean;
   returnWindowDays: number;
+  returnPolicyText?: string | null;
 }
 
 export default function ProductTrustBadges({
   isReturnable,
-  returnWindowDays
+  returnWindowDays,
+  returnPolicyText,
 }: ProductTrustBadgesProps) {
-  const [pincode, setPincode] = useState('');
-  const [deliveryEstimate, setDeliveryEstimate] = useState<string | null>(null);
-
-  const checkPincode = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pincode.length !== 6) {
-      toast.error('Please enter a valid 6-digit pincode');
-      return;
-    }
-    
-    // Placeholder logic for dynamic delivery
-    toast.success('Pincode verified!');
-    setDeliveryEstimate('Estimated Delivery: 3-5 Business Days');
-  };
+  const { language } = useLanguage();
+  const isHindi = language === 'hi';
 
   return (
-    <div className="mt-6 space-y-6">
-      {/* Pincode Checker (Placeholder) */}
-      <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/30 shadow-sm">
-        <h4 className="font-semibold text-sm mb-3 flex items-center gap-2 text-on-surface">
-          <MapPin className="w-4 h-4 text-secondary" />
-          Check Delivery Availability
-        </h4>
-        <form onSubmit={checkPincode} className="flex gap-2">
-          <Input 
-            type="number" 
-            placeholder="Enter Pincode" 
-            value={pincode}
-            onChange={(e) => setPincode(e.target.value)}
-            className="bg-surface"
-            maxLength={6}
-          />
-          <Button type="submit" variant="secondary" className="whitespace-nowrap">
-            Check
-          </Button>
-        </form>
-        {deliveryEstimate && (
-          <p className="mt-3 text-sm font-medium text-emerald-600 flex items-center gap-2">
-            <Truck className="w-4 h-4" />
-            {deliveryEstimate}
-          </p>
-        )}
-      </div>
-
+    <div className="mt-4">
       {/* Trust Badges */}
-      <div className="grid grid-cols-2 gap-3 text-xs font-medium text-on-surface-variant">
-        <div className="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-lg text-center gap-2 border border-outline-variant/20">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-medium text-on-surface-variant">
+        <div className="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-xl text-center gap-2 border border-outline-variant/20 shadow-2xs">
           <ShieldCheck className="w-6 h-6 text-emerald-600" />
-          <span>Secure Payments</span>
+          <span>{isHindi ? '100% सुरक्षित भुगतान' : 'Secure Payments'}</span>
         </div>
         
-        <div className="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-lg text-center gap-2 border border-outline-variant/20">
+        <div className="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-xl text-center gap-2 border border-outline-variant/20 shadow-2xs">
           {isReturnable ? (
             <>
               <RotateCcw className="w-6 h-6 text-emerald-600" />
-              <span>{returnWindowDays} Days Return</span>
+              <span>{isHindi ? `${returnWindowDays} दिन में सहज वापसी` : `${returnWindowDays} Days Return`}</span>
             </>
           ) : (
             <>
-              <RotateCcw className="w-6 h-6 text-red-500/70" />
-              <span>Non-Returnable</span>
+              <RotateCcw className="w-6 h-6 text-amber-600/80" />
+              <span>{isHindi ? 'विग्रह नाप अनुसार' : 'Made to Measure'}</span>
             </>
           )}
         </div>
 
-        <div className="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-lg text-center gap-2 border border-outline-variant/20">
+        <div className="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-xl text-center gap-2 border border-outline-variant/20 shadow-2xs">
           <Truck className="w-6 h-6 text-secondary" />
-          <span>Free Shipping<br/>above ₹999</span>
+          <span>{isHindi ? '₹999+ पर मुफ़्त डिलीवरी' : 'Free Shipping above ₹999'}</span>
         </div>
 
-        <div className="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-lg text-center gap-2 border border-outline-variant/20">
-          <PackageCheck className="w-6 h-6 text-secondary" />
-          <span>Authentic<br/>Vrindavan Product</span>
-        </div>
+        <Link 
+          href="/policies/authenticity"
+          className="flex flex-col items-center justify-center p-3 bg-surface-container-low hover:bg-[#FAF7F0] rounded-xl text-center gap-1.5 border border-outline-variant/20 hover:border-[#E6C16A] transition-all group shadow-2xs"
+        >
+          <PackageCheck className="w-6 h-6 text-secondary group-hover:scale-105 transition-transform" />
+          <span>{isHindi ? 'प्रामाणिक ब्रज हस्तशिल्प' : 'Authentic Braj Craft'}</span>
+          <span className="text-[10px] text-[#0F6F74] font-semibold underline opacity-80 group-hover:opacity-100">
+            {isHindi ? 'हमारा संकल्प ↗' : 'Our Promise ↗'}
+          </span>
+        </Link>
       </div>
+
+      {returnPolicyText && (
+        <div className="mt-3.5 p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs text-[#003020] flex items-start gap-2.5 shadow-2xs">
+          <RotateCcw className="w-4 h-4 text-[#C88A20] flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <span className="font-bold text-[#003020] block mb-1">
+              {isHindi ? 'वापसी एवं विनिमय नीति' : 'Return & Exchange Policy'}:
+            </span>
+            <div 
+              className="text-neutral-700 leading-relaxed font-normal prose prose-xs max-w-none [&_b]:font-bold [&_strong]:font-bold [&_b]:text-[#003020] [&_strong]:text-[#003020] [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:my-1.5 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:my-1.5 [&_li]:my-0.5 [&_p]:mb-1 last:[&_p]:mb-0"
+              dangerouslySetInnerHTML={{ __html: returnPolicyText }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

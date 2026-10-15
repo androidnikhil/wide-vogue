@@ -265,3 +265,12 @@ p {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px -10px rgba(0,0,0,0.15);
 }
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}

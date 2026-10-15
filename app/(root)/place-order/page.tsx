@@ -195,7 +195,15 @@ const PlaceOrderPage = async () => {
                   <span className="text-2xl font-bold text-primary">{formatCurrency(cart.totalPrice)}</span>
                 </div>
                 
-                <PlaceOrderForm />
+                <PlaceOrderForm 
+                  paymentMethod={paymentMethod}
+                  totalAmount={Number(cart.totalPrice)}
+                  customer={{
+                    name: userAddress.fullName,
+                    email: userAddress.guestEmail || '',
+                    phone: userAddress.contactNumber || '',
+                  }}
+                />
               </CardContent>
             </Card>
           </div>

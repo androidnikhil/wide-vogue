@@ -59,6 +59,57 @@ export async function addItemToCart(data: CartItem) {
     });
     if (!product) throw new Error('Product not found');
 
+    // SECURITY: Enforce authoritative server-side price from product or variant
+    let authoritativePrice = product.price.toString();
+    const cleanSize = (s?: string) => (s ? s.toLowerCase().replace(/no\.?/gi, '').trim() : '');
+
+    if (product.sizeVariants) {
+      try {
+        const variants = typeof product.sizeVariants === 'string' 
+          ? JSON.parse(product.sizeVariants) 
+          : product.sizeVariants;
+        if (Array.isArray(variants) && variants.length > 0) {
+          if (item.size) {
+            const targetClean = cleanSize(item.size);
+            const matchingVariant = variants.find((v: any) => 
+              v.size === item.size || 
+              cleanSize(v.size) === targetClean
+            );
+            if (matchingVariant) {
+              const vp = Number(matchingVariant.price);
+              const vop = Number(matchingVariant.originalPrice);
+              const effectiveVPrice = vp > 0 ? vp : (vop > 0 ? vop : 0);
+              if (effectiveVPrice > 0) {
+                authoritativePrice = effectiveVPrice.toFixed(2);
+              }
+            }
+          }
+
+          // Failsafe: If authoritativePrice is still 0/invalid, fallback to lowest valid variant price
+          if (Number(authoritativePrice) <= 0) {
+            const validPrices = variants
+              .map((v: any) => {
+                const vp = Number(v.price);
+                const vop = Number(v.originalPrice);
+                return vp > 0 ? vp : (vop > 0 ? vop : 0);
+              })
+              .filter((n: number) => n > 0);
+            if (validPrices.length > 0) {
+              authoritativePrice = Math.min(...validPrices).toFixed(2);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error parsing sizeVariants in addItemToCart:", err);
+      }
+    }
+
+    // Final fallback to item.price if product.price was 0 and item.price is positive
+    if (Number(authoritativePrice) <= 0 && Number(item.price) > 0) {
+      authoritativePrice = Number(item.price).toFixed(2);
+    }
+    item.price = authoritativePrice;
+
     if (!cart) {
       // Create new cart object
       const newCart = insertCartSchema.parse({

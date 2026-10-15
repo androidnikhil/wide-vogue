@@ -27,6 +27,7 @@ model Product {
   createdAt        DateTime    @default(now()) @db.Timestamp(6)
   updatedAt        DateTime    @updatedAt
   sizes            String[]    @default([])
+  sizeVariants     Json?       @default("[]")
   isReturnable     Boolean     @default(false)
   returnPolicyText String?
   returnWindowDays Int         @default(0)
@@ -38,7 +39,8 @@ model Product {
 model User {
   id             String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name           String     @default("NO_NAME")
-  email          String     @unique(map: "user_email_idx")
+  email          String?    @unique(map: "user_email_idx")
+  phoneNumber    String?    @unique(map: "user_phone_idx")
   emailVerified  DateTime?  @db.Timestamp(6)
   image          String?
   password       String?
@@ -48,6 +50,8 @@ model User {
   createdAt      DateTime   @default(now()) @db.Timestamp(6)
   updatedAt      DateTime   @updatedAt
   addresses      Json[]     @default([])
+  savedCards     Json?      @default("[]")
+  savedUpiIds    Json?      @default("[]")
   bhaktiPoints   Int        @default(0)
   lifetimePoints Int        @default(0)
   account        Account[]
@@ -171,6 +175,7 @@ model Review {
   rating             Int
   title              String
   description        String
+  images             String[] @default([])
   isVerifiedPurchase Boolean  @default(true)
   createdAt          DateTime @default(now()) @db.Timestamp(6)
   product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)

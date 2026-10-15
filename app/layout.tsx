@@ -1,17 +1,119 @@
 import type { Metadata } from "next";
 import "@/assets/styles/globals.css";
-import { APP_DESCRIPTION, APP_NAME, APP_URL } from "@/lib/constants";
+import { APP_NAME, APP_URL, DEFAULT_SEO_TITLE, DEFAULT_SEO_DESCRIPTION, SEO_KEYWORDS } from "@/lib/constants";
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from "@/components/ui/sonner";
+import { LanguageProvider } from "@/lib/i18n/language-context";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: {
-    template: `%s | Madhav Shringaar`,
-    default: APP_NAME
+    template: `%s | Madhav Shringaar - Agra & Noida`,
+    default: DEFAULT_SEO_TITLE,
   },
-  description: APP_DESCRIPTION,
-  metadataBase: new URL(APP_URL)
+  description: DEFAULT_SEO_DESCRIPTION,
+  keywords: SEO_KEYWORDS,
+  authors: [{ name: 'Madhav Shringaar', url: APP_URL }],
+  creator: 'Madhav Shringaar',
+  publisher: 'Madhav Shringaar',
+  formatDetection: {
+    email: false,
+    address: true,
+    telephone: true,
+  },
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_IN',
+    url: APP_URL,
+    siteName: 'Madhav Shringaar | Agra & Noida',
+    title: DEFAULT_SEO_TITLE,
+    description: DEFAULT_SEO_DESCRIPTION,
+    images: [
+      {
+        url: '/images/devotional/complete_shringar.webp',
+        width: 1200,
+        height: 630,
+        alt: 'Madhav Shringaar - Divine Laddu Gopal Ji Poshak & Shringaar Agra Noida',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: DEFAULT_SEO_TITLE,
+    description: DEFAULT_SEO_DESCRIPTION,
+    images: ['/images/devotional/complete_shringar.webp'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+};
+
+const jsonLdLocalBusiness = {
+  '@context': 'https://schema.org',
+  '@type': ['Store', 'LocalBusiness'],
+  name: 'Madhav Shringaar',
+  alternateName: 'Madhav Shringaar - Devotional Store Agra & Noida',
+  description: DEFAULT_SEO_DESCRIPTION,
+  url: APP_URL,
+  logo: `${APP_URL}/images/logo.png`,
+  image: `${APP_URL}/images/devotional/complete_shringar.webp`,
+  telephone: '+917982160480',
+  email: 'info@madhavshringaar.com',
+  taxID: '09EHFPP7126A1ZE',
+  priceRange: '₹₹',
+  currenciesAccepted: 'INR',
+  paymentAccepted: 'Cash on Delivery, UPI, Credit Card, Debit Card, Net Banking',
+  areaServed: [
+    { '@type': 'City', name: 'Agra' },
+    { '@type': 'City', name: 'Noida' },
+    { '@type': 'City', name: 'Greater Noida' },
+    { '@type': 'City', name: 'Mathura' },
+    { '@type': 'City', name: 'Vrindavan' },
+    { '@type': 'AdministrativeArea', name: 'Delhi NCR' },
+    { '@type': 'AdministrativeArea', name: 'Uttar Pradesh' },
+    { '@type': 'Country', name: 'India' },
+  ],
+  address: [
+    {
+      '@type': 'PostalAddress',
+      addressLocality: 'Agra',
+      addressRegion: 'Uttar Pradesh',
+      postalCode: '282001',
+      addressCountry: 'IN',
+    },
+    {
+      '@type': 'PostalAddress',
+      addressLocality: 'Noida',
+      addressRegion: 'Uttar Pradesh',
+      postalCode: '201301',
+      addressCountry: 'IN',
+    },
+  ],
+  sameAs: ['https://wa.me/917982160480'],
+};
+
+const jsonLdWebSite = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Madhav Shringaar',
+  url: APP_URL,
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: `${APP_URL}/search?q={search_term_string}`,
+    'query-input': 'required name=search_term_string',
+  },
 };
 
 export default function RootLayout({
@@ -26,6 +128,14 @@ export default function RootLayout({
         <link crossOrigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect"/>
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdLocalBusiness) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite) }}
+        />
       </head>
       <body
         className="font-body-lg antialiased bg-background text-on-background"
@@ -38,8 +148,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster />
+          <LanguageProvider>
+            {children}
+            <Toaster />
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

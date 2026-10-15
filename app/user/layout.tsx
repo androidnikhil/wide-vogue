@@ -2,39 +2,80 @@ import { APP_NAME } from '@/lib/constants';
 import Image from 'next/image';
 import Link from 'next/link';
 import Menu from '@/components/shared/header/menu';
-import MainNav from './main-nav';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+import { getUserAccountData } from '@/lib/actions/user.actions';
+import UserSidebar from './user-sidebar';
 
-export default function UserLayout({
+export default async function UserLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+  if (!session?.user) {
+    redirect('/sign-in?callbackUrl=/user');
+  }
+
+  const user = await getUserAccountData();
+  const userName = user?.name || session.user.name || 'Devotee';
+  const userEmail = user?.email || session.user.email || '';
+  const bhaktiPoints = user?.bhaktiPoints || 0;
+  const userRole = session.user.role || 'user';
+
   return (
-    <>
-      <div className='flex flex-col'>
-        <div className='border-b container mx-auto'>
-          <div className='flex items-center h-28 px-4 py-2'>
-            <Link href='/' className='flex items-center gap-2 mr-8'>
-              <Image
-                src='https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ'
-                className='h-20 w-auto object-contain scale-125 ml-6'
-                alt={APP_NAME}
-                width={240}
-                height={96}
-                sizes="240px"
-              />
-            </Link>
-            <MainNav className='mx-6' />
-            <div className='ml-auto items-center flex space-x-4'>
+    <div className="min-h-screen bg-[#FAF7F0]/40 flex flex-col">
+      {/* Top Header: Clean, Uncluttered, Zero Scrollbars */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-200/80 shadow-2xs">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-20">
+            {/* Left: Brand Logo & Devotee Portal Subtitle */}
+            <div className="flex items-center gap-4">
+              <Link href="/" className="flex items-center gap-2 group">
+                <Image
+                  src="/images/logo.png"
+                  width={140}
+                  height={56}
+                  className="h-14 w-auto object-contain group-hover:scale-102 transition-transform"
+                  alt={APP_NAME}
+                  priority
+                />
+              </Link>
+              <div className="hidden sm:block border-l border-neutral-200 pl-3">
+                <span className="text-[10px] uppercase font-bold text-[#C88A20] tracking-widest block">
+                  Devotee Portal
+                </span>
+                <span className="font-serif text-xs font-semibold text-[#003020]">
+                  Account Dashboard
+                </span>
+              </div>
+            </div>
+
+            {/* Right: Cart, Theme, User Avatar Menu */}
+            <div className="flex items-center gap-3">
               <Menu />
             </div>
           </div>
         </div>
+      </header>
 
-        <div className='flex-1 space-y-4 p-8 pt-6 container mx-auto'>
-          {children}
+      {/* Main Body: Flipkart-Style Sidebar + Main Content */}
+      <div className="flex-1 container mx-auto px-4 py-6 md:py-8">
+        <div className="flex flex-col md:flex-row gap-6 lg:gap-8 items-start">
+          {/* Dedicated Left Sidebar (Desktop) / Clean Drawer & Pills (Mobile) */}
+          <UserSidebar
+            userName={userName}
+            userEmail={userEmail}
+            bhaktiPoints={bhaktiPoints}
+            userRole={userRole}
+          />
+
+          {/* Right Main Content */}
+          <main className="flex-1 min-w-0 w-full">
+            {children}
+          </main>
         </div>
       </div>
-    </>
+    </div>
   );
 }

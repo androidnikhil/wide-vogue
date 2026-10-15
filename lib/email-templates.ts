@@ -1,4 +1,6 @@
-const LOGO_URL = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Fv3CrZlOOVgVq0caDYsVbk_a77C6oy6RTPfvK0_-SsHGjfQhX_4LXSy1W2MlwTdBwzc9Hkxd6hQjg_ljscUAOXCXwDveuh30AWjxZr1NBOiWHB-7hQR7AheTAFjlwGxn9gJCxthYw7srh8HwtwuPmK_fuXdbFmGvicsRGakLpVI9Vvf4JoGRKDImPg7xo9sEne6tQA-UxJ9hwedwyvBoKKBdbeEB9hu_70_JoTV8qok-ZeyTDt4xCNZQD8nfNqrmQ';
+import { APP_URL } from '@/lib/constants';
+
+const LOGO_URL = `${APP_URL}/images/logo.png`;
 const BRAND_COLOR = '#b38b22'; // Gold/Secondary color
 const BG_COLOR = '#fff8e7'; // Cream background
 

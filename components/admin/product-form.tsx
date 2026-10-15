@@ -1,8 +1,17 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import { productDefaultValues } from '@/lib/constants';
+import { productDefaultValues, PRODUCT_CATEGORIES, DEFAULT_RETURN_POLICY_HTML } from '@/lib/constants';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 import { insertProductSchema, updateProductSchema } from '@/lib/validators';
 import { Product } from '@/types';
 import { toast } from 'sonner';
@@ -24,10 +33,12 @@ import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { createProduct, updateProduct } from '@/lib/actions/product.action';
 import { UploadButton } from '@/lib/uploadthing';
+import { convertFilesToWebP } from '@/lib/utils/image-converter';
 import { Card, CardContent } from '../ui/card';
 import Image from 'next/image';
 import { Checkbox } from '../ui/checkbox';
-import { X } from 'lucide-react';
+import { X, Sparkles, Layers } from 'lucide-react';
+import RichTextEditor from './rich-text-editor';
 
 const ProductForm = ({
   type,
@@ -43,12 +54,65 @@ const ProductForm = ({
   const form = useForm<z.infer<typeof insertProductSchema>>({
     resolver: type === 'Update' ? zodResolver(updateProductSchema) : zodResolver(insertProductSchema),
     defaultValues:
-      product && type === 'Update' ? product : productDefaultValues,
+      product && type === 'Update' ? {
+        ...product,
+        sizeVariants: (product as any).sizeVariants || [],
+      } : productDefaultValues,
   });
+
+  const selectedSizes = form.watch('sizes') || [];
+  const sizeVariants = form.watch('sizeVariants') || [];
+  const basePrice = form.watch('price') || '0';
+  const baseOriginalPrice = form.watch('originalPrice') || '0';
+  const baseStock = form.watch('stock') || 0;
+  const hasExistingVariants = (product && (product as any).sizeVariants && (product as any).sizeVariants.length > 0) || (product?.sizes && product.sizes.length > 0);
+  const [pricingMode, setPricingMode] = useState<'single' | 'size'>(hasExistingVariants ? 'size' : 'single');
+  const [syncSamePrice, setSyncSamePrice] = useState(false);
+  const initialCategory = product?.category || form.getValues('category') || '';
+  const [isCustomCategory, setIsCustomCategory] = useState<boolean>(
+    Boolean(initialCategory && !PRODUCT_CATEGORIES.includes(initialCategory as any))
+  );
 
   const onSubmit: SubmitHandler<z.infer<typeof insertProductSchema>> = async (
     values
   ) => {
+    // If product has size variants, clean up pricing and auto-derive base price
+    if (selectedSizes.length > 0 && values.sizeVariants && values.sizeVariants.length > 0) {
+      const cleanedVariants = values.sizeVariants.map((v) => {
+        const p = Number(v.price) || 0;
+        const op = Number(v.originalPrice) || 0;
+        const effectivePrice = p > 0 ? String(v.price) : (op > 0 ? String(v.originalPrice) : '0');
+        const effectiveOriginalPrice = op > 0 ? String(v.originalPrice) : effectivePrice;
+        return {
+          ...v,
+          price: effectivePrice,
+          originalPrice: effectiveOriginalPrice,
+        };
+      });
+      values.sizeVariants = cleanedVariants;
+
+      // Extract valid non-zero prices to determine base starting price
+      const validPrices = cleanedVariants
+        .map((v) => Number(v.price))
+        .filter((n) => !isNaN(n) && n > 0);
+
+      if (validPrices.length > 0) {
+        const minPrice = Math.min(...validPrices);
+        const matchingVariant = cleanedVariants.find((v) => Number(v.price) === minPrice);
+        const minOriginalPrice = matchingVariant?.originalPrice ? Number(matchingVariant.originalPrice) : minPrice;
+
+        // Auto-assign base price if 0 or when using size-based matrix
+        if (Number(values.price || 0) <= 0 || pricingMode === 'size') {
+          values.price = minPrice.toFixed(2);
+          values.originalPrice = (minOriginalPrice || minPrice).toFixed(2);
+          if (minOriginalPrice > minPrice) {
+            values.discountPercent = Math.round(((minOriginalPrice - minPrice) / minOriginalPrice) * 100);
+          } else {
+            values.discountPercent = 0;
+          }
+        }
+      }
+    }
     // On Create
     if (type === 'Create') {
       const res = await createProduct(values);
@@ -175,29 +239,109 @@ const ProductForm = ({
           <FormField
             control={form.control}
             name='category'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>Category</FormLabel>
-                <FormControl>
-                  <div>
-                    <Input 
-                      placeholder='Select or type a category' 
-                      list="category-options" 
-                      {...field} 
-                    />
-                    <datalist id="category-options">
-                      <option value="Laddu Gopal" />
-                      <option value="Mukut & Pagdi" />
-                      <option value="Moti Mala" />
-                      <option value="Bansuri" />
-                      <option value="Singhasan" />
-                      <option value="Combos" />
-                    </datalist>
+            render={({ field }) => {
+              const isPredefined = PRODUCT_CATEGORIES.includes(field.value as any);
+              const selectValue = isPredefined ? field.value : (field.value || isCustomCategory ? '__custom__' : '');
+
+              return (
+                <FormItem className='w-full'>
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Category</FormLabel>
+                    {isCustomCategory && (
+                      <span className="text-[11px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                        Custom Category Mode
+                      </span>
+                    )}
                   </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+                  <FormControl>
+                    <div className="space-y-2">
+                      <Select
+                        value={selectValue}
+                        onValueChange={(val) => {
+                          if (val === '__custom__') {
+                            setIsCustomCategory(true);
+                          } else {
+                            setIsCustomCategory(false);
+                            field.onChange(val);
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-full bg-white border-outline-variant/60 shadow-xs">
+                          <SelectValue placeholder="Select deity product category..." />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-80 bg-white">
+                          <SelectGroup>
+                            <SelectLabel className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
+                              👗 Poshak & Vastras
+                            </SelectLabel>
+                            <SelectItem value="Designer Poshak">Designer Poshak</SelectItem>
+                            <SelectItem value="Special / Festival Poshak">Special / Festival Poshak</SelectItem>
+                            <SelectItem value="Winter Woolen Poshak">Winter Woolen Poshak</SelectItem>
+                            <SelectItem value="Cotton Summer Poshak">Cotton Summer Poshak</SelectItem>
+                            <SelectItem value="Poshak">Poshak (All / General)</SelectItem>
+                          </SelectGroup>
+
+                          <SelectGroup>
+                            <SelectLabel className="text-[11px] font-bold text-amber-800 uppercase tracking-wider pt-2">
+                              👑 Mukut, Bansuri & Shringar
+                            </SelectLabel>
+                            <SelectItem value="Mukut & Pagdi">Mukut & Pagdi</SelectItem>
+                            <SelectItem value="Mukut & Bansuri">Mukut & Bansuri</SelectItem>
+                            <SelectItem value="Bansuri">Bansuri</SelectItem>
+                            <SelectItem value="Jewellery & Mala">Jewellery & Mala</SelectItem>
+                            <SelectItem value="Moti Mala">Moti Mala</SelectItem>
+                            <SelectItem value="Kangan & Payal">Kangan & Payal</SelectItem>
+                          </SelectGroup>
+
+                          <SelectGroup>
+                            <SelectLabel className="text-[11px] font-bold text-amber-900 uppercase tracking-wider pt-2">
+                              🪑 Sinhasan, Seva & Combos
+                            </SelectLabel>
+                            <SelectItem value="Singhasan">Singhasan</SelectItem>
+                            <SelectItem value="Jhula">Jhula</SelectItem>
+                            <SelectItem value="Seva Essentials">Seva Essentials</SelectItem>
+                            <SelectItem value="Festive Sets">Festive Sets</SelectItem>
+                            <SelectItem value="Complete Shringar">Complete Shringar</SelectItem>
+                          </SelectGroup>
+
+                          <SelectGroup>
+                            <SelectLabel className="text-[11px] font-bold text-stone-600 uppercase tracking-wider pt-2">
+                              ➕ Custom
+                            </SelectLabel>
+                            <SelectItem value="__custom__">➕ Custom / Type New Category...</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+
+                      {(isCustomCategory || (!isPredefined && field.value)) && (
+                        <div className="flex items-center gap-2 pt-1 animate-in fade-in-50">
+                          <Input
+                            placeholder="Enter custom category name (e.g. Laddu Gopal Vigrah)"
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(e.target.value)}
+                            className="bg-amber-50/50 border-amber-300 focus-visible:ring-amber-500"
+                            autoFocus
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setIsCustomCategory(false);
+                              field.onChange('Designer Poshak');
+                            }}
+                            className="text-xs text-muted-foreground hover:text-foreground shrink-0"
+                          >
+                            Reset
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
           {/* Brand */}
           <FormField
@@ -221,16 +365,68 @@ const ProductForm = ({
             )}
           />
         </div>
-        <div className='flex flex-col md:flex-row gap-5'>
+
+        {/* Pricing Strategy Selector */}
+        <div className="p-4 bg-gradient-to-r from-amber-50/60 to-orange-50/40 rounded-2xl border border-amber-200/80 shadow-2xs space-y-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                Pricing Strategy
+              </span>
+              <p className="text-xs text-neutral-600 mt-0.5">
+                Choose whether this product has one uniform price or different prices for each size
+              </p>
+            </div>
+            <div className="inline-flex rounded-xl border border-amber-300/80 bg-white p-1 shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setPricingMode('single')}
+                className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                  pricingMode === 'single'
+                    ? 'bg-[#003020] text-[#E6C16A] shadow-xs'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                Single Fixed Price
+              </button>
+              <button
+                type="button"
+                onClick={() => setPricingMode('size')}
+                className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+                  pricingMode === 'size'
+                    ? 'bg-[#003020] text-[#E6C16A] shadow-xs'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" />
+                Size-Wise Pricing Matrix
+              </button>
+            </div>
+          </div>
+
+          {pricingMode === 'size' && (
+            <div className="p-3 bg-white/90 rounded-xl border border-amber-200/70 text-xs text-amber-950 flex items-center gap-2">
+              <span className="material-symbols-outlined text-amber-700 text-base">info</span>
+              <span>
+                <strong>Size-Wise Pricing Active:</strong> You can enter specific MRP and Selling Price for each size below. The base price will automatically be set to the starting/lowest size price.
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className={`flex flex-col md:flex-row gap-5 ${pricingMode === 'size' ? 'opacity-85' : ''}`}>
           {/* Original Price */}
           <FormField
             control={form.control}
             name='originalPrice'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Original Price (MRP)</FormLabel>
+                <FormLabel>
+                  {pricingMode === 'size' ? 'Base / Starting MRP (₹)' : 'Original Price (MRP)'}
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter actual price' {...field} />
+                  <Input placeholder={pricingMode === 'size' ? 'Auto-filled from lowest size' : 'Enter actual price'} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -262,7 +458,9 @@ const ProductForm = ({
             name='price'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Selling Price (Auto-calculated)</FormLabel>
+                <FormLabel>
+                  {pricingMode === 'size' ? 'Base Selling Price (Auto-set)' : 'Selling Price (Auto-calculated)'}
+                </FormLabel>
                 <FormControl>
                   <Input placeholder='Calculated selling price' readOnly className="bg-gray-100" {...field} />
                 </FormControl>
@@ -327,6 +525,192 @@ const ProductForm = ({
               </FormItem>
             )}
           />
+
+          {/* Dynamic Size-Wise Pricing & Inventory Matrix */}
+          {selectedSizes.length > 0 && (
+            <div className="mt-2 p-4 rounded-xl border border-[#E6C16A]/60 bg-[#FAF7F0] space-y-3.5 shadow-2xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h4 className="font-bold text-sm text-[#003020] flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[#C88A20] text-base">straighten</span>
+                    Size-Specific Pricing &amp; Stock Matrix
+                  </h4>
+                  <p className="text-xs text-neutral-600">
+                    Set customized selling prices and original MRPs for each size.
+                  </p>
+                </div>
+                
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-xs bg-amber-100/70 hover:bg-amber-200 text-amber-950 border-amber-300 font-bold flex items-center gap-1"
+                    onClick={() => {
+                      const updated = selectedSizes.map((s) => {
+                        const existing = sizeVariants.find((v) => v.size === s);
+                        const mrp = existing?.originalPrice && Number(existing.originalPrice) > 0 
+                          ? String(existing.originalPrice) 
+                          : (baseOriginalPrice && Number(baseOriginalPrice) > 0 ? String(baseOriginalPrice) : (existing?.price || '0'));
+                        return {
+                          size: s,
+                          price: mrp,
+                          originalPrice: mrp,
+                          stock: existing?.stock !== undefined ? existing.stock : Number(baseStock || 0),
+                        };
+                      });
+                      form.setValue('sizeVariants', updated);
+                      setSyncSamePrice(true);
+                      toast.success("⚡ Selling Price set same as Original MRP for all sizes!");
+                    }}
+                  >
+                    ⚡ Same Price (Selling = MRP)
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-xs border-[#E6C16A] text-[#003020] hover:bg-[#F3E5AB]/40"
+                    onClick={() => {
+                      const updated = selectedSizes.map((s) => {
+                        const existing = sizeVariants.find((v) => v.size === s);
+                        return {
+                          size: s,
+                          price: existing?.price && Number(existing.price) > 0 ? existing.price : (basePrice || '0'),
+                          originalPrice: existing?.originalPrice && Number(existing.originalPrice) > 0 ? existing.originalPrice : (baseOriginalPrice || '0'),
+                          stock: existing?.stock !== undefined ? existing.stock : Number(baseStock || 0),
+                        };
+                      });
+                      form.setValue('sizeVariants', updated);
+                      toast.success("Applied base price and stock to all sizes");
+                    }}
+                  >
+                    Auto-Fill from Base Values
+                  </Button>
+                </div>
+              </div>
+
+              {/* Sync Toggle */}
+              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-amber-200/60">
+                <input
+                  type="checkbox"
+                  id="sync-same-price"
+                  checked={syncSamePrice}
+                  onChange={(e) => setSyncSamePrice(e.target.checked)}
+                  className="rounded text-[#0F6F74] focus:ring-[#0F6F74] h-4 w-4"
+                />
+                <label htmlFor="sync-same-price" className="text-xs font-semibold text-neutral-800 cursor-pointer select-none">
+                  Selling Price is same as Original MRP (Typing MRP will automatically fill Selling Price)
+                </label>
+              </div>
+
+              <div className="overflow-x-auto bg-white rounded-lg border border-neutral-200">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-neutral-200 bg-neutral-50 text-neutral-700">
+                      <th className="py-2.5 px-3 font-semibold">Size</th>
+                      <th className="py-2.5 px-3 font-semibold">Selling Price (₹)</th>
+                      <th className="py-2.5 px-3 font-semibold">Original MRP (₹)</th>
+                      <th className="py-2.5 px-3 font-semibold">Stock Qty</th>
+                      <th className="py-2.5 px-3 font-semibold text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100">
+                    {selectedSizes.map((sz) => {
+                      const variant = sizeVariants.find((v) => v.size === sz) || {
+                        size: sz,
+                        price: basePrice,
+                        originalPrice: baseOriginalPrice,
+                        stock: Number(baseStock || 0),
+                      };
+
+                      const updateVariant = (field: 'price' | 'originalPrice' | 'stock', val: any) => {
+                        const others = sizeVariants.filter((v) => v.size !== sz);
+                        const updatedVar = {
+                          ...variant,
+                          size: sz,
+                          [field]: val,
+                        };
+                        // If syncSamePrice is true and originalPrice is updated, mirror to price
+                        if (syncSamePrice && field === 'originalPrice') {
+                          updatedVar.price = val;
+                        }
+                        form.setValue('sizeVariants', [...others, updatedVar]);
+                      };
+
+                      const handleRowSamePrice = () => {
+                        const targetPrice = variant.originalPrice || variant.price || '0';
+                        const others = sizeVariants.filter((v) => v.size !== sz);
+                        form.setValue('sizeVariants', [
+                          ...others,
+                          {
+                            ...variant,
+                            size: sz,
+                            price: targetPrice,
+                            originalPrice: targetPrice,
+                          },
+                        ]);
+                        toast.success(`Size ${sz} Selling Price set same as MRP (₹${targetPrice})`);
+                      };
+
+                      return (
+                        <tr key={sz} className="hover:bg-amber-50/40 transition-colors">
+                          <td className="py-2.5 px-3 font-bold text-[#003020] whitespace-nowrap">
+                            <span className="px-2.5 py-0.5 rounded-full bg-[#E6C16A]/20 text-[#8A5A0A] font-medium text-xs border border-[#E6C16A]/40">
+                              Size {sz} No.
+                            </span>
+                          </td>
+                          <td className="py-2 px-3">
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              placeholder={variant.originalPrice || basePrice || '0'}
+                              value={variant.price || ''}
+                              onChange={(e) => updateVariant('price', e.target.value)}
+                              className="h-8 w-28 text-xs bg-white font-semibold text-[#003020]"
+                            />
+                          </td>
+                          <td className="py-2 px-3">
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              placeholder={baseOriginalPrice || '0'}
+                              value={variant.originalPrice || ''}
+                              onChange={(e) => updateVariant('originalPrice', e.target.value)}
+                              className="h-8 w-28 text-xs bg-white"
+                            />
+                          </td>
+                          <td className="py-2 px-3">
+                            <Input
+                              type="number"
+                              min="0"
+                              placeholder={String(baseStock || 0)}
+                              value={variant.stock ?? ''}
+                              onChange={(e) => updateVariant('stock', Number(e.target.value || 0))}
+                              className="h-8 w-24 text-xs bg-white"
+                            />
+                          </td>
+                          <td className="py-2 px-3 text-right">
+                            <button
+                              type="button"
+                              onClick={handleRowSamePrice}
+                              className="text-[11px] font-semibold text-[#0F6F74] hover:underline"
+                              title="Copy MRP to Selling Price for this size"
+                            >
+                              Same as MRP
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
         <div className='upload-field flex flex-col md:flex-row gap-5'>
           {/* Images */}
@@ -370,9 +754,16 @@ const ProductForm = ({
                             allowedContent: "text-on-surface-variant text-xs mt-1",
                             container: "w-max border border-outline-variant rounded-md p-4 bg-surface-container flex flex-col items-center justify-center",
                           }}
+                          onBeforeUploadBegin={async (files) => {
+                            toast.loading('Converting images to WebP...', { id: 'webp-convert' });
+                            const webpFiles = await convertFilesToWebP(files);
+                            toast.dismiss('webp-convert');
+                            return webpFiles;
+                          }}
                           onClientUploadComplete={(res: { url: string }[]) => {
                             const newUrls = res.map((file) => file.url);
                             form.setValue('images', [...images, ...newUrls]);
+                            toast.success('Images converted to WebP & uploaded!');
                           }}
                           onUploadError={(error: Error) => {
                             toast.error(`ERROR! ${error.message}`,{
@@ -446,8 +837,15 @@ const ProductForm = ({
                     allowedContent: "text-on-surface-variant text-xs mt-1",
                     container: "w-max border border-outline-variant rounded-md p-4 bg-surface-container flex flex-col items-center justify-center",
                   }}
+                  onBeforeUploadBegin={async (files) => {
+                    toast.loading('Converting banner to WebP...', { id: 'webp-banner' });
+                    const webpFiles = await convertFilesToWebP(files);
+                    toast.dismiss('webp-banner');
+                    return webpFiles;
+                  }}
                   onClientUploadComplete={(res: { url: string }[]) => {
                     form.setValue('banner', res[0].url);
+                    toast.success('Banner converted to WebP & uploaded!');
                   }}
                   onUploadError={(error: Error) => {
                     toast.error(`ERROR! ${error.message}`,{
@@ -467,21 +865,19 @@ const ProductForm = ({
           <FormField
             control={form.control}
             name='description'
-            render={({
-              field,
-            }: {
-              field: ControllerRenderProps<
-                z.infer<typeof insertProductSchema>,
-                'description'
-              >;
-            }) => (
+            render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Description</FormLabel>
+                <FormLabel className="flex items-center justify-between">
+                  <span>Product Description (Rich Text &amp; Formatted Paste Supported)</span>
+                  <span className="text-[11px] text-neutral-500 font-normal">
+                    Supports Bold, Italic, Bullet Lists &amp; Formatting
+                  </span>
+                </FormLabel>
                 <FormControl>
-                  <Textarea
-                    placeholder='Enter product description'
-                    className='resize-none'
-                    {...field}
+                  <RichTextEditor
+                    value={field.value || ''}
+                    onChange={field.onChange}
+                    placeholder="Enter divine details, poshak fabric quality, embroidery style, seva recommendations..."
                   />
                 </FormControl>
                 <FormMessage />
@@ -508,7 +904,17 @@ const ProductForm = ({
                 <FormControl>
                   <Checkbox
                     checked={field.value}
-                    onCheckedChange={field.onChange}
+                    onCheckedChange={(checked) => {
+                      field.onChange(checked);
+                      if (checked) {
+                        if (!form.getValues('returnPolicyText')) {
+                          form.setValue('returnPolicyText', DEFAULT_RETURN_POLICY_HTML, { shouldDirty: true });
+                        }
+                        if (!form.getValues('returnWindowDays')) {
+                          form.setValue('returnWindowDays', 7, { shouldDirty: true });
+                        }
+                      }
+                    }}
                     className="h-5 w-5"
                   />
                 </FormControl>
@@ -517,43 +923,82 @@ const ProductForm = ({
           />
 
           {form.watch('isReturnable') && (
-            <div className='grid md:grid-cols-2 gap-5'>
-              <FormField
-                control={form.control}
-                name='returnWindowDays'
-                render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel>Return Window (Days)</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder='e.g., 7' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className='flex flex-col gap-5'>
+              <div className='max-w-xs'>
+                <FormField
+                  control={form.control}
+                  name='returnWindowDays'
+                  render={({ field }) => (
+                    <FormItem className='w-full'>
+                      <FormLabel className="font-semibold text-primary">Return Window (Days)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder='e.g., 7' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <FormField
                 control={form.control}
                 name='returnPolicyText'
                 render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel>Return Policy Text (Optional)</FormLabel>
-                    <FormControl>
-                      <div>
-                        <Input 
-                          placeholder='e.g., 7 Days Replacement Policy' 
-                          value={field.value || ''} 
-                          onChange={field.onChange}
-                          list="return-policy-options" 
-                        />
-                        <datalist id="return-policy-options">
-                          <option value="7 Days Replacement Policy" />
-                          <option value="7 Days Refund Policy" />
-                          <option value="14 Days Replacement Policy" />
-                          <option value="Replacement only on damaged item" />
-                          <option value="No questions asked returns" />
-                        </datalist>
+                  <FormItem className='w-full space-y-3'>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <FormLabel className="font-semibold text-primary">Return Policy Terms & Instructions (Rich Text)</FormLabel>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          field.onChange(DEFAULT_RETURN_POLICY_HTML);
+                          toast.success('Suggested return policy loaded!');
+                        }}
+                        className="h-8 text-xs font-semibold text-amber-900 bg-amber-50 hover:bg-amber-100 border-amber-300 gap-1.5 self-start sm:self-auto shadow-xs"
+                      >
+                        <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+                        ⚡ Use Suggested Return Policy
+                      </Button>
+                    </div>
+
+                    {/* Suggested Policy Banner / Card */}
+                    <div className="rounded-xl border border-amber-200/90 bg-linear-to-br from-amber-50/70 via-[#FFFDF5] to-orange-50/40 p-4 text-xs text-stone-700 shadow-xs space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-amber-900 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                          <span className="material-symbols-outlined text-sm text-amber-600">verified</span>
+                          Suggested Standard Return Policy
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            field.onChange(DEFAULT_RETURN_POLICY_HTML);
+                            toast.success('Suggested return policy applied to editor!');
+                          }}
+                          className="text-[11px] font-bold text-amber-800 hover:text-amber-950 underline underline-offset-2 transition-colors cursor-pointer flex items-center gap-1"
+                        >
+                          Fill into Editor ↵
+                        </button>
                       </div>
+                      <div className="space-y-2 text-stone-700 leading-relaxed font-sans bg-white/90 p-3 rounded-lg border border-amber-100 shadow-2xs">
+                        <p>
+                          Returns are accepted only for size issues or defective products. Customers must report the issue within 48 hours of delivery and provide clear photos or an unboxing video as proof. Products must be unused and returned in their original packaging. Return approval is subject to verification.
+                        </p>
+                        <p className="pt-2 text-stone-600 border-t border-amber-100/70">
+                          Returns are not accepted for change of mind, colour preference, or minor variations in handmade designs.
+                        </p>
+                      </div>
+                    </div>
+
+                    <FormControl>
+                      <RichTextEditor
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        placeholder="Enter return and replacement terms..."
+                      />
                     </FormControl>
+                    <p className="text-xs text-on-surface-variant">
+                      Supports bold, italic, bullet lists, and clean copy-paste. Click <b>Use Suggested Return Policy</b> above to auto-fill anytime without typing manually.
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -36,12 +36,14 @@ export type Order = z.infer<typeof insertOrderSchema> & {
   paymentResult: PaymentResult;
   status: string;
   awbNumber: string | null;
+  trackingUrl?: string | null;
 };
 export type PaymentResult = z.infer<typeof paymentResultSchema>;
 export type Review = z.infer<typeof insertReviewSchema> & {
   id: string;
   createdAt: Date;
   user?: { name: string };
+  isVerifiedPurchase?: boolean;
 };
 
 export type GiftCard = {

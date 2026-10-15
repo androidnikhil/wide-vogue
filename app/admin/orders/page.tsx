@@ -14,6 +14,7 @@ import {
   import Pagination from '@/components/shared/pagination';
   import DeleteDialog from '@/components/shared/delete-dialog';
   import { requireAdmin } from '@/lib/auth-guard';
+  import { Printer } from 'lucide-react';
   
   export const metadata: Metadata = {
     title: 'Admin Orders',
@@ -74,20 +75,40 @@ import {
                       : 'Not Paid'}
                   </TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                      order.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
-                      order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' :
-                      order.status === 'OUT_FOR_DELIVERY' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {order.status || 'PENDING'}
-                    </span>
+                    <div className="flex flex-col gap-1 items-start">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                        order.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
+                        order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' :
+                        order.status === 'OUT_FOR_DELIVERY' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {order.status || 'PENDING'}
+                      </span>
+                      {order.refundStatus === 'RETURN_REQUESTED' && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                          ⚠️ RETURN REQ
+                        </span>
+                      )}
+                      {order.refundStatus === 'RETURN_APPROVED' && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
+                          ✅ RETURN OK
+                        </span>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
-                    <Button asChild variant='outline' size='sm'>
-                      <Link href={`/order/${order.id}`}>Details</Link>
-                    </Button>
-                    <DeleteDialog id={order.id} action={deleteOrder} />
+                    <div className="flex items-center gap-1.5">
+                      <Button asChild variant='outline' size='sm' className="h-8 px-2.5">
+                        <Link href={`/admin/orders/${order.id}`}>Details</Link>
+                      </Button>
+                      <Button asChild variant='outline' size='sm' className="h-8 px-2.5 bg-neutral-50 hover:bg-neutral-100 border-neutral-300 text-neutral-800" title="Print Tax Invoice & Packing Slip">
+                        <Link href={`/admin/orders/${order.id}/invoice`}>
+                          <Printer className="w-3.5 h-3.5 mr-1 text-[#003020]" />
+                          Invoice
+                        </Link>
+                      </Button>
+                      <DeleteDialog id={order.id} action={deleteOrder} />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

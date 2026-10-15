@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/shared/product/product-card';
 import { getAllProducts, getLatestProducts } from '@/lib/actions/product.action';
+import { getServerTranslations } from '@/lib/i18n/server';
 
 const productSizes = new Set(['0', '1', '2', '3', '4', '5', '6', '7']);
 
@@ -12,6 +13,9 @@ export default async function Homepage({
   searchParams: Promise<{ size?: string }>;
 }) {
   const { size } = await searchParams;
+  const { t, lang } = await getServerTranslations();
+  const isHindi = lang === 'hi';
+
   const selectedSize = size && productSizes.has(size) ? size : undefined;
   let latestProducts = selectedSize
     ? (
@@ -65,30 +69,39 @@ export default async function Homepage({
           <div className="lg:col-span-5 flex flex-col items-start text-left z-30 pt-10">
             <div className="inline-flex items-center gap-3 bg-white/70 backdrop-blur-md px-6 py-2 rounded-full border border-white/40 shadow-sm mb-8 transform -rotate-2">
               <span className="w-2 h-2 rounded-full bg-[#C88A20] animate-ping"></span>
-              <span className="font-bold text-xs uppercase tracking-[0.2em] text-[#003020]">Divine Essentials</span>
+              <span className="font-bold text-xs uppercase tracking-[0.2em] text-[#003020]">{t.home.divineEssentials}</span>
             </div>
             
-            <h1 className="text-6xl md:text-[6.5rem] text-[#003020] font-bold tracking-tight leading-[0.95] font-serif mb-6 relative z-10 drop-shadow-sm">
-              Adorn Your <br />
-              <span className="inline-block transform -rotate-3 text-[#0F6F74] italic font-medium bg-[#E6C16A]/20 px-4 rounded-3xl mt-2">Beloved</span> Kanha
+            <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-[6.5rem] text-[#003020] font-bold tracking-tight leading-[1.05] md:leading-[1] lg:leading-[0.95] font-serif mb-6 relative z-10 drop-shadow-sm">
+              {isHindi ? (
+                <>
+                  सजाएं अपने <br />
+                  <span className="inline-block transform -rotate-3 text-[#0F6F74] italic font-medium bg-[#E6C16A]/20 px-3 sm:px-4 rounded-3xl mt-2">लाडले</span> कान्हा को
+                </>
+              ) : (
+                <>
+                  Adorn Your <br />
+                  <span className="inline-block transform -rotate-3 text-[#0F6F74] italic font-medium bg-[#E6C16A]/20 px-3 sm:px-4 rounded-3xl mt-2">Beloved</span> Kanha
+                </>
+              )}
             </h1>
             
-            <p className="text-xl md:text-2xl text-[#003020]/70 max-w-md font-serif mb-10 pl-6 border-l-4 border-[#C88A20] rounded-sm">
-              Beautiful Poshak & Shringar, Chosen With Love.
+            <p className="text-lg sm:text-xl md:text-2xl text-[#003020]/70 max-w-md font-serif mb-8 sm:mb-10 pl-4 sm:pl-6 border-l-4 border-[#C88A20] rounded-sm">
+              {t.home.hero1Subtitle}
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Link href="/search?category=Poshak" className="bg-[#003020] px-10 py-5 rounded-[2rem] text-white font-bold shadow-xl shadow-[#003020]/20 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 text-center uppercase tracking-widest text-sm border-2 border-[#003020]">
-                Shop Poshak
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+              <Link href="/search?category=Poshak" className="bg-[#003020] px-8 sm:px-10 py-3.5 sm:py-5 rounded-[2rem] text-white font-bold shadow-xl shadow-[#003020]/20 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 text-center uppercase tracking-widest text-xs sm:text-sm border-2 border-[#003020]">
+                {t.home.hero1Btn}
               </Link>
-              <Link href="/search?category=Mukut" className="bg-white px-10 py-5 rounded-[2rem] text-[#003020] font-bold shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300 text-center uppercase tracking-widest text-sm border-2 border-[#E6C16A]/30">
-                Explore Shringar
+              <Link href="/search?category=Mukut" className="bg-white px-8 sm:px-10 py-3.5 sm:py-5 rounded-[2rem] text-[#003020] font-bold shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300 text-center uppercase tracking-widest text-xs sm:text-sm border-2 border-[#E6C16A]/30">
+                {t.home.hero1Btn2}
               </Link>
             </div>
           </div>
 
           {/* RIGHT: Floating Artwork & Organic Layout */}
-          <div className="lg:col-span-7 relative h-[550px] lg:h-[750px] w-full flex justify-center lg:justify-end items-center mt-10 lg:mt-0">
+          <div className="lg:col-span-7 relative h-[420px] sm:h-[500px] lg:h-[750px] w-full flex justify-center lg:justify-end items-center mt-6 lg:mt-0">
             {/* Organic Blob Background for Image */}
             <div className="absolute w-[90%] h-[90%] bg-gradient-to-tr from-[#E6C16A] to-[#FDE8DF] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] animate-[spin_30s_linear_infinite] opacity-50 blur-xl"></div>
             <div className="absolute w-[80%] h-[80%] bg-[#0F6F74] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] animate-[spin_25s_linear_infinite_reverse] opacity-20 blur-2xl"></div>
@@ -124,41 +137,47 @@ export default async function Homepage({
       {/* 2. DISCOVER KANHA — PLAYFUL ASYMMETRIC CATEGORY COMPOSITION */}
       <section className="py-24 max-w-7xl mx-auto px-6 md:px-12 relative z-20 -mt-10">
         <div className="text-center mb-16">
-          <span className="text-[#C88A20] font-bold tracking-[0.2em] uppercase text-xs">Curated Seva</span>
-          <h2 className="text-5xl md:text-6xl font-bold text-[#003020] font-serif mt-2">Discover <span className="italic text-[#0F6F74] font-light">Shringar</span></h2>
+          <span className="text-[#C88A20] font-bold tracking-[0.2em] uppercase text-xs">{t.home.curatedSeva}</span>
+          <h2 className="text-5xl md:text-6xl font-bold text-[#003020] font-serif mt-2">
+            {isHindi ? (
+              <>दिव्य <span className="italic text-[#0F6F74] font-light">शृंगार दर्शन</span></>
+            ) : (
+              <>Discover <span className="italic text-[#0F6F74] font-light">Shringar</span></>
+            )}
+          </h2>
         </div>
         
         <div className="grid grid-cols-2 gap-4 md:h-[560px] md:grid-cols-12 md:grid-rows-3 md:gap-5">
            <Link href="/search?category=Poshak" className="group relative col-span-2 h-[360px] overflow-hidden rounded-[2rem] border-4 border-white bg-white shadow-xl transition-transform active:scale-[0.99] md:col-span-8 md:row-span-3 md:h-full md:rounded-[2.5rem]">
-             <Image src="/images/devotional/poshak.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt="Poshak" width={1200} height={900} sizes="(max-width: 768px) 100vw, 66vw" />
+             <Image src="/images/devotional/poshak.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt={t.home.poshakTitle} width={1200} height={900} sizes="(max-width: 768px) 100vw, 66vw" />
              <div className="absolute inset-0 bg-gradient-to-t from-[#003020]/80 via-transparent to-transparent"></div>
              <div className="absolute bottom-6 left-6 text-white sm:bottom-8 sm:left-8">
-               <h3 className="text-3xl font-serif font-bold sm:text-4xl">Poshak</h3>
-               <span className="mt-2 inline-block rounded-full bg-[#E6C16A] px-3 py-1 text-xs font-bold text-[#003020]">Bestsellers</span>
+               <h3 className="text-3xl font-serif font-bold sm:text-4xl">{t.home.poshakTitle}</h3>
+               <span className="mt-2 inline-block rounded-full bg-[#E6C16A] px-3 py-1 text-xs font-bold text-[#003020]">{t.home.bestsellersBadge}</span>
              </div>
            </Link>
 
            <div className="col-span-2 grid grid-cols-3 gap-3 md:col-span-4 md:row-span-3 md:grid-cols-1 md:grid-rows-3 md:gap-5">
              <Link href="/search?category=Mukut" className="group relative aspect-square overflow-hidden rounded-[1.5rem] border-4 border-white bg-[#E8F3EE] shadow-lg transition-transform duration-300 hover:-translate-y-1 active:scale-[0.98] md:aspect-auto md:min-h-0 md:rounded-[1.75rem]">
-               <Image src="/images/devotional/mukut.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt="Mukut" width={500} height={500} sizes="34vw" />
+               <Image src="/images/devotional/mukut.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt={t.home.mukutTitle} width={500} height={500} sizes="34vw" />
                <div className="absolute inset-0 bg-gradient-to-br from-[#0F6F74]/70 to-transparent"></div>
                <div className="absolute left-5 top-5 text-white sm:left-6 sm:top-6">
-                 <h3 className="text-xl font-serif font-bold sm:text-2xl">Mukut</h3>
+                 <h3 className="text-xl font-serif font-bold sm:text-2xl">{t.home.mukutTitle}</h3>
                </div>
              </Link>
 
              <Link href="/search?category=Bansuri" className="group relative aspect-square overflow-hidden rounded-[1.5rem] border-4 border-white bg-[#FDE8DF] shadow-lg transition-transform duration-300 hover:-translate-y-1 active:scale-[0.98] md:aspect-auto md:min-h-0 md:rounded-[1.75rem]">
-               <Image src="/images/devotional/bansuri.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt="Bansuri" width={500} height={500} sizes="34vw" />
+               <Image src="/images/devotional/bansuri.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt={t.home.bansuriTitle} width={500} height={500} sizes="34vw" />
                <div className="absolute inset-0 bg-gradient-to-t from-[#003020]/75 to-transparent"></div>
                <div className="absolute bottom-4 right-4 text-right text-white sm:bottom-6 sm:right-6">
-                 <h3 className="text-xl font-serif font-bold sm:text-2xl">Bansuri</h3>
+                 <h3 className="text-xl font-serif font-bold sm:text-2xl">{t.home.bansuriTitle}</h3>
                </div>
              </Link>
 
              <Link href="/search?category=Jewellery" className="group relative flex aspect-square items-center justify-center overflow-hidden rounded-[1.5rem] border-4 border-white bg-[#FBF7EE] shadow-lg transition-transform duration-300 hover:-translate-y-1 active:scale-[0.98] md:aspect-auto md:min-h-0 md:rounded-[1.75rem]">
-               <Image src="/images/devotional/jewellery.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt="Jewellery" width={500} height={500} sizes="34vw" />
+               <Image src="/images/devotional/jewellery.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt={t.home.jewelsTitle} width={500} height={500} sizes="34vw" />
                <div className="absolute inset-0 bg-[#C88A20]/20 transition-colors group-hover:bg-transparent"></div>
-               <h3 className="absolute rounded-full bg-[#003020]/60 px-3 py-2 text-center font-serif text-base font-bold text-white backdrop-blur-sm sm:px-4 sm:text-xl">Jewels</h3>
+               <h3 className="absolute rounded-full bg-[#003020]/60 px-3 py-2 text-center font-serif text-base font-bold text-white backdrop-blur-sm sm:px-4 sm:text-xl">{t.home.jewelsTitle}</h3>
              </Link>
            </div>
         </div>
@@ -172,23 +191,27 @@ export default async function Homepage({
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 gap-10 items-center relative z-10 lg:grid-cols-2 lg:gap-16">
            <div className="relative group">
               <div className="w-full h-[400px] md:h-[480px] lg:h-[600px] bg-white p-3 rounded-t-[10rem] rounded-b-[2rem] transform -rotate-3 transition-transform group-hover:rotate-0 active:rotate-0 duration-500 shadow-2xl">
-                <Image src="/images/devotional/poshak.webp" className="w-full h-full object-cover rounded-t-[9.5rem] rounded-b-[1.5rem] transition-transform duration-700 group-hover:scale-[1.02] group-active:scale-[1.02]" alt="Signature Poshak" width={1000} height={1200} sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/devotional/poshak.webp" className="w-full h-full object-cover rounded-t-[9.5rem] rounded-b-[1.5rem] transition-transform duration-700 group-hover:scale-[1.02] group-active:scale-[1.02]" alt={t.home.hero2Title} width={1000} height={1200} sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
-              <div className="absolute -right-6 top-1/4 bg-[#E6C16A] text-[#003020] w-24 h-24 rounded-full flex items-center justify-center font-bold text-lg rotate-12 shadow-lg border-4 border-[#003020]">
-                 New!
+              <div className="absolute -right-6 top-1/4 bg-[#E6C16A] text-[#003020] w-24 h-24 rounded-full flex items-center justify-center font-bold text-sm sm:text-base text-center p-2 rotate-12 shadow-lg border-4 border-[#003020]">
+                 {t.home.newBadge}
               </div>
            </div>
            
            <div className="flex min-w-0 flex-col items-start justify-center">
               <span className="material-symbols-outlined text-[#E6C16A] text-5xl mb-6">workspace_premium</span>
               <h2 className="mb-6 max-w-full break-words font-serif text-4xl font-bold leading-tight sm:text-5xl lg:text-[clamp(3rem,5.3vw,4.5rem)]">
-                Signature <br /><span className="text-[#E6C16A] italic font-light">Poshak</span>
+                {isHindi ? (
+                  <>विशेष <br /><span className="text-[#E6C16A] italic font-light">ज़री पोशाक</span></>
+                ) : (
+                  <>Signature <br /><span className="text-[#E6C16A] italic font-light">Poshak</span></>
+                )}
               </h2>
               <p className="text-lg md:text-xl text-white/80 font-light mb-10 border-l-4 border-[#0F6F74] pl-6">
-                Handcrafted by master artisans. Every stitch is infused with pure devotion. Designed perfectly for your beloved Laddu Gopal.
+                {t.home.hero2Subtitle}
               </p>
               <Link href="/search?category=Poshak" className="bg-[#E6C16A] text-[#003020] px-10 py-4 rounded-full font-bold shadow-lg hover:bg-white transition-colors uppercase tracking-widest text-sm">
-                Explore The Collection
+                {t.home.hero2Btn}
               </Link>
            </div>
         </div>
@@ -211,17 +234,21 @@ export default async function Homepage({
           </div>
           
           <div className="order-1 lg:order-2 space-y-6 text-center lg:text-left">
-            <span className="text-[#0F6F74] font-bold tracking-[0.2em] uppercase text-sm border-b-2 border-[#0F6F74] pb-1">The Divine Details</span>
-            <h2 className="text-6xl md:text-7xl font-serif leading-none text-[#003020] font-bold mb-4">
-              Kanha's <br/> <span className="text-[#C88A20] italic">Little World</span>
+            <span className="text-[#0F6F74] font-bold tracking-[0.2em] uppercase text-sm border-b-2 border-[#0F6F74] pb-1">{t.home.kanhasWorldTag}</span>
+            <h2 className="text-5xl md:text-7xl font-serif leading-none text-[#003020] font-bold mb-4">
+              {isHindi ? (
+                <>कान्हा की <br/> <span className="text-[#C88A20] italic">बाल लीला एवं शृंगार</span></>
+              ) : (
+                <>Kanha's <br/> <span className="text-[#C88A20] italic">Little World</span></>
+              )}
             </h2>
-            <p className="text-2xl font-serif italic text-[#003020]/70">“Where every little detail is chosen with love.”</p>
+            <p className="text-2xl font-serif italic text-[#003020]/70">{t.home.kanhasWorldSubtitle}</p>
             <p className="text-lg leading-relaxed text-[#003020]/80 mt-6 max-w-lg mx-auto lg:mx-0">
-              Enter a world where devotion takes physical form. The gentle curve of His bansuri, the vibrant feathers of His mukut, the delicate embroidery of His poshak—everything is curated to resonate with the purest love.
+              {t.home.kanhasWorldDesc}
             </p>
-            <button className="mt-8 bg-[#0F6F74] text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-sm shadow-xl hover:-translate-y-1 transition-transform">
-              Read Our Story
-            </button>
+            <Link href="/about" className="inline-block mt-8 bg-[#0F6F74] text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-sm shadow-xl hover:-translate-y-1 transition-transform">
+              {t.home.readOurStoryBtn}
+            </Link>
           </div>
           
         </div>
@@ -231,11 +258,11 @@ export default async function Homepage({
       <section className="py-24 max-w-7xl mx-auto px-6 md:px-12 bg-white rounded-[3rem] shadow-sm my-12 border border-[#003020]/5">
         <div className="flex flex-col items-center text-center mb-16">
           <span className="material-symbols-outlined text-[#C88A20] text-4xl mb-4">shopping_bag</span>
-          <h2 className="text-4xl md:text-5xl font-serif text-[#003020] font-bold mb-4">Featured Collection</h2>
-          <p className="text-[#003020]/60 max-w-2xl text-lg">Real Madhav Shringaar products, ready for your beloved Kanha.</p>
+          <h2 className="text-4xl md:text-5xl font-serif text-[#003020] font-bold mb-4">{t.home.featuredTitle}</h2>
+          <p className="text-[#003020]/60 max-w-2xl text-lg">{t.home.featuredSubtitle}</p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
           {latestProducts && latestProducts.length > 0 ? (
             latestProducts.slice(0, 4).map((product: any) => (
                 <div key={product.id} className="w-full transform hover:-translate-y-2 transition-transform duration-300">
@@ -245,14 +272,14 @@ export default async function Homepage({
           ) : (
             <div className="col-span-full py-20 text-center text-on-surface-variant bg-[#FBF7EE] rounded-2xl">
                <span className="material-symbols-outlined text-4xl mb-2 opacity-50">inventory_2</span>
-               <p>No featured products available.</p>
+               <p>{t.home.noFeatured}</p>
             </div>
           )}
         </div>
         
         <div className="mt-16 text-center">
            <Link href="/search" className="inline-block border-2 border-[#003020] text-[#003020] px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-[#003020] hover:text-white transition-colors shadow-sm">
-              View Entire Collection
+              {t.home.viewEntireCollection}
            </Link>
         </div>
       </section>
@@ -268,23 +295,26 @@ export default async function Homepage({
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
            <div className="order-2 lg:order-1 text-center lg:text-left space-y-6">
               <h2 className="text-6xl md:text-8xl font-serif font-bold text-[#003020] leading-none mb-6">
-                Complete <br/>
-                <span className="italic text-[#C88A20] font-light">Shringar</span>
+                {isHindi ? (
+                  <>संपूर्ण <br/><span className="italic text-[#C88A20] font-light">शृंगार सेट</span></>
+                ) : (
+                  <>Complete <br/><span className="italic text-[#C88A20] font-light">Shringar</span></>
+                )}
               </h2>
               <p className="text-xl text-[#003020]/80 font-serif italic mb-10 bg-white/50 inline-block px-6 py-2 rounded-full border border-white">
-                “Everything your beloved Kanha needs, thoughtfully brought together.”
+                {t.home.completeSubtitle}
               </p>
               
               <div className="flex flex-wrap gap-3 justify-center lg:justify-start mb-10">
-                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">Poshak</span>
-                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">Mukut</span>
-                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">Mala</span>
-                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">Bansuri</span>
-                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">Kangan</span>
+                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">{t.home.poshakBadge}</span>
+                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">{t.home.mukutBadge}</span>
+                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">{t.home.malaBadge}</span>
+                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">{t.home.bansuriBadge}</span>
+                 <span className="bg-white text-[#003020] font-bold px-4 py-2 rounded-full shadow-sm">{t.home.kanganBadge}</span>
               </div>
               
               <Link href="/search?category=Complete Shringar" className="inline-block bg-[#003020] text-white px-12 py-5 rounded-full font-bold shadow-xl hover:-translate-y-1 transition-transform uppercase tracking-widest text-sm">
-                Explore Combos
+                {t.home.exploreCombos}
               </Link>
            </div>
            
@@ -293,8 +323,8 @@ export default async function Homepage({
                  <Image src="/images/devotional/complete_shringar.webp" className="w-full h-full object-cover rounded-[3rem_0.5rem_3rem_0.5rem] transition-transform duration-700 group-hover:scale-[1.02] group-active:scale-[1.02]" alt="Complete Shringar Arrangement" width={1000} height={900} sizes="(max-width: 768px) 100vw, 50vw" />
                  
                  {/* Floating price badge */}
-                 <div className="absolute -bottom-6 -left-6 bg-[#0F6F74] text-white p-6 rounded-full shadow-xl rotate-[-15deg] font-serif font-bold text-xl border-4 border-white">
-                    Matching<br/>Sets!
+                 <div className="absolute -bottom-6 -left-6 bg-[#0F6F74] text-white p-6 rounded-full shadow-xl rotate-[-15deg] font-serif font-bold text-lg md:text-xl border-4 border-white text-center leading-tight">
+                    {t.home.matchingSets}
                  </div>
               </div>
            </div>
@@ -304,21 +334,21 @@ export default async function Homepage({
       {/* 8. FESTIVAL / OCCASION CAMPAIGN */}
       <section className="py-24 bg-[#0F6F74] text-white">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <h2 className="text-5xl md:text-6xl font-serif font-bold mb-12">Seva For Every Occasion</h2>
+          <h2 className="text-4xl md:text-6xl font-serif font-bold mb-12">{t.home.sevaForOccasions}</h2>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { name: 'Daily Seva', img: '/images/devotional/poshak.webp', color: 'bg-[#003020]' },
-              { name: 'Janmashtami', img: '/images/devotional/hero_krishna.webp', color: 'bg-[#C88A20]' },
-              { name: 'Festivals', img: '/images/devotional/mukut.webp', color: 'bg-[#E6C16A]' },
-              { name: 'Special Darshan', img: '/images/devotional/complete_shringar.webp', color: 'bg-[#FDE8DF]' }
-            ].map((occ, i) => (
-              <Link key={occ.name} href={`/search?q=${occ.name}`} className="group block relative h-64 md:h-80 rounded-[2rem] overflow-hidden shadow-lg hover:-translate-y-3 active:scale-[0.98] transition-all duration-300">
+              { name: t.home.dailySeva, query: 'Daily Seva', img: '/images/devotional/poshak.webp', color: 'bg-[#003020]' },
+              { name: t.home.janmashtami, query: 'Janmashtami', img: '/images/devotional/hero_krishna.webp', color: 'bg-[#C88A20]' },
+              { name: t.home.festivals, query: 'Festivals', img: '/images/devotional/mukut.webp', color: 'bg-[#E6C16A]' },
+              { name: t.home.specialDarshan, query: 'Special Darshan', img: '/images/devotional/complete_shringar.webp', color: 'bg-[#FDE8DF]' }
+            ].map((occ) => (
+              <Link key={occ.query} href={`/search?q=${encodeURIComponent(occ.query)}`} className="group block relative h-64 md:h-80 rounded-[2rem] overflow-hidden shadow-lg hover:-translate-y-3 active:scale-[0.98] transition-all duration-300">
                 <Image src={occ.img} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 group-active:opacity-100 group-active:scale-110 transition-all duration-700" alt={occ.name} width={800} height={800} sizes="(max-width: 768px) 50vw, 25vw" />
                 <div className={`absolute inset-0 bg-gradient-to-t ${occ.color}/90 via-transparent to-transparent`}></div>
                 <div className="absolute bottom-6 left-0 w-full text-center px-4">
-                   <h3 className="text-white font-bold font-serif text-2xl drop-shadow-md">{occ.name}</h3>
-                   <span className="text-white/80 text-sm mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Explore </span>
+                   <h3 className="text-white font-bold font-serif text-xl md:text-2xl drop-shadow-md">{occ.name}</h3>
+                   <span className="text-white/80 text-sm mt-1 opacity-0 group-hover:opacity-100 transition-opacity">{t.home.explore}</span>
                 </div>
               </Link>
             ))}
@@ -326,39 +356,128 @@ export default async function Homepage({
         </div>
       </section>
 
-      {/* 9. WHY YOU'LL LOVE US — PLAYFUL BENEFITS */}
-      <section className="py-24 bg-[#FBF7EE]">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow text-center border-b-4 border-[#0F6F74]">
-            <div className="w-20 h-20 mx-auto bg-[#E8F3EE] rounded-full flex items-center justify-center text-[#0F6F74] mb-6 shadow-inner">
-               <span className="material-symbols-outlined text-4xl">local_shipping</span>
-            </div>
-            <h4 className="font-bold text-[#003020] font-serif text-2xl mb-2">Fast & Secure</h4>
-            <p className="text-[#003020]/70 font-light">Safe delivery right to your doorstep</p>
+      {/* 9. WHY DEVOTEES CHOOSE US — HANDCRAFTED SEVA COMMITMENT */}
+      <section className="py-24 bg-gradient-to-b from-[#FBF7EE] via-[#F8F2E2]/60 to-[#FBF7EE] relative overflow-hidden border-y border-[#E6C16A]/20">
+        <div className="max-w-7xl mx-auto px-6">
+          {/* Section Heading with Human/Devotional Warmth */}
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#0F6F74]/10 text-[#0F6F74] mb-3 uppercase tracking-widest font-sans">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0F6F74]"></span>
+              {t.home.devotionalPromise}
+            </span>
+            <h2 className="text-3xl md:text-5xl font-serif text-[#003020] font-bold tracking-tight mb-4">
+              {t.home.promiseTitle}
+            </h2>
+            <p className="text-[#003020]/75 text-base md:text-lg font-light leading-relaxed">
+              {t.home.promiseDesc}
+            </p>
           </div>
-          
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow text-center border-b-4 border-[#C88A20]">
-            <div className="w-20 h-20 mx-auto bg-[#FDFBF7] rounded-full flex items-center justify-center text-[#C88A20] mb-6 shadow-inner">
-               <span className="material-symbols-outlined text-4xl">workspace_premium</span>
+
+          {/* 4 Human-Crafted Seva Pillars */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Card 1: Braj Dhām Karigari */}
+            <div className="bg-white rounded-3xl p-7 shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-[#D4A346]/40 hover:border-[#B37812] ring-1 ring-[#D4A346]/15 hover:ring-[#B37812]/30 flex flex-col justify-between group hover:-translate-y-1.5 relative">
+              <div>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FFF9EE] to-[#FBF2DE] border border-[#D4A346]/40 flex items-center justify-center text-[#C88A20] shadow-xs group-hover:scale-105 group-hover:border-[#B37812]/60 transition-all duration-300">
+                    <span className="material-symbols-outlined text-3xl">workspace_premium</span>
+                  </div>
+                  <span className="inline-flex items-center text-[11px] font-bold text-[#8A5A0A] bg-[#FAF3E0] border border-[#D4A346]/35 px-3 py-1 rounded-full tracking-wide uppercase font-sans">
+                    {t.home.pillar1Top}
+                  </span>
+                </div>
+                <h3 className="font-bold text-[#003020] font-serif text-xl tracking-tight mb-2.5 group-hover:text-[#8A5A0A] transition-colors">
+                  {t.home.pillar1Title}
+                </h3>
+                <p className="text-[#003020]/80 text-sm leading-relaxed font-light mb-6">
+                  {t.home.pillar1Desc}
+                </p>
+              </div>
+              <div className="pt-4 border-t border-neutral-100">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#FAF3E0]/70 border border-[#D4A346]/30 text-xs text-[#8A5A0A] font-semibold font-sans">
+                  <span className="material-symbols-outlined text-base text-[#0F6F74] shrink-0">verified</span>
+                  <span className="truncate">{t.home.pillar1Badge}</span>
+                </div>
+              </div>
             </div>
-            <h4 className="font-bold text-[#003020] font-serif text-2xl mb-2">Authentic Quality</h4>
-            <p className="text-[#003020]/70 font-light">Premium craftsmanship you can trust</p>
-          </div>
-          
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow text-center border-b-4 border-[#E6C16A]">
-            <div className="w-20 h-20 mx-auto bg-[#FDE8DF] rounded-full flex items-center justify-center text-[#E6C16A] mb-6 shadow-inner">
-               <span className="material-symbols-outlined text-4xl">favorite</span>
+
+            {/* Card 2: Pavitra Safe Packaging */}
+            <div className="bg-white rounded-3xl p-7 shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-[#0F6F74]/35 hover:border-[#0F6F74] ring-1 ring-[#0F6F74]/15 hover:ring-[#0F6F74]/35 flex flex-col justify-between group hover:-translate-y-1.5 relative">
+              <div>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#EAF5F2] to-[#DEF0EB] border border-[#0F6F74]/30 flex items-center justify-center text-[#0F6F74] shadow-xs group-hover:scale-105 group-hover:border-[#0F6F74]/60 transition-all duration-300">
+                    <span className="material-symbols-outlined text-3xl">local_shipping</span>
+                  </div>
+                  <span className="inline-flex items-center text-[11px] font-bold text-[#0F6F74] bg-[#EAF5F2] border border-[#0F6F74]/30 px-3 py-1 rounded-full tracking-wide uppercase font-sans">
+                    {t.home.pillar2Top}
+                  </span>
+                </div>
+                <h3 className="font-bold text-[#003020] font-serif text-xl tracking-tight mb-2.5 group-hover:text-[#0F6F74] transition-colors">
+                  {t.home.pillar2Title}
+                </h3>
+                <p className="text-[#003020]/80 text-sm leading-relaxed font-light mb-6">
+                  {t.home.pillar2Desc}
+                </p>
+              </div>
+              <div className="pt-4 border-t border-neutral-100">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#EAF5F2]/70 border border-[#0F6F74]/30 text-xs text-[#0F6F74] font-semibold font-sans">
+                  <span className="material-symbols-outlined text-base text-[#0F6F74] shrink-0">inventory_2</span>
+                  <span className="truncate">{t.home.pillar2Badge}</span>
+                </div>
+              </div>
             </div>
-            <h4 className="font-bold text-[#003020] font-serif text-2xl mb-2">Made With Love</h4>
-            <p className="text-[#003020]/70 font-light">Created with devotion for Kanha</p>
-          </div>
-          
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow text-center border-b-4 border-[#003020]">
-            <div className="w-20 h-20 mx-auto bg-gray-50 rounded-full flex items-center justify-center text-[#003020] mb-6 shadow-inner">
-               <span className="material-symbols-outlined text-4xl">support_agent</span>
+
+            {/* Card 3: Size Fit Guarantee (0 to 6 No.) */}
+            <div className="bg-white rounded-3xl p-7 shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-[#D97706]/35 hover:border-[#B45309] ring-1 ring-[#D97706]/15 hover:ring-[#B45309]/30 flex flex-col justify-between group hover:-translate-y-1.5 relative">
+              <div>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FFF5ED] to-[#FEEAD9] border border-[#D97706]/40 flex items-center justify-center text-[#D97706] shadow-xs group-hover:scale-105 group-hover:border-[#B45309]/60 transition-all duration-300">
+                    <span className="material-symbols-outlined text-3xl">favorite</span>
+                  </div>
+                  <span className="inline-flex items-center text-[11px] font-bold text-[#B45309] bg-[#FFF5ED] border border-[#D97706]/35 px-3 py-1 rounded-full tracking-wide uppercase font-sans">
+                    {t.home.pillar3Top}
+                  </span>
+                </div>
+                <h3 className="font-bold text-[#003020] font-serif text-xl tracking-tight mb-2.5 group-hover:text-[#B45309] transition-colors">
+                  {t.home.pillar3Title}
+                </h3>
+                <p className="text-[#003020]/80 text-sm leading-relaxed font-light mb-6">
+                  {t.home.pillar3Desc}
+                </p>
+              </div>
+              <div className="pt-4 border-t border-neutral-100">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#FFF5ED]/80 border border-[#D97706]/30 text-xs text-[#B45309] font-semibold font-sans">
+                  <span className="material-symbols-outlined text-base text-[#D97706] shrink-0">published_with_changes</span>
+                  <span className="truncate">{t.home.pillar3Badge}</span>
+                </div>
+              </div>
             </div>
-            <h4 className="font-bold text-[#003020] font-serif text-2xl mb-2">Devotee Care</h4>
-            <p className="text-[#003020]/70 font-light">We are always here to help you</p>
+
+            {/* Card 4: Devotee Care on Call & WhatsApp */}
+            <div className="bg-white rounded-3xl p-7 shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-[#003020]/25 hover:border-[#003020] ring-1 ring-[#003020]/15 hover:ring-[#003020]/30 flex flex-col justify-between group hover:-translate-y-1.5 relative">
+              <div>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F0F5F2] to-[#E2EBE5] border border-[#003020]/20 flex items-center justify-center text-[#003020] shadow-xs group-hover:scale-105 group-hover:border-[#003020]/50 transition-all duration-300">
+                    <span className="material-symbols-outlined text-3xl">support_agent</span>
+                  </div>
+                  <span className="inline-flex items-center text-[11px] font-bold text-[#003020] bg-[#F0F5F2] border border-[#003020]/25 px-3 py-1 rounded-full tracking-wide uppercase font-sans">
+                    {t.home.pillar4Top}
+                  </span>
+                </div>
+                <h3 className="font-bold text-[#003020] font-serif text-xl tracking-tight mb-2.5 group-hover:text-[#003020] transition-colors">
+                  {t.home.pillar4Title}
+                </h3>
+                <p className="text-[#003020]/80 text-sm leading-relaxed font-light mb-6">
+                  {t.home.pillar4Desc}
+                </p>
+              </div>
+              <div className="pt-4 border-t border-neutral-100">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F0F5F2]/80 border border-[#003020]/20 text-xs text-[#003020] font-semibold font-sans">
+                  <span className="material-symbols-outlined text-base text-[#25D366] shrink-0">chat</span>
+                  <span className="truncate">{t.home.pillar4Badge}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -366,8 +485,8 @@ export default async function Homepage({
       {/* 10. MOMENTS OF SEVA */}
       <section className="py-24 max-w-7xl mx-auto px-6 md:px-12 bg-white rounded-[4rem] my-12 shadow-sm border border-[#003020]/5">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-6xl font-serif text-[#003020] font-bold mb-4">Moments of Seva</h2>
-          <p className="text-[#003020]/60 text-lg">Glimpses of devotion from our artisans and devotees.</p>
+          <h2 className="text-4xl md:text-6xl font-serif text-[#003020] font-bold mb-4">{t.home.momentsOfSeva}</h2>
+          <p className="text-[#003020]/60 text-lg">{t.home.momentsSubtitle}</p>
         </div>
         
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
@@ -386,13 +505,13 @@ export default async function Homepage({
       {/* 11. TESTIMONIALS */}
       <section className="py-24 bg-[#E8F3EE]">
          <div className="max-w-6xl mx-auto px-6">
-            <h2 className="text-center text-4xl md:text-5xl font-serif text-[#003020] font-bold mb-16">Loved by Devotees</h2>
+            <h2 className="text-center text-4xl md:text-5xl font-serif text-[#003020] font-bold mb-16">{t.home.lovedByDevotees}</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                {[
-                 { name: 'Radhika S.', text: 'The poshak is absolutely stunning. The embroidery work is so detailed. My Kanha looks divine!' },
-                 { name: 'Meera V.', text: 'I ordered the complete shringar set for Janmashtami. The packaging was beautiful and the quality is premium.' },
-                 { name: 'Ananya D.', text: 'Beautiful mukut and bansuri. Exactly what I was looking for. Will definitely shop again for daily seva items.' }
+                 { name: t.home.review1Name, text: t.home.review1Text },
+                 { name: t.home.review2Name, text: t.home.review2Text },
+                 { name: t.home.review3Name, text: t.home.review3Text }
                ].map((review, i) => (
                  <div key={i} className="bg-white p-8 rounded-[2rem] shadow-sm relative pt-12">
                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-[#E6C16A] rounded-full flex items-center justify-center text-white text-2xl font-serif">"</div>
@@ -419,11 +538,19 @@ export default async function Homepage({
         <div className="relative z-20 max-w-4xl mx-auto px-6 text-center flex flex-col items-center">
           <span className="material-symbols-outlined text-[#E6C16A] text-6xl mb-6">favorite</span>
           <h2 className="text-5xl md:text-7xl font-serif font-bold mb-8 leading-tight">
-            Bring Home <br/> <span className="text-[#E6C16A] italic font-light">Divine Happiness</span>
+            {isHindi ? (
+              <>
+                घर लाएं <br/> <span className="text-[#E6C16A] italic font-light">दिव्य आनंद एवं कृपा</span>
+              </>
+            ) : (
+              <>
+                Bring Home <br/> <span className="text-[#E6C16A] italic font-light">Divine Happiness</span>
+              </>
+            )}
           </h2>
-          <p className="text-xl md:text-2xl text-white/80 font-serif italic mb-12">Make every moment of seva special.</p>
+          <p className="text-xl md:text-2xl text-white/80 font-serif italic mb-12">{t.home.ctaSubtitle}</p>
           <Link href="/search" className="bg-[#E6C16A] text-[#003020] px-12 py-5 rounded-full font-bold uppercase tracking-widest text-sm shadow-2xl hover:bg-white hover:-translate-y-1 transition-all duration-300">
-            Shop Madhav Shringaar
+            {t.home.ctaBtn}
           </Link>
         </div>
       </section>

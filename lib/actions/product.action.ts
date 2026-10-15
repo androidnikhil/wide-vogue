@@ -12,7 +12,7 @@ import { Product } from '@/types';
 // Get latest products
 export async function getLatestProducts() {
   const data = await prisma.product.findMany({
-    take: LATEST_PRODUCT_LIMIT,
+    take: Math.max(LATEST_PRODUCT_LIMIT || 4, 8),
     orderBy: { createdAt: 'desc' },
   });
 
@@ -187,6 +187,7 @@ export async function getProductById(productId: string) {
     return {
       data: data as any as Product[],
       totalPages: Math.ceil(dataCount / limit),
+      totalCount: dataCount,
     };
   }
 

@@ -7,6 +7,7 @@ import {
 import Link from 'next/link';
 import PriceSlider from '@/components/shared/search/price-slider';
 import MobileFilterDrawer from '@/components/shared/search/mobile-filter-drawer';
+import Pagination from '@/components/shared/pagination';
 
 const ratings = [4, 3, 2, 1];
 
@@ -114,15 +115,16 @@ const SearchPage = async (props: {
     rating,
     sort,
     page: Number(page),
+    limit: 24,
     size,
   });
 
   const categories = await getAllCategories();
 
   return (
-    <div className='container mx-auto px-4 lg:px-8 grid md:grid-cols-5 md:gap-8 my-6 md:my-10'>
-      {/* Desktop Filter Sidebar - Hidden on mobile */}
-      <div className='hidden md:block md:col-span-1 bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/30 h-fit sticky top-24'>
+    <div className='container mx-auto px-4 lg:px-8 grid lg:grid-cols-5 lg:gap-8 my-6 md:my-10'>
+      {/* Desktop Filter Sidebar - Shown on Desktop only (lg:), button drawer on Mobile & iPad */}
+      <div className='hidden lg:block lg:col-span-1 bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/30 h-fit sticky top-24'>
         {/* Category Links */}
         <div className='font-title-lg text-primary mb-4 border-b border-outline-variant/30 pb-2 flex items-center gap-2'>
           <span className="material-symbols-outlined text-secondary text-xl">category</span>
@@ -214,13 +216,13 @@ const SearchPage = async (props: {
       </div>
       
       {/* Products & Top Controls */}
-      <div className='w-full md:col-span-4 space-y-6'>
+      <div className='w-full lg:col-span-4 space-y-6'>
         <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center bg-surface-container p-3 md:p-4 rounded-xl border border-outline-variant/30 gap-3'>
           
           {/* Active Filter Tags */}
           <div className='flex items-center text-on-surface-variant flex-wrap gap-2'>
-            {/* Mobile Filter Button (visible on mobile only) */}
-            <div className="md:hidden">
+            {/* Mobile & iPad Filter Button (visible on mobile and tablet) */}
+            <div className="lg:hidden">
               <MobileFilterDrawer
                 categories={categories}
                 category={category}
@@ -259,7 +261,7 @@ const SearchPage = async (props: {
         </div>
 
         {/* Product Grid */}
-        <div className='grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'>
+        <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6'>
           {products.data.length === 0 && (
             <div className="col-span-full py-16 text-center text-gray-500">
               <span className="text-3xl mb-2 block">🦚</span>
@@ -274,6 +276,16 @@ const SearchPage = async (props: {
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
+
+        {/* Pagination & Total Count */}
+        {products.totalPages > 1 && (
+          <div className="pt-8 pb-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant/30">
+            <p className="text-xs text-neutral-500">
+              Showing page <b>{page}</b> of <b>{products.totalPages}</b> ({products.totalCount || products.data.length} total products)
+            </p>
+            <Pagination page={Number(page)} totalPages={products.totalPages} />
+          </div>
+        )}
       </div>
     </div>
   );

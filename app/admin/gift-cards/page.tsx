@@ -16,6 +16,7 @@ import Pagination from '@/components/shared/pagination';
 import GiftCardGenerator from '@/components/admin/gift-card-generator';
 import ShareGiftCardModal from '@/components/admin/share-gift-card-modal';
 import Link from 'next/link';
+import CopyButton from '@/components/shared/copy-button';
 
 export const metadata: Metadata = {
   title: 'Admin Gift Cards',
@@ -57,7 +58,12 @@ const AdminGiftCardsPage = async (props: {
           <TableBody>
             {giftcards.data.map((gc: any) => (
               <TableRow key={gc.id} className="hover:bg-surface-container-lowest">
-                <TableCell className="font-medium font-mono text-primary">{gc.code}</TableCell>
+                <TableCell className="font-medium font-mono text-primary">
+                  <div className="flex items-center gap-1.5">
+                    <span>{gc.code}</span>
+                    <CopyButton text={gc.code} title="Copy Gift Card Code" size="xs" />
+                  </div>
+                </TableCell>
                 <TableCell className="font-bold">{formatCurrency(gc.initialValue)}</TableCell>
                 <TableCell>
                   {gc.usedOrderId ? (

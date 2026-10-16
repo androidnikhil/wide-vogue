@@ -25,6 +25,7 @@ import GiftCardForm from "@/components/shared/cart/gift-card-form";
 import BhaktiPointsForm from "@/components/shared/cart/bhakti-points-form";
 import { LOYALTY_CONFIG } from "@/lib/loyalty.config";
 import { calculateShiprocketRatesForPincode } from "@/lib/actions/shiprocket.actions";
+import CopyButton from "@/components/shared/copy-button";
 
 const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints?: number }) => {
   const router = useRouter();
@@ -299,15 +300,21 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                   )}
 
                   {Number(cart.discountPrice) > 0 && (
-                    <div className="flex justify-between text-emerald-600 font-body-md py-1 font-medium">
-                      <span>Discount (Code: {cart.couponCode}):</span>
+                    <div className="flex justify-between items-center text-emerald-600 font-body-md py-1 font-medium">
+                      <span className="flex items-center gap-1.5">
+                        Discount (Code: {cart.couponCode})
+                        <CopyButton text={cart.couponCode || ''} title="Copy Promo Code" size="xs" />
+                      </span>
                       <span>-{formatCurrency(cart.discountPrice || "0")}</span>
                     </div>
                   )}
 
                   {Number(cart.giftCardAmount) > 0 && (
-                    <div className="flex justify-between text-emerald-600 font-body-md py-1 font-medium">
-                      <span>Gift Card ({cart.giftCardCode}):</span>
+                    <div className="flex justify-between items-center text-emerald-600 font-body-md py-1 font-medium">
+                      <span className="flex items-center gap-1.5">
+                        Gift Card ({cart.giftCardCode})
+                        <CopyButton text={cart.giftCardCode || ''} title="Copy Gift Card Code" size="xs" />
+                      </span>
                       <span>-{formatCurrency(cart.giftCardAmount || "0")}</span>
                     </div>
                   )}

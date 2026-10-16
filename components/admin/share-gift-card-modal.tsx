@@ -14,6 +14,7 @@ import { useRef, useState } from 'react';
 import * as htmlToImage from 'html-to-image';
 import { APP_NAME } from '@/lib/constants';
 import Image from 'next/image';
+import CopyButton from '@/components/shared/copy-button';
 
 interface ShareGiftCardModalProps {
   giftCard: {
@@ -98,8 +99,9 @@ export default function ShareGiftCardModal({ giftCard }: ShareGiftCardModalProps
             <div className='relative z-10 flex justify-between items-end mt-6'>
               <div>
                 <p className='text-[10px] text-[#f5d061]/90 uppercase tracking-widest mb-1.5'>Redeem Code</p>
-                <div className='bg-white/10 px-4 py-2 rounded-lg border border-white/20 backdrop-blur-md shadow-inner'>
+                <div className='bg-white/10 px-4 py-2 rounded-lg border border-white/20 backdrop-blur-md shadow-inner flex items-center gap-2'>
                   <p className='font-mono font-bold text-xl tracking-wider text-white drop-shadow-sm'>{giftCard.code}</p>
+                  <CopyButton text={giftCard.code} title="Copy Gift Card Code" variant="light" size="xs" />
                 </div>
               </div>
               <div className='text-right'>

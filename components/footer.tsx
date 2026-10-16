@@ -17,9 +17,9 @@ export default async function Footer() {
               <Link href="/" className="inline-block group transition-transform hover:opacity-95">
                 <Image 
                   alt="Madhav Shringaar" 
-                  width={320} 
-                  height={110} 
-                  className="h-20 sm:h-22 w-auto object-contain drop-shadow-md group-hover:scale-102 transition-transform" 
+                  width={360} 
+                  height={125} 
+                  className="h-24 sm:h-28 w-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform" 
                   src="/images/logo-footer.webp" 
                   priority
                 />

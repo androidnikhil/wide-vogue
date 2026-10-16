@@ -43,19 +43,37 @@ export default async function Header() {
         </div>
       </div>
 
-      <header id="main-header" className="sticky top-0 w-full z-50 border-b border-outline-variant/10 py-2 bg-[#FBF7EE]/95 shadow-sm backdrop-blur-lg">
-        <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 flex flex-col gap-2 max-sm:px-2">
-          <div className="flex items-center justify-between gap-2 sm:gap-3 md:gap-4 w-full">
+      <header id="main-header" className="sticky top-0 w-full z-50 border-b border-outline-variant/10 py-1.5 sm:py-2 bg-[#FBF7EE]/95 shadow-sm backdrop-blur-lg">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-2.5 flex flex-col gap-2 max-sm:px-2">
+          <div className="relative flex items-center justify-between gap-2 sm:gap-3 md:gap-4 w-full">
 
-            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 md:gap-2.5">
-              <MobileMenu sessionUser={session?.user} />
-              <Link className="shrink-0 flex items-center" href="/">
+            {/* Left: Hamburger (Mobile) and Logo (Desktop) */}
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 md:gap-2.5 z-10">
+              <div className="md:hidden">
+                <MobileMenu sessionUser={session?.user} />
+              </div>
+              <Link className="hidden md:flex shrink-0 items-center" href="/">
                 <Image
                   alt="Madhav Shringaar"
-                  className="h-11 sm:h-12 md:h-13 lg:h-15 xl:h-16 w-auto object-contain shrink-0 transition-transform duration-300 hover:scale-[1.02]"
+                  className="h-16 md:h-[74px] lg:h-[80px] xl:h-[86px] w-auto object-contain shrink-0 transition-transform duration-300 hover:scale-[1.02]"
                   src="/images/logo.webp"
-                  width={260}
-                  height={85}
+                  width={340}
+                  height={108}
+                  quality={95}
+                  priority
+                />
+              </Link>
+            </div>
+
+            {/* Mobile Centered Logo */}
+            <div className="md:hidden absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-auto">
+              <Link className="flex items-center" href="/">
+                <Image
+                  alt="Madhav Shringaar"
+                  className="h-12 sm:h-13 w-auto object-contain shrink-0 transition-transform duration-300 hover:scale-[1.02]"
+                  src="/images/logo.webp"
+                  width={250}
+                  height={80}
                   quality={95}
                   priority
                 />
@@ -82,7 +100,7 @@ export default async function Header() {
               </form>
             </div>
 
-            <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 md:gap-2 lg:gap-4">
+            <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 md:gap-2 lg:gap-4 z-10">
               <MobileSearch />
 
               <div className="hidden lg:flex items-center">

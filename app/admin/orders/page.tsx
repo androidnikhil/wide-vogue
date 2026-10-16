@@ -15,6 +15,7 @@ import {
   import DeleteDialog from '@/components/shared/delete-dialog';
   import { requireAdmin } from '@/lib/auth-guard';
   import { Printer, HeartHandshake } from 'lucide-react';
+  import CopyButton from '@/components/shared/copy-button';
   
   export const metadata: Metadata = {
     title: 'Admin Orders',
@@ -63,7 +64,12 @@ import {
             <TableBody>
               {orders.data.map((order) => (
                 <TableRow key={order.id} className="hover:bg-surface-container-lowest">
-                  <TableCell className="font-medium font-mono text-primary">{formatId(order.id)}</TableCell>
+                  <TableCell className="font-medium font-mono text-primary">
+                    <div className="flex items-center gap-1.5">
+                      <span>{formatId(order.id)}</span>
+                      <CopyButton text={order.id} title="Copy Order ID" size="xs" />
+                    </div>
+                  </TableCell>
                   <TableCell>
                     {formatDateTime(order.createdAt).dateTime}
                   </TableCell>

@@ -131,9 +131,9 @@ export default function MobileMenu({ sessionUser }: MobileMenuProps) {
                 <Image
                   src="/images/logo.webp"
                   alt="Madhav Shringaar"
-                  width={190}
-                  height={68}
-                  className="h-11 sm:h-12 w-auto object-contain drop-shadow-xs"
+                  width={220}
+                  height={78}
+                  className="h-13 sm:h-14 w-auto object-contain drop-shadow-xs"
                   priority
                 />
               </Link>

@@ -19,6 +19,7 @@ import {
 import Image from 'next/image';
 import { formatCurrency } from '@/lib/utils';
 import PlaceOrderForm from './place-order-form';
+import CopyButton from '@/components/shared/copy-button';
 
 export const metadata: Metadata = {
   title: 'Place Order',
@@ -177,13 +178,19 @@ const PlaceOrderPage = async () => {
                   )}
                   {Number(cart.discountPrice) > 0 && (
                     <div className='flex justify-between items-center text-emerald-600 font-medium'>
-                      <span>Discount (Code: {cart.couponCode})</span>
+                      <span className='flex items-center gap-1.5'>
+                        Discount (Code: {cart.couponCode})
+                        <CopyButton text={cart.couponCode || ''} title="Copy Promo Code" size="xs" />
+                      </span>
                       <span>-{formatCurrency(cart.discountPrice || "0")}</span>
                     </div>
                   )}
                   {Number(cart.giftCardAmount) > 0 && (
                     <div className='flex justify-between items-center text-emerald-600 font-medium'>
-                      <span>Gift Card ({cart.giftCardCode})</span>
+                      <span className='flex items-center gap-1.5'>
+                        Gift Card ({cart.giftCardCode})
+                        <CopyButton text={cart.giftCardCode || ''} title="Copy Gift Card Code" size="xs" />
+                      </span>
                       <span>-{formatCurrency(cart.giftCardAmount || "0")}</span>
                     </div>
                   )}

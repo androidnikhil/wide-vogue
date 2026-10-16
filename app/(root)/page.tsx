@@ -115,7 +115,7 @@ export default async function Homepage({
                   className="w-full h-full object-cover rounded-[2.5rem] lg:rounded-[5.5rem]"
                   width={1200}
                   height={1200}
-                  preload
+                  priority
                   sizes="(max-width: 1024px) 85vw, 60vw"
                 />
                 

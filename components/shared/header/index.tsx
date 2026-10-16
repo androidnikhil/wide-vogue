@@ -13,11 +13,13 @@ import LanguageSwitcher from './language-switcher';
 import { getServerTranslations } from '@/lib/i18n/server';
 
 export default async function Header() {
-  const session = await auth();
-  const cart = await getMyCart();
-  const wishlistRes = await getWishlist();
+  const [session, cart, wishlistRes, { t }] = await Promise.all([
+    auth(),
+    getMyCart(),
+    getWishlist(),
+    getServerTranslations(),
+  ]);
   const wishlistItems = wishlistRes.success ? wishlistRes.data : [];
-  const { t } = await getServerTranslations();
 
   return (
     <>
@@ -100,7 +102,7 @@ export default async function Header() {
                 )}
               </Link>
 
-              <CartTrigger cartItemCount={cart ? cart.items.reduce((a, c) => a + c.qty, 0) : 0} cartPrice={cart ? cart.itemsPrice : '0'} />
+              <CartTrigger cartItemCount={cart ? cart.items.reduce((a: number, c: any) => a + Number(c.qty || 0), 0) : 0} cartPrice={cart ? cart.itemsPrice : '0'} />
             </div>
           </div>
         </div>

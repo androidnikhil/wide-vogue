@@ -117,7 +117,12 @@ const jsonLdLocalBusiness = {
       addressCountry: 'IN',
     },
   ],
-  sameAs: ['https://wa.me/917982160480'],
+  sameAs: [
+    'https://www.instagram.com/madhav.shringaar',
+    'https://www.facebook.com/share/1CLPMdGbhJ/',
+    'https://pin.it/51M0t5Fs5',
+    'https://wa.me/917982160480',
+  ],
 };
 
 const jsonLdWebSite = {

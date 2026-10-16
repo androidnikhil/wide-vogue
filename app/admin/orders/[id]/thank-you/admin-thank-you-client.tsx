@@ -102,23 +102,15 @@ export default function AdminThankYouClient({ order }: AdminThankYouClientProps)
               <Image
                 src="/images/logo.png"
                 alt="Madhav Shringaar"
-                width={120}
-                height={35}
-                className="h-8 w-auto object-contain filter grayscale contrast-200"
+                width={200}
+                height={60}
+                className="h-14 w-auto object-contain"
                 priority
                 unoptimized
               />
             </div>
-            <h1 className="text-sm font-black tracking-wider uppercase">MADHAV SHRINGAAR</h1>
-            <p className="text-[9px] uppercase font-semibold text-neutral-800">Premium Handcrafted Collection</p>
-            <p className="text-[8px] text-neutral-600">Noida &bull; Agra &bull; Vrindavan</p>
-          </div>
-
-          <div className="border-b border-dashed border-black my-1.5" />
-
-          {/* Title */}
-          <div className="text-center py-0.5">
-            <p className="font-bold text-[11px] uppercase tracking-wide">*** THANK YOU NOTE ***</p>
+            <p className="text-[9.5px] uppercase font-semibold text-neutral-800 tracking-wider">Premium Handcrafted Collection</p>
+            <p className="text-[8.5px] text-neutral-600">Noida &bull; Agra &bull; Vrindavan</p>
           </div>
 
           <div className="border-b border-dashed border-black my-1.5" />

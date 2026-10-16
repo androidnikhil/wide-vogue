@@ -20,6 +20,7 @@ export default function PincodeChecker() {
     codAvailable?: boolean;
     courierName?: string;
     estimatedDays?: number;
+    shippingRate?: number;
   } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -50,6 +51,7 @@ export default function PincodeChecker() {
         codAvailable: res.codAvailable,
         courierName: res.courierName,
         estimatedDays: res.estimatedDays,
+        shippingRate: res.shippingRate,
       });
     } catch {
       setErrorMessage('Could not verify delivery options right now. Please try again.');
@@ -116,14 +118,14 @@ export default function PincodeChecker() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-1 border-t border-emerald-200/60 text-[11px]">
-            <div className="flex items-center gap-1.5 text-emerald-900">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>{t.product.cashOnDelivery}: <strong>{result.codAvailable ? t.product.available : t.product.prepaidOnly}</strong></span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-1.5 border-t border-emerald-200/60 text-[11px]">
+            <div className="flex items-center gap-1.5 text-emerald-900 font-medium">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Courier: <strong>{result.courierName || 'Shiprocket Express'}</strong> (Rate: ₹{result.shippingRate || 50})</span>
             </div>
             <div className="flex items-center gap-1 text-emerald-800">
-              <Sparkles className="w-3 h-3 text-[#C88A20]" />
-              <span>{language === 'hi' ? '₹999+ पर मुफ़्त डिलीवरी' : 'Free Delivery on ₹999+'}</span>
+              <Sparkles className="w-3 h-3 text-[#C88A20] shrink-0" />
+              <span>{language === 'hi' ? '₹999+ पर मुफ़्त डिलीवरी' : 'FREE Shipping above ₹999'}</span>
             </div>
           </div>
         </div>

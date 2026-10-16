@@ -18,29 +18,60 @@ export function formatNumberWithDecimal(num: number): string {
   return decimal ? `${int}.${decimal.padEnd(2, '0')}` : `${int}.00`;
 }
 
-// Format errors
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function formatError(error: any) {
-  if (error.name === 'ZodError') {
-    // Handle Zod error
-    const fieldErrors = Object.keys(error.errors).map(
-      (field) => error.errors[field].message
-    );
+// Format errors safely without leaking sensitive server paths, database credentials, or API keys
+export function formatError(error: any): string {
+  if (!error) return 'An unexpected error occurred. Please try again.';
 
+  if (error.name === 'ZodError') {
+    const fieldErrors = Object.keys(error.errors || {}).map(
+      (field) => error.errors[field]?.message || 'Invalid input'
+    );
     return fieldErrors.join('. ');
-  } else if (
+  } 
+  
+  if (
     error.name === 'PrismaClientKnownRequestError' &&
     error.code === 'P2002'
   ) {
-    // Handle Prisma error
-    const field = error.meta?.target ? error.meta.target[0] : 'Field';
-    return `${field.charAt(0).toUpperCase() + field.slice(1)} already exists`;
-  } else {
-    // Handle other errors
-    return typeof error.message === 'string'
-      ? error.message
-      : JSON.stringify(error.message);
+    const field = error.meta?.target ? error.meta.target[0] : 'Item';
+    return `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.`;
   }
+
+  const rawMessage = typeof error === 'string'
+    ? error
+    : typeof error?.message === 'string'
+    ? error.message
+    : '';
+
+  // SECURITY SHIELD: Detect and scrub sensitive patterns (DB connection strings, stack traces, internal paths, API keys)
+  const sensitivePatterns = [
+    /postgres(ql)?:\/\//i,
+    /mongodb(\+srv)?:\/\//i,
+    /bearer\s+[a-z0-9_\-\.]+/i,
+    /rzp_(test|live)_[a-z0-9]+/i,
+    /key_[a-z0-9]+/i,
+    /api[-_]?key/i,
+    /secret/i,
+    /jwt/i,
+    /econnrefused/i,
+    /etimedout/i,
+    /prisma/i,
+    /database/i,
+    /select\s+.*\s+from/i,
+    /insert\s+into/i,
+    /syntax\s+error/i,
+    /[a-z]:\\/i,
+    /\/home\//i,
+    /node_modules/i,
+  ];
+
+  const hasSensitiveData = sensitivePatterns.some((pattern) => pattern.test(rawMessage));
+
+  if (hasSensitiveData || !rawMessage) {
+    return 'An unexpected processing error occurred. Please try again or contact support.';
+  }
+
+  return rawMessage.slice(0, 200);
 }
 
 // Round number to 2 decimal places

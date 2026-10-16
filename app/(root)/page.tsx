@@ -115,7 +115,7 @@ export default async function Homepage({
                   className="w-full h-full object-cover rounded-[2.5rem] lg:rounded-[5.5rem]"
                   width={1200}
                   height={1200}
-                  preload
+                  priority
                   sizes="(max-width: 1024px) 85vw, 60vw"
                 />
                 
@@ -264,7 +264,7 @@ export default async function Homepage({
         
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
           {latestProducts && latestProducts.length > 0 ? (
-            latestProducts.slice(0, 4).map((product: any) => (
+            latestProducts.slice(0, 8).map((product: any) => (
                 <div key={product.id} className="w-full transform hover:-translate-y-2 transition-transform duration-300">
                   <ProductCard product={product} />
                 </div>

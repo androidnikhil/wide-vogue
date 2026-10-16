@@ -3,6 +3,7 @@ import { prisma } from '@/db/prisma';
 import { formatDateTime, formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
 import PromoCodeGenerator from '@/components/admin/promo-code-generator';
+import CopyButton from '@/components/shared/copy-button';
 
 export const metadata = {
   title: 'Admin - Coupons',
@@ -49,7 +50,12 @@ export default async function AdminCouponsPage() {
               
               return (
                 <tr key={coupon.id} className="border-b border-outline-variant/20 hover:bg-surface transition-colors">
-                  <td className="p-4 font-bold text-primary font-mono">{coupon.code}</td>
+                  <td className="p-4 font-bold text-primary font-mono">
+                    <div className="flex items-center gap-2">
+                      <span>{coupon.code}</span>
+                      <CopyButton text={coupon.code} title="Copy Promo Code" />
+                    </div>
+                  </td>
                   <td className="p-4 font-medium text-sm">
                     {coupon.discountType === 'percentage' 
                       ? `${coupon.discountValue}% Off` 

@@ -31,17 +31,24 @@ export default function WishlistButton({ productId, className }: { productId: st
 
   return (
     <button
+      type="button"
       onClick={(e) => {
-        e.preventDefault(); // Prevent navigating if wrapped in a link
+        e.preventDefault();
+        e.stopPropagation();
         handleToggle();
       }}
       disabled={isPending}
-      className={className || `absolute top-2 right-2 z-10 p-1.5 bg-surface/90 hover:bg-surface rounded-full shadow-xs active:scale-90 transition-transform flex items-center justify-center ${
-        inWishlist ? 'text-red-500' : 'text-on-surface-variant hover:text-secondary'
-      }`}
+      className={
+        className
+          ? `${className} ${inWishlist ? '!text-rose-600 !border-rose-300 !bg-rose-50/60' : ''}`
+          : `absolute top-2 right-2 z-10 w-8 h-8 bg-white/90 hover:bg-white rounded-full shadow-xs active:scale-90 transition-all flex items-center justify-center ${
+              inWishlist ? 'text-rose-600' : 'text-neutral-500 hover:text-rose-600'
+            }`
+      }
+      title={inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
     >
       <span
-        className="material-symbols-outlined text-base transition-colors"
+        className="material-symbols-outlined text-base sm:text-lg transition-colors"
         style={{ fontVariationSettings: inWishlist ? "'FILL' 1" : "'FILL' 0" }}
       >
         favorite

@@ -1,10 +1,26 @@
 import type { Metadata } from "next";
+import { Inter, Playfair_Display } from "next/font/google";
 import "@/assets/styles/globals.css";
 import { APP_NAME, APP_URL, DEFAULT_SEO_TITLE, DEFAULT_SEO_DESCRIPTION, SEO_KEYWORDS } from "@/lib/constants";
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from "@/components/ui/sonner";
 import { LanguageProvider } from "@/lib/i18n/language-context";
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-playfair",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
@@ -126,7 +142,6 @@ export default function RootLayout({
       <head>
         <link href="https://fonts.googleapis.com" rel="preconnect"/>
         <link crossOrigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect"/>
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
         <script
           type="application/ld+json"
@@ -138,7 +153,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="font-body-lg antialiased bg-background text-on-background"
+        className={`${inter.className} ${playfair.variable} font-body-lg antialiased bg-background text-on-background`}
         suppressHydrationWarning
       >
         <NextTopLoader color="#b8860b" showSpinner={false} />

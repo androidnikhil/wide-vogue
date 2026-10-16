@@ -53,7 +53,7 @@ export const shippingAddressDefaultValues = {
   country: '',
 };
 
-export const PAYMENT_METHODS = ['UPI', 'Card', 'NetBanking', 'CashOnDelivery'];
+export const PAYMENT_METHODS = ['UPI', 'Card', 'NetBanking', 'CashOnDelivery', 'GiftCard'];
 export const DEFAULT_PAYMENT_METHOD = process.env.DEFAULT_PAYMENT_METHOD || 'UPI';
 
 export const PAGE_SIZE = Number(process.env.PAGE_SIZE) || 12;

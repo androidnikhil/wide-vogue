@@ -7,8 +7,14 @@ import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import { signInWithCredentials } from '@/lib/actions/user.actions';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ShieldAlert, Lock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  checkLoginLockout,
+  recordFailedLogin,
+  clearLoginAttempts,
+  type LockoutCheckResult,
+} from '@/lib/actions/auth-limiter.actions';
 
 // Firebase
 import { auth as firebaseAuth } from '@/lib/firebase';
@@ -31,6 +37,7 @@ const CredentialsSignInForm = () => {
 
   // Email Auth State
   const [isEmailPending, setIsEmailPending] = useState(false);
+  const [lockoutInfo, setLockoutInfo] = useState<LockoutCheckResult | null>(null);
 
   // Phone Auth State
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -136,6 +143,14 @@ const CredentialsSignInForm = () => {
       const cleanPhone = phoneNumber.replace(/\D/g, '');
       const formattedPhone = `+91${cleanPhone.slice(-10)}`; // strictly 10 digits
       
+      // 1. Check if phone number is locked out
+      const phoneLockout = await checkLoginLockout(`phone:${cleanPhone}`);
+      if (phoneLockout.isLocked) {
+        toast.error(phoneLockout.message || 'Account temporarily locked for 1 hour.', { duration: 6000 });
+        setIsSendingOtp(false);
+        return;
+      }
+
       // Ensure clean, fresh verifier so stale/consumed tokens never poison the request
       let appVerifier = recaptchaVerifierRef.current;
       if (!appVerifier) {
@@ -191,6 +206,15 @@ const CredentialsSignInForm = () => {
     e.preventDefault();
     if (!otp || !confirmationResult) return;
 
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+
+    // 1. Check lockout on phone
+    const phoneLockout = await checkLoginLockout(`phone:${cleanPhone}`);
+    if (phoneLockout.isLocked) {
+      toast.error(phoneLockout.message || 'Account temporarily locked for 1 hour.', { duration: 6000 });
+      return;
+    }
+
     setIsVerifyingOtp(true);
     try {
       const result = await confirmationResult.confirm(otp);
@@ -205,14 +229,17 @@ const CredentialsSignInForm = () => {
 
       if (response?.error) {
         console.error("NextAuth signIn error:", response.error);
-        toast.error("Authentication failed. Please verify server connection or retry.");
+        const failRes = await recordFailedLogin(`phone:${cleanPhone}`);
+        toast.error(failRes.message, { duration: 6000 });
       } else {
+        await clearLoginAttempts(`phone:${cleanPhone}`);
         toast.success("Login successful!");
         window.location.href = callbackUrl;
       }
     } catch (error: any) {
       console.error('OTP confirmation error:', error);
-      toast.error(error.message || "Invalid OTP. Please try again.");
+      const failRes = await recordFailedLogin(`phone:${cleanPhone}`);
+      toast.error(failRes.message || "Invalid OTP. Please try again.", { duration: 6000 });
     } finally {
       setIsVerifyingOtp(false);
     }
@@ -249,32 +276,83 @@ const CredentialsSignInForm = () => {
   const handleEmailSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
+    const email = (formData.get('email') as string || '').trim().toLowerCase();
     const password = formData.get('password') as string;
+
+    if (!email || !password) {
+      toast.error("Please enter both email and password.");
+      return;
+    }
 
     setIsEmailPending(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(firebaseAuth, email, password);
-      const idToken = await userCredential.user.getIdToken();
-      
-      const response = await signIn('firebase', {
-        idToken,
-        redirect: false,
-        callbackUrl
-      });
+      // 1. Pre-check if account is locked out for 1 hour
+      const lockoutCheck = await checkLoginLockout(email);
+      if (lockoutCheck.isLocked) {
+        setLockoutInfo(lockoutCheck);
+        toast.error(lockoutCheck.message || 'Account is locked for 1 hour due to too many failed attempts.', { duration: 6000 });
+        setIsEmailPending(false);
+        return;
+      }
 
-      if (response?.error) {
-        toast.error("Authentication failed. Please try again.");
+      // 2. Try Firebase Auth first
+      let firebaseToken: string | null = null;
+      try {
+        const userCredential = await signInWithEmailAndPassword(firebaseAuth, email, password);
+        firebaseToken = await userCredential.user.getIdToken();
+      } catch (fbErr: any) {
+        console.log("Firebase email sign-in attempt info:", fbErr?.code);
+      }
+
+      if (firebaseToken) {
+        const response = await signIn('firebase', {
+          idToken: firebaseToken,
+          redirect: false,
+          callbackUrl
+        });
+
+        if (response?.error) {
+          const failRes = await recordFailedLogin(email);
+          if (failRes.isLocked) {
+            setLockoutInfo(failRes);
+          }
+          toast.error(failRes.message, { duration: 6000 });
+        } else {
+          await clearLoginAttempts(email);
+          setLockoutInfo(null);
+          toast.success("Login successful!");
+          window.location.href = callbackUrl;
+        }
       } else {
-        router.push(callbackUrl);
+        // Fallback: Check NextAuth credentials provider (for database accounts, admins, seeded users)
+        const nextAuthRes = await signIn('credentials', {
+          email,
+          password,
+          redirect: false,
+          callbackUrl
+        });
+
+        if (nextAuthRes?.ok && !nextAuthRes.error) {
+          await clearLoginAttempts(email);
+          setLockoutInfo(null);
+          toast.success("Login successful!");
+          window.location.href = callbackUrl;
+        } else {
+          // Authentication failed for both -> Record failed attempt
+          const failRes = await recordFailedLogin(email);
+          if (failRes.isLocked) {
+            setLockoutInfo(failRes);
+          }
+          toast.error(failRes.message, { duration: 6000 });
+        }
       }
     } catch (error: any) {
-      console.error(error);
-      if (error.code === 'auth/invalid-credential') {
-        toast.error("Invalid email or password");
-      } else {
-        toast.error("Failed to sign in. Please try again.");
+      console.error("Sign-in error:", error);
+      const failRes = await recordFailedLogin(email);
+      if (failRes.isLocked) {
+        setLockoutInfo(failRes);
       }
+      toast.error(failRes.message || "Failed to sign in. Please try again.", { duration: 6000 });
     } finally {
       setIsEmailPending(false);
     }
@@ -386,6 +464,23 @@ const CredentialsSignInForm = () => {
         
         {/* EMAIL TAB */}
         <TabsContent value="email">
+          {lockoutInfo?.isLocked && (
+            <div className="mb-4 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive space-y-2">
+              <div className="flex items-center gap-2 font-bold text-sm">
+                <ShieldAlert className="w-5 h-5 text-destructive shrink-0" />
+                <span>Account Temporarily Locked</span>
+              </div>
+              <p className="text-xs leading-relaxed text-destructive/90">
+                {lockoutInfo.message}
+              </p>
+              <div className="pt-1 flex items-center justify-between text-xs">
+                <span className="font-semibold text-muted-foreground">Remaining: ~{lockoutInfo.remainingMinutes || 60} mins</span>
+                <Link href="/forgot-password" className="text-primary underline font-bold hover:opacity-80">
+                  Reset Password
+                </Link>
+              </div>
+            </div>
+          )}
           <form onSubmit={handleEmailSignIn}>
             <input type='hidden' name='callbackUrl' value={callbackUrl} />
             <div className='space-y-4'>
@@ -398,6 +493,7 @@ const CredentialsSignInForm = () => {
                   required
                   autoComplete='email'
                   defaultValue={signInDefaultValues.email}
+                  disabled={Boolean(lockoutInfo?.isLocked)}
                 />
               </div>
               <div>
@@ -415,6 +511,7 @@ const CredentialsSignInForm = () => {
                     required
                     autoComplete='password'
                     defaultValue={signInDefaultValues.password}
+                    disabled={Boolean(lockoutInfo?.isLocked)}
                   />
                   <button
                     type="button"
@@ -426,8 +523,8 @@ const CredentialsSignInForm = () => {
                 </div>
               </div>
               <div>
-                <Button disabled={isEmailPending} className='w-full' variant='default' type="submit">
-                  {isEmailPending ? 'Signing In...' : 'Sign In with Email'}
+                <Button disabled={isEmailPending || Boolean(lockoutInfo?.isLocked)} className='w-full' variant='default' type="submit">
+                  {isEmailPending ? 'Signing In...' : lockoutInfo?.isLocked ? 'Account Locked (1 Hour)' : 'Sign In with Email'}
                 </Button>
               </div>
             </div>

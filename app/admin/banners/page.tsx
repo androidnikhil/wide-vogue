@@ -5,14 +5,21 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Manage Banners',
 };
 
 const BannersPage = async () => {
-  const banners = await prisma.banner.findMany({
-    orderBy: { position: 'asc' },
-  });
+  let banners: any[] = [];
+  try {
+    banners = await prisma.banner.findMany({
+      orderBy: { position: 'asc' },
+    });
+  } catch (error) {
+    console.error('Failed to load banners:', error);
+  }
 
   return (
     <div className='space-y-6'>

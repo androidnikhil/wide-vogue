@@ -1,10 +1,11 @@
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { Language, translations, Translations } from "./translations";
 
 /**
- * Server-side helper to read language from cookie
+ * Server-side helper to read language from cookie (memoized per-request)
  */
-export async function getServerLanguage(): Promise<Language> {
+export const getServerLanguage = cache(async (): Promise<Language> => {
   try {
     const cookieStore = await cookies();
     const lang = cookieStore.get("madhav_lang")?.value;
@@ -12,12 +13,12 @@ export async function getServerLanguage(): Promise<Language> {
   } catch {
     return "en";
   }
-}
+});
 
 /**
- * Server-side helper to get translations dictionary
+ * Server-side helper to get translations dictionary (memoized per-request)
  */
-export async function getServerTranslations(): Promise<{ lang: Language; t: Translations }> {
+export const getServerTranslations = cache(async (): Promise<{ lang: Language; t: Translations }> => {
   const lang = await getServerLanguage();
   return { lang, t: translations[lang] };
-}
+});

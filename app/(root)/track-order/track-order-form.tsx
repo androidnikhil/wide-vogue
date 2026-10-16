@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { trackOrderByQuery } from '@/lib/actions/order.actions';
 import { Loader } from 'lucide-react';
 import OrderTimeline from '@/components/shared/order/order-timeline';
+import CopyButton from '@/components/shared/copy-button';
 
 const TrackOrderForm = () => {
   const searchParams = useSearchParams();
@@ -73,7 +74,10 @@ const TrackOrderForm = () => {
         <div className="space-y-6">
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20 text-center">
             <p className="text-sm text-on-surface-variant">Order Status for</p>
-            <p className="font-title-lg text-primary">{order.id}</p>
+            <div className="flex items-center justify-center gap-2 mt-1">
+              <p className="font-title-lg text-primary font-mono">{order.id}</p>
+              <CopyButton text={order.id} title="Copy Order ID" size="xs" />
+            </div>
           </div>
           <OrderTimeline order={order} />
           <Button variant="outline" className="w-full" onClick={() => setOrder(null)}>

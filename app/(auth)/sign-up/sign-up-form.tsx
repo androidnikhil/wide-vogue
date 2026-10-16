@@ -5,28 +5,41 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { signUpDefaultValues } from '@/lib/constants';
 import Link from 'next/link';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Eye, EyeOff, Check, X, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, Check, X, ShieldAlert, ShieldCheck, Mail, ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { auth as firebaseAuth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { signIn } from 'next-auth/react';
 import { checkEmailAvailability } from '@/lib/actions/user.actions';
+import { generateAndSendOtp, verifyOtpCode } from '@/lib/actions/otp.actions';
 
 export default function SignUpForm() {
+  const [step, setStep] = useState<'DETAILS' | 'OTP'>('DETAILS');
   const [name, setName] = useState(signUpDefaultValues.name);
   const [email, setEmail] = useState(signUpDefaultValues.email);
   const [password, setPassword] = useState(signUpDefaultValues.password);
   const [confirmPassword, setConfirmPassword] = useState(signUpDefaultValues.confirmPassword);
+  const [otp, setOtp] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isPending, setIsPending] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const searchParams = useSearchParams();
   const router = useRouter();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
+
+  // Cooldown timer effect
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   // Standard password rules evaluation
   const passwordCriteria = useMemo(() => {
@@ -54,7 +67,8 @@ export default function SignUpForm() {
 
   const isPasswordStrong = metCount === 5;
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  // Step 1: Send OTP to verify email exists
+  const handleInitiateOtp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const cleanEmail = email.trim().toLowerCase();
@@ -81,14 +95,72 @@ export default function SignUpForm() {
         return;
       }
 
-      // 4. Create user in Firebase
+      // 4. Generate and send Email OTP
+      const otpRes = await generateAndSendOtp(cleanEmail, 'SIGN_UP');
+      if (!otpRes.success) {
+        toast.error(otpRes.message);
+        setIsPending(false);
+        return;
+      }
+
+      toast.success(otpRes.message);
+      setStep('OTP');
+      setResendCooldown(60); // 60 seconds cooldown
+    } catch {
+      toast.error('Unable to send verification code. Please check your internet or try again.');
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  // Resend OTP
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0 || isPending) return;
+    setIsPending(true);
+    try {
+      const otpRes = await generateAndSendOtp(email.trim().toLowerCase(), 'SIGN_UP');
+      if (otpRes.success) {
+        toast.success('A fresh verification code has been sent to your email.');
+        setResendCooldown(60);
+      } else {
+        toast.error(otpRes.message);
+      }
+    } catch {
+      toast.error('Failed to resend code.');
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  // Step 2: Verify OTP and finalize Registration
+  const handleVerifyOtpAndRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanOtp = otp.trim();
+
+    if (cleanOtp.length !== 6) {
+      toast.error('Please enter the complete 6-digit verification code.');
+      return;
+    }
+
+    setIsPending(true);
+    try {
+      // 1. Verify OTP with Server
+      const verifyRes = await verifyOtpCode(cleanEmail, cleanOtp);
+      if (!verifyRes.success) {
+        toast.error(verifyRes.message);
+        setIsPending(false);
+        return;
+      }
+
+      // 2. Create user in Firebase
       const userCredential = await createUserWithEmailAndPassword(firebaseAuth, cleanEmail, password);
       const user = userCredential.user;
 
-      // 5. Update Firebase Display Name
+      // 3. Update Firebase Display Name
       await updateProfile(user, { displayName: name.trim() });
 
-      // 6. Get ID Token and Sign In with NextAuth
+      // 4. Get ID Token and Sign In with NextAuth
       const idToken = await user.getIdToken();
       const response = await signIn('firebase', {
         idToken,
@@ -97,30 +169,114 @@ export default function SignUpForm() {
       });
 
       if (response?.error) {
-        toast.error('Account created, but automatic sign in failed. Please log in.');
+        toast.error('Account verified, but automatic sign in failed. Please log in.');
         router.push('/sign-in');
       } else {
-        toast.success('Account created successfully! Welcome to Madhav Shringaar.');
+        toast.success('Email verified! Welcome to Madhav Shringaar.');
         router.push(callbackUrl);
       }
     } catch (error: any) {
-      console.error('Sign up error:', error);
+      console.error('Registration error:', error);
       if (error.code === 'auth/email-already-in-use') {
         toast.error('An account with this email already exists. Please Sign In.');
-      } else if (error.code === 'auth/weak-password') {
-        toast.error('Password does not meet standard security requirements.');
-      } else if (error.code === 'auth/invalid-email') {
-        toast.error('Please enter a valid email address.');
+        setStep('DETAILS');
       } else {
-        toast.error(error.message || 'Failed to create account. Please try again.');
+        toast.error(error.message || 'Verification failed. Please try again.');
       }
     } finally {
       setIsPending(false);
     }
   };
 
+  // =========================================================================
+  // VIEW: Step 2 - OTP Input
+  // =========================================================================
+  if (step === 'OTP') {
+    return (
+      <form onSubmit={handleVerifyOtpAndRegister} className="space-y-6">
+        <div className="text-center space-y-2">
+          <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto">
+            <Mail className="w-6 h-6" />
+          </div>
+          <h2 className="text-xl font-bold text-primary">Verify Your Email</h2>
+          <p className="text-xs text-neutral-600 max-w-sm mx-auto">
+            We have sent a 6-digit verification code to <strong className="text-neutral-900">{email}</strong>.
+            Please enter it below to confirm your account.
+          </p>
+        </div>
+
+        <div>
+          <Label htmlFor="otp" className="text-center block text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-2">
+            Enter 6-Digit Code
+          </Label>
+          <Input
+            id="otp"
+            name="otp"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={6}
+            autoFocus
+            autoComplete="one-time-code"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            placeholder="• • • • • •"
+            className="text-center font-mono text-2xl tracking-[10px] h-14 font-bold border-2 focus-visible:ring-primary"
+            required
+          />
+        </div>
+
+        <div className="space-y-3">
+          <Button
+            disabled={isPending || otp.length !== 6}
+            className="w-full h-11 text-base font-semibold"
+            variant="default"
+            type="submit"
+          >
+            {isPending ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Verifying Code...
+              </span>
+            ) : (
+              'Verify & Create Account'
+            )}
+          </Button>
+
+          <div className="flex items-center justify-between text-xs pt-1">
+            <button
+              type="button"
+              onClick={() => setStep('DETAILS')}
+              className="text-neutral-600 hover:text-neutral-900 flex items-center gap-1 font-medium transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Change email
+            </button>
+
+            <button
+              type="button"
+              disabled={resendCooldown > 0 || isPending}
+              onClick={handleResendOtp}
+              className={`font-semibold transition-colors flex items-center gap-1 ${
+                resendCooldown > 0
+                  ? 'text-neutral-400 cursor-not-allowed'
+                  : 'text-primary hover:underline'
+              }`}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isPending ? 'animate-spin' : ''}`} />
+              {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend code'}
+            </button>
+          </div>
+        </div>
+      </form>
+    );
+  }
+
+  // =========================================================================
+  // VIEW: Step 1 - Form Details
+  // =========================================================================
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleInitiateOtp}>
       <input type="hidden" name="callbackUrl" value={callbackUrl} />
       <div className="space-y-5">
         <div>
@@ -151,6 +307,9 @@ export default function SignUpForm() {
             required
             className="mt-1"
           />
+          <p className="text-[11px] text-neutral-500 mt-1">
+            We will send a 6-digit OTP code to verify this email address.
+          </p>
         </div>
 
         <div>
@@ -282,7 +441,7 @@ export default function SignUpForm() {
           )}
           {confirmPassword && password === confirmPassword && isPasswordStrong && (
             <p className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" /> Passwords match & criteria satisfied
+              <ShieldCheck className="w-3.5 h-3.5" /> Passwords match &amp; criteria satisfied
             </p>
           )}
         </div>
@@ -294,7 +453,14 @@ export default function SignUpForm() {
             variant="default"
             type="submit"
           >
-            {isPending ? 'Creating Account...' : 'Sign Up'}
+            {isPending ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Sending Verification Code...
+              </span>
+            ) : (
+              'Verify Email & Sign Up'
+            )}
           </Button>
           {!isPasswordStrong && password.length > 0 && (
             <p className="text-[11px] text-center text-amber-700 mt-2 font-medium">

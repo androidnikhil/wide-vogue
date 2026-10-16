@@ -137,7 +137,17 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
 
             {/* Header */}
             <div className="text-center space-y-0.5 pb-1">
-              <p className="font-bold text-xs tracking-wider">॥ श्री राधे राधे ॥</p>
+              <div className="flex justify-center pb-0.5">
+                <Image
+                  src="/images/logo.png"
+                  alt="Madhav Shringaar"
+                  width={110}
+                  height={32}
+                  className="h-7 w-auto object-contain filter grayscale contrast-200"
+                  priority
+                  unoptimized
+                />
+              </div>
               <h1 className="text-sm font-black uppercase tracking-wide">MADHAV SHRINGAAR</h1>
               <p className="text-[9px] uppercase font-semibold">Madhav Shringaar Pvt Ltd</p>
               <p className="text-[8px] text-neutral-700">Hubs: Noida &bull; Agra &bull; Vrindavan</p>
@@ -282,7 +292,7 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
             <div className="text-center space-y-0.5 text-[8px]">
               <p className="font-bold">Thank You For Choosing Madhav Shringaar!</p>
               <p>www.madhavshringaar.com &bull; +91 79821 60480</p>
-              <p className="text-[7px] tracking-widest uppercase pt-1">*** RADHE RADHE ***</p>
+              <p className="text-[7px] tracking-widest uppercase pt-1">*** THANK YOU FOR YOUR BUSINESS ***</p>
             </div>
           </div>
         </div>
@@ -429,10 +439,10 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
                 </div>
               </div>
 
-              {/* Devotional Footer */}
+              {/* Business Footer */}
               <div className="text-center pt-4 border-t border-neutral-200 text-neutral-500 text-[10px]">
-                <p className="font-bold text-[#003020]">॥ हरे कृष्ण हरे कृष्ण कृष्ण कृष्ण हरे हरे ॥</p>
-                <p>Thank you for choosing Madhav Shringaar for your Thakur Ji&apos;s holy seva.</p>
+                <p className="font-bold text-[#003020]">THANK YOU FOR YOUR BUSINESS</p>
+                <p>For inquiries, support, or order returns, please contact info@madhavshringaar.com or call +91 79821 60480.</p>
               </div>
             </div>
           </div>

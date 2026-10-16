@@ -2,8 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Printer, ArrowLeft, Heart, Sparkles, MessageCircle, Phone, Globe } from 'lucide-react';
+import { Printer, ArrowLeft } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
 
 interface AdminThankYouClientProps {
@@ -18,7 +19,7 @@ export default function AdminThankYouClient({ order }: AdminThankYouClientProps)
   const cleanOrderId = `OD${order.id.replace(/-/g, '').slice(0, 16).toUpperCase()}`;
   const orderDate = formatDateTime(new Date(order.createdAt)).dateOnly;
   const address = order.shippingAddress || {};
-  const customerName = address.fullName || order.user?.name || 'Devotee';
+  const customerName = address.fullName || order.user?.name || 'Customer';
   const customerCity = address.city ? `${address.city}, ${address.state || ''}` : 'India';
 
   return (
@@ -95,20 +96,35 @@ export default function AdminThankYouClient({ order }: AdminThankYouClientProps)
             }
           `}</style>
 
-          {/* Devotional Header */}
-          <div className="text-center space-y-1 pb-2">
-            <p className="font-bold text-sm tracking-wider">॥ श्री राधे राधे ॥</p>
-            <p className="text-[10px] uppercase font-bold tracking-widest">॥ जय श्री कृष्णा ॥</p>
-            <div className="border-b border-dashed border-black my-1" />
-            <h1 className="text-base font-black tracking-wide uppercase">MADHAV SHRINGAAR</h1>
-            <p className="text-[9px] uppercase font-semibold">Devotional Deity Shringaar &amp; Poshak</p>
-            <p className="text-[8px] text-neutral-700">Vrindavan Dham • Noida • Agra</p>
+          {/* Brand Header with Logo */}
+          <div className="text-center space-y-1 pb-1">
+            <div className="flex justify-center pb-1">
+              <Image
+                src="/images/logo.png"
+                alt="Madhav Shringaar"
+                width={120}
+                height={35}
+                className="h-8 w-auto object-contain filter grayscale contrast-200"
+                priority
+                unoptimized
+              />
+            </div>
+            <h1 className="text-sm font-black tracking-wider uppercase">MADHAV SHRINGAAR</h1>
+            <p className="text-[9px] uppercase font-semibold text-neutral-800">Premium Handcrafted Collection</p>
+            <p className="text-[8px] text-neutral-600">Noida &bull; Agra &bull; Vrindavan</p>
+          </div>
+
+          <div className="border-b border-dashed border-black my-1.5" />
+
+          {/* Title */}
+          <div className="text-center py-0.5">
+            <p className="font-bold text-[11px] uppercase tracking-wide">*** THANK YOU NOTE ***</p>
           </div>
 
           <div className="border-b border-dashed border-black my-1.5" />
 
           {/* Order Details */}
-          <div className="space-y-0.5 text-[10px]">
+          <div className="space-y-0.5 text-[9.5px]">
             <div className="flex justify-between">
               <span>Order No:</span>
               <span className="font-bold">{cleanOrderId}</span>
@@ -118,62 +134,62 @@ export default function AdminThankYouClient({ order }: AdminThankYouClientProps)
               <span>{orderDate}</span>
             </div>
             <div className="flex justify-between">
-              <span>Devotee:</span>
+              <span>Customer Name:</span>
               <span className="font-bold truncate max-w-[150px]">{customerName}</span>
             </div>
             <div className="flex justify-between">
-              <span>City:</span>
+              <span>Delivery City:</span>
               <span className="truncate max-w-[150px]">{customerCity}</span>
             </div>
           </div>
 
           <div className="border-b border-dashed border-black my-1.5" />
 
-          {/* Devotional Message */}
-          <div className="text-center py-1 space-y-1">
-            <p className="font-bold text-[11px] leading-snug">
-              🙏 Heartfelt Gratitude 🙏
+          {/* Customer Appreciation Message (Devoted yet safe from discarding/waste) */}
+          <div className="py-1 space-y-1">
+            <p className="font-bold text-[10px] text-neutral-900">
+              Dear {customerName},
             </p>
-            <p className="text-[9.5px] leading-tight text-neutral-900 font-sans">
-              Thank you for welcoming <strong>Thakur Ji&apos;s</strong> divine poshak and sacred shringaar into your home and daily seva. May your devotion blossom ever more!
+            <p className="text-[9px] leading-tight text-neutral-900 font-sans">
+              Thank you for shopping with <strong>Madhav Shringaar</strong>! We deeply appreciate your trust in our handcrafted collections. We hope these items bring joy and elegance to your home.
             </p>
           </div>
 
           <div className="border-b border-dashed border-black my-1.5" />
 
-          {/* Sacred Care Guidelines */}
-          <div className="space-y-1 text-[9px] font-sans">
-            <p className="font-bold uppercase tracking-wide text-center font-mono text-[9.5px]">
-              ★ Poshak Care Guidelines ★
+          {/* Care Instructions */}
+          <div className="space-y-1 text-[8.5px] font-sans">
+            <p className="font-bold uppercase tracking-wide text-center font-mono text-[9px]">
+              ★ Product Care Guidelines ★
             </p>
             <ul className="space-y-1 list-none pl-0">
               <li className="flex items-start gap-1">
                 <span>1.</span>
-                <span><strong>Pure Seva:</strong> Always handle delicate zari, pearl &amp; stone work with clean, dry hands.</span>
+                <span><strong>Gentle Handling:</strong> Handle fine fabrics, zari and stone work with clean, dry hands.</span>
               </li>
               <li className="flex items-start gap-1">
                 <span>2.</span>
-                <span><strong>No Machine Wash:</strong> Never machine wash or soak poshak in water. Use a soft dry brush for gentle dusting.</span>
+                <span><strong>No Machine Wash:</strong> Do not machine wash or soak delicate garments. Use a soft dry brush for gentle dusting.</span>
               </li>
               <li className="flex items-start gap-1">
                 <span>3.</span>
-                <span><strong>Safe Storage:</strong> Keep wrapped in muslin or butter paper in a dry shringaar box.</span>
+                <span><strong>Safe Storage:</strong> Keep wrapped in clean muslin cloth or butter paper in a moisture-free pouch.</span>
               </li>
               <li className="flex items-start gap-1">
                 <span>4.</span>
-                <span><strong>Jewellery:</strong> Store mukut, bansuri &amp; haar separately to prevent snags.</span>
+                <span><strong>Accessories:</strong> Store metallic and stone accessories separately to prevent fabric snagging.</span>
               </li>
             </ul>
           </div>
 
           <div className="border-b border-dashed border-black my-1.5" />
 
-          {/* Items In Seva List */}
-          <div className="space-y-1 text-[9px]">
-            <p className="font-bold uppercase text-[9.5px]">Items In Your Sacred Seva:</p>
+          {/* Items In Order Summary */}
+          <div className="space-y-1 text-[8.5px]">
+            <p className="font-bold uppercase text-[9px]">Items In Your Package:</p>
             {order.orderitems?.map((item: any, idx: number) => (
               <div key={idx} className="flex justify-between items-start gap-1 text-[8.5px]">
-                <span className="truncate max-w-[190px]">
+                <span className="truncate max-w-[195px]">
                   {idx + 1}. {item.name} {item.size ? `(${item.size})` : ''}
                 </span>
                 <span className="font-bold shrink-0">x{item.qty}</span>
@@ -183,31 +199,18 @@ export default function AdminThankYouClient({ order }: AdminThankYouClientProps)
 
           <div className="border-b border-dashed border-black my-1.5" />
 
-          {/* Divine Blessing */}
-          <div className="text-center py-1 space-y-0.5">
-            <p className="text-[9.5px] font-bold font-sans">
-              May Laddu Gopal Ji shower eternal peace, good health &amp; joy upon your family.
-            </p>
-            <p className="text-[8.5px] italic font-serif">
-              ॥ हरे कृष्ण हरे कृष्ण कृष्ण कृष्ण हरे हरे ॥<br />
-              ॥ हरे राम हरे राम राम राम हरे हरे ॥
-            </p>
-          </div>
-
-          <div className="border-b border-dashed border-black my-1.5" />
-
-          {/* Contact & Support */}
-          <div className="text-center space-y-0.5 text-[8.5px]">
+          {/* Help & Support */}
+          <div className="text-center space-y-0.5 text-[8px]">
             <p className="font-bold">WhatsApp / Support: +91 79821 60480</p>
             <p>Email: info@madhavshringaar.com</p>
             <p className="font-bold">www.madhavshringaar.com</p>
-            <p className="text-[7.5px] text-neutral-600 pt-1">
-              Please share your Thakur Ji&apos;s Shringaar photo with us on WhatsApp or Instagram!
+            <p className="text-[7.5px] text-neutral-600 pt-0.5">
+              Have feedback or need assistance? Reach out to our customer care team anytime!
             </p>
           </div>
 
           <div className="text-center pt-2">
-            <p className="text-[7px] tracking-widest uppercase">*** THANK YOU &bull; RADHE RADHE ***</p>
+            <p className="text-[7px] tracking-widest uppercase">*** THANK YOU FOR YOUR TRUST ***</p>
           </div>
         </div>
       </div>

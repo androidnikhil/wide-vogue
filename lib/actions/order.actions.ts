@@ -78,6 +78,20 @@ export async function createOrder() {
     const pointsEarned = LOYALTY_CONFIG.calculatePointsEarned(Number(cart.totalPrice));
 
     const isZeroTotal = Number(cart.totalPrice) <= 0;
+    
+    // SECURITY GUARD:
+    // createOrder can ONLY be called for:
+    // 1. Zero-amount orders (totalPrice <= 0)
+    // 2. Cash on Delivery (paymentMethod === 'CashOnDelivery')
+    // All online payments (UPI, Card, NetBanking) MUST go through createPaidOrderWithRazorpay!
+    if (!isZeroTotal && paymentMethod !== 'CashOnDelivery') {
+      return {
+        success: false,
+        message: 'Online orders must be completed through the secure payment gateway.',
+        redirectTo: '/place-order',
+      };
+    }
+
     const finalPaymentMethod = isZeroTotal ? 'GiftCard' : paymentMethod;
 
     // Create order object
@@ -1025,11 +1039,10 @@ export async function createPaidOrderWithRazorpay(paymentData: {
       .update(body.toString())
       .digest("hex");
 
-    const isTestMode = (process.env.RAZORPAY_KEY_ID || "").startsWith("rzp_test_");
     const isSignatureValid = expectedSignature === paymentData.razorpay_signature;
 
-    if (!isSignatureValid && !(isTestMode && paymentData.razorpay_payment_id?.startsWith("pay_"))) {
-      throw new Error("Invalid Razorpay payment signature. Transaction unverified.");
+    if (!isSignatureValid) {
+      throw new Error("Invalid payment signature. Transaction could not be verified.");
     }
 
     // 2. Calculate Loyalty Points

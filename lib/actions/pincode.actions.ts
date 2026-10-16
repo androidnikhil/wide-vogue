@@ -12,6 +12,7 @@ interface PincodeCheckResult {
   estimatedDays?: number;
   codAvailable?: boolean;
   courierName?: string;
+  shippingRate?: number;
 }
 
 export async function checkDeliveryPincode(pincode: string): Promise<PincodeCheckResult> {
@@ -48,6 +49,7 @@ export async function checkDeliveryPincode(pincode: string): Promise<PincodeChec
     let estimatedDays = 3;
     let courierName = "Express Courier (Air Dispatch)";
     let codAvailable = true;
+    let shippingRate = 50;
 
     try {
       const pickupPin = process.env.DISPATCH_PINCODE || "201301"; // Noida dispatch hub
@@ -58,6 +60,9 @@ export async function checkDeliveryPincode(pincode: string): Promise<PincodeChec
         const bestCourier = couriers[0];
         courierName = bestCourier.courier_name || "Shiprocket Express";
         codAvailable = Boolean(bestCourier.cod === 1);
+        if (bestCourier.rate) {
+          shippingRate = Math.round(Number(bestCourier.rate));
+        }
         
         if (bestCourier.etd_hours) {
           estimatedDays = Math.max(2, Math.ceil(bestCourier.etd_hours / 24));
@@ -97,6 +102,7 @@ export async function checkDeliveryPincode(pincode: string): Promise<PincodeChec
       estimatedDays,
       codAvailable,
       courierName,
+      shippingRate,
     };
   } catch (error: any) {
     console.error("Pincode check error:", error);

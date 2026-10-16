@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useTransition, useState } from "react";
 import { addItemToCart, removeItemFromCart } from "@/lib/actions/cart.action";
 import { Cart } from "@/types";
-import { ArrowRight, Loader, Minus, Plus, ShoppingBag } from "lucide-react";
+import { ArrowRight, Loader, Minus, Plus, ShoppingBag, Truck, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import CouponForm from "@/components/shared/cart/coupon-form";
@@ -23,11 +24,50 @@ import GiftWrapToggle from "@/components/shared/cart/gift-wrap-toggle";
 import GiftCardForm from "@/components/shared/cart/gift-card-form";
 import BhaktiPointsForm from "@/components/shared/cart/bhakti-points-form";
 import { LOYALTY_CONFIG } from "@/lib/loyalty.config";
+import { calculateShiprocketRatesForPincode } from "@/lib/actions/shiprocket.actions";
 
 const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints?: number }) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showDiscounts, setShowDiscounts] = useState(false);
+
+  // Shiprocket live rate calculation state
+  const [pincode, setPincode] = useState<string>(((cart as any)?.shippingAddress)?.postalCode || "");
+  const [shippingQuote, setShippingQuote] = useState<{
+    courierName: string;
+    rate: number;
+    days: string;
+    isFree: boolean;
+  } | null>(null);
+  const [isCheckingPincode, setIsCheckingPincode] = useState(false);
+
+  const handleCheckPincodeRate = async () => {
+    const cleanPincode = pincode.trim();
+    if (!cleanPincode || cleanPincode.length !== 6) {
+      toast.error("Please enter a valid 6-digit PIN code.");
+      return;
+    }
+
+    setIsCheckingPincode(true);
+    try {
+      const res = await calculateShiprocketRatesForPincode(cleanPincode, Number(cart?.itemsPrice || 0));
+      if (res.success && res.data) {
+        setShippingQuote({
+          courierName: res.data.courierName,
+          rate: res.data.actualCourierRate,
+          days: res.data.estimatedDays,
+          isFree: res.data.isFree,
+        });
+        toast.success(`Shiprocket delivery available to ${cleanPincode} via ${res.data.courierName}`);
+      } else {
+        toast.error(res.message || "Failed to calculate courier rate for this PIN code.");
+      }
+    } catch {
+      toast.error("Unable to connect to courier service. Standard delivery charges apply.");
+    } finally {
+      setIsCheckingPincode(false);
+    }
+  };
 
   return (
     <div className="wrapper py-10">
@@ -163,11 +203,67 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                     <span>Delivery Charges:</span>
                     {Number(cart.itemsPrice) >= 999 ? (
                       <span className="text-emerald-700 font-semibold flex items-center gap-1.5">
-                        <span className="line-through text-xs text-neutral-400 font-normal">₹50</span>
+                        <span className="line-through text-xs text-neutral-400 font-normal">
+                          {shippingQuote ? formatCurrency(shippingQuote.rate) : '₹50'}
+                        </span>
                         <span>FREE</span>
                       </span>
+                    ) : shippingQuote ? (
+                      <span className="font-semibold text-neutral-800">{formatCurrency(shippingQuote.rate)}</span>
                     ) : (
                       <span className="font-semibold text-neutral-800">{formatCurrency(50)}</span>
+                    )}
+                  </div>
+
+                  {/* Shiprocket Live Pincode Estimator */}
+                  <div className="p-3 rounded-xl bg-surface-container/40 border border-secondary/15 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-semibold text-primary">
+                      <span className="flex items-center gap-1.5">
+                        <Truck className="w-3.5 h-3.5 text-secondary" />
+                        Check Delivery &amp; Courier Rate
+                      </span>
+                      <span className="text-[10px] text-muted-foreground font-medium">via Shiprocket</span>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Enter 6-digit PIN code"
+                        maxLength={6}
+                        value={pincode}
+                        onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        className="h-8 text-xs bg-white"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={isCheckingPincode || pincode.trim().length !== 6}
+                        onClick={handleCheckPincodeRate}
+                        className="h-8 px-3 text-xs font-semibold shrink-0"
+                      >
+                        {isCheckingPincode ? <Loader className="w-3.5 h-3.5 animate-spin" /> : 'Check'}
+                      </Button>
+                    </div>
+
+                    {shippingQuote && (
+                      <div className="pt-1 text-[11px] text-neutral-700 space-y-0.5">
+                        <div className="flex items-center justify-between font-medium">
+                          <span className="text-emerald-700 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            {shippingQuote.courierName}
+                          </span>
+                          <span className="font-bold">
+                            {shippingQuote.isFree ? (
+                              <span className="text-emerald-700">FREE ({formatCurrency(shippingQuote.rate)} saved)</span>
+                            ) : (
+                              formatCurrency(shippingQuote.rate)
+                            )}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">
+                          Estimated Delivery: <strong>{shippingQuote.days}</strong> (Noida to {pincode})
+                        </p>
+                      </div>
                     )}
                   </div>
 
@@ -228,7 +324,7 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                     <span className="font-bold text-xl text-primary">{formatCurrency(
                       Math.max(0, (
                         Number(cart.itemsPrice) + 
-                        (Number(cart.itemsPrice) >= 999 ? 0 : 50) +
+                        (Number(cart.itemsPrice) >= 999 ? 0 : (shippingQuote ? shippingQuote.rate : 50)) +
                         (cart.isGiftWrapped ? 50 : 0) - 
                         Number(cart.discountPrice || 0) - 
                         Number(cart.giftCardAmount || 0) - 
@@ -236,7 +332,7 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                       )).toString()
                     )}</span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground pb-2">Inclusive of all taxes & delivery charges</p>
+                  <p className="text-[11px] text-muted-foreground pb-2">Inclusive of all taxes &amp; delivery charges</p>
 
                   <div className="pb-4 border-b border-secondary/20">
                     <GiftWrapToggle isGiftWrapped={cart.isGiftWrapped || false} />

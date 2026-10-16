@@ -9,7 +9,8 @@ import {
   generateShiprocketAWB, 
   getShiprocketToken, 
   trackShiprocketShipmentByAWB,
-  trackShiprocketShipmentByOrderId
+  trackShiprocketShipmentByOrderId,
+  checkShiprocketServiceability,
 } from "../shiprocket";
 import { ShippingAddress } from "@/types";
 
@@ -180,6 +181,88 @@ export async function trackOrderShipment(orderId: string) {
     return {
       success: false,
       message: formatError(error),
+    };
+  }
+}
+
+/**
+ * Calculate live Shiprocket shipping prices by destination pincode
+ */
+export async function calculateShiprocketRatesForPincode(
+  deliveryPincode: string,
+  itemsPrice: number = 0,
+  weight: number = 0.5
+) {
+  try {
+    const cleanPincode = deliveryPincode?.trim();
+    if (!cleanPincode || !/^\d{6}$/.test(cleanPincode)) {
+      return {
+        success: false,
+        message: "Please enter a valid 6-digit Indian PIN code.",
+      };
+    }
+
+    const pickupPincode = process.env.SHIPROCKET_PICKUP_PINCODE || "201301"; // Noida Sector 120
+
+    // Call Shiprocket Serviceability API
+    let serviceabilityResult: any = null;
+    try {
+      serviceabilityResult = await checkShiprocketServiceability(
+        pickupPincode,
+        cleanPincode,
+        false,
+        weight
+      );
+    } catch (apiErr) {
+      console.warn("Shiprocket live rate check fallback:", apiErr);
+    }
+
+    const couriers = serviceabilityResult?.data?.available_courier_companies || [];
+
+    let lowestRate = 50;
+    let courierName = "Standard Surface Courier";
+    let estimatedDays = "2-4 Business Days";
+    let isServiceable = true;
+
+    if (couriers.length > 0) {
+      // Sort by rate to find most economical reliable courier
+      couriers.sort((a: any, b: any) => Number(a.rate) - Number(b.rate));
+      const bestCourier = couriers[0];
+      lowestRate = Math.round(Number(bestCourier.rate));
+      courierName = bestCourier.courier_name || "Express Courier";
+      estimatedDays = bestCourier.etd || `${bestCourier.estimated_delivery_days || 3} Days`;
+    } else if (serviceabilityResult && serviceabilityResult.status !== 200) {
+      // If Shiprocket returned non-serviceable
+      isServiceable = false;
+    }
+
+    // Free delivery above 999 condition
+    const isFree = itemsPrice >= 999;
+    const finalCustomerShipping = isFree ? 0 : lowestRate;
+
+    return {
+      success: true,
+      data: {
+        pincode: cleanPincode,
+        pickupPincode,
+        isServiceable,
+        courierName,
+        estimatedDays,
+        actualCourierRate: lowestRate,
+        finalCustomerShipping,
+        isFree,
+        availableCouriers: couriers.slice(0, 3).map((c: any) => ({
+          name: c.courier_name,
+          rate: Math.round(Number(c.rate)),
+          days: c.etd || `${c.estimated_delivery_days || 3} Days`,
+        })),
+      },
+    };
+  } catch (error: any) {
+    console.error("Shipping Rate Calculation Error:", error);
+    return {
+      success: false,
+      message: "Unable to calculate courier rates at this time. Standard shipping applies.",
     };
   }
 }

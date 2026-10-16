@@ -202,9 +202,27 @@ export async function calculateShiprocketRatesForPincode(
       };
     }
 
-    const pickupPincode = process.env.SHIPROCKET_PICKUP_PINCODE || "201301"; // Noida Sector 120
+    const pickupPincode = process.env.SHIPROCKET_PICKUP_PINCODE || process.env.DISPATCH_PINCODE || "201301"; // Noida Sector 120
+    const pickupCity = process.env.SHIPROCKET_PICKUP_LOCATION || "Noida";
 
-    // Call Shiprocket Serviceability API
+    // 1. Fetch Destination City/District from Indian Postal PIN code API
+    let destinationCity = "";
+    let destinationState = "";
+    try {
+      const pinRes = await fetch(`https://api.postalpincode.in/pincode/${cleanPincode}`, {
+        next: { revalidate: 86400 },
+      });
+      const pinData = await pinRes.json();
+      if (pinData?.[0]?.Status === "Success" && pinData[0]?.PostOffice?.length > 0) {
+        const po = pinData[0].PostOffice[0];
+        destinationCity = po.District || po.Block || po.Division || po.Name || "";
+        destinationState = po.State || "";
+      }
+    } catch (e) {
+      console.warn("Pincode city lookup fallback:", e);
+    }
+
+    // 2. Call Shiprocket Serviceability API if credentials are present
     let serviceabilityResult: any = null;
     try {
       serviceabilityResult = await checkShiprocketServiceability(
@@ -232,7 +250,7 @@ export async function calculateShiprocketRatesForPincode(
       courierName = bestCourier.courier_name || "Express Courier";
       estimatedDays = bestCourier.etd || `${bestCourier.estimated_delivery_days || 3} Days`;
     } else if (serviceabilityResult && serviceabilityResult.status !== 200) {
-      // If Shiprocket returned non-serviceable
+      // If Shiprocket explicitly returned non-serviceable
       isServiceable = false;
     }
 
@@ -244,6 +262,9 @@ export async function calculateShiprocketRatesForPincode(
       success: true,
       data: {
         pincode: cleanPincode,
+        destinationCity: destinationCity || cleanPincode,
+        destinationState,
+        pickupCity,
         pickupPincode,
         isServiceable,
         courierName,
@@ -251,11 +272,6 @@ export async function calculateShiprocketRatesForPincode(
         actualCourierRate: lowestRate,
         finalCustomerShipping,
         isFree,
-        availableCouriers: couriers.slice(0, 3).map((c: any) => ({
-          name: c.courier_name,
-          rate: Math.round(Number(c.rate)),
-          days: c.etd || `${c.estimated_delivery_days || 3} Days`,
-        })),
       },
     };
   } catch (error: any) {

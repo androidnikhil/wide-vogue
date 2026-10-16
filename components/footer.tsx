@@ -113,6 +113,62 @@ export default async function Footer() {
             </div>
           </div>
 
+          {/* Popular Devotional Searches — Organic SEO internal links */}
+          <div className="border-t border-secondary/20 pt-6 text-[11px] leading-relaxed text-white/70">
+            <p className="font-semibold text-secondary-fixed mb-2 uppercase tracking-wider text-[10px]">Popular Searches:</p>
+            <div className="flex flex-wrap gap-x-3 gap-y-1">
+              <Link href="/search?category=Poshak" className="hover:text-secondary-fixed transition-colors">Laddu Gopal dress online</Link>
+              <span>•</span>
+              <Link href="/search?category=Poshak" className="hover:text-secondary-fixed transition-colors">Laddu Gopal poshak</Link>
+              <span>•</span>
+              <Link href="/search?category=Poshak" className="hover:text-secondary-fixed transition-colors">Kanha Ji dress online</Link>
+              <span>•</span>
+              <Link href="/search?category=Designer+Poshak" className="hover:text-secondary-fixed transition-colors">Laddu Gopal designer dress</Link>
+              <span>•</span>
+              <Link href="/search?category=Winter+Woolen+Poshak" className="hover:text-secondary-fixed transition-colors">Laddu Gopal winter dress</Link>
+              <span>•</span>
+              <Link href="/search?category=Cotton+Summer+Poshak" className="hover:text-secondary-fixed transition-colors">Laddu Gopal summer dress</Link>
+              <span>•</span>
+              <Link href="/search?category=Mukut+%26+Pagdi" className="hover:text-secondary-fixed transition-colors">Laddu Gopal mukut online</Link>
+              <span>•</span>
+              <Link href="/search?category=Mukut+%26+Pagdi" className="hover:text-secondary-fixed transition-colors">Kanha Ji mukut online</Link>
+              <span>•</span>
+              <Link href="/search?category=Jewellery+%26+Mala" className="hover:text-secondary-fixed transition-colors">Laddu Gopal jewellery set</Link>
+              <span>•</span>
+              <Link href="/search?category=Jewellery+%26+Mala" className="hover:text-secondary-fixed transition-colors">Laddu Gopal mala & kanthi mala</Link>
+              <span>•</span>
+              <Link href="/search?category=Complete+Shringar" className="hover:text-secondary-fixed transition-colors">Laddu Gopal shringaar online</Link>
+              <span>•</span>
+              <Link href="/search?category=Complete+Shringar" className="hover:text-secondary-fixed transition-colors">Kanha Ji shringaar online</Link>
+              <span>•</span>
+              <Link href="/search?category=Festive+Sets" className="hover:text-secondary-fixed transition-colors">Laddu Gopal poshak with mukut and mala</Link>
+              <span>•</span>
+              <Link href="/search?category=Poshak" className="hover:text-secondary-fixed transition-colors">Thakur Ji poshak online</Link>
+              <span>•</span>
+              <Link href="/search?category=Poshak" className="hover:text-secondary-fixed transition-colors">Banke Bihari shringaar items</Link>
+              <span>•</span>
+              <Link href="/search?category=Poshak" className="hover:text-secondary-fixed transition-colors">Krishna Ji dress online</Link>
+              <span>•</span>
+              <Link href="/size-chart" className="hover:text-secondary-fixed transition-colors">Laddu Gopal dress size 0 to 6</Link>
+              <span>•</span>
+              <Link href="/policies/shipping" className="hover:text-secondary-fixed transition-colors">Buy Laddu Gopal dress online in India</Link>
+              <span>•</span>
+              <Link href="/policies/shipping" className="hover:text-secondary-fixed transition-colors">Laddu Gopal dress with free delivery</Link>
+              <span>•</span>
+              <Link href="/policies/shipping" className="hover:text-secondary-fixed transition-colors">Laddu Gopal dresses with COD</Link>
+              <span>•</span>
+              <Link href="/policies/shipping" className="hover:text-secondary-fixed transition-colors">Laddu Gopal poshak in Agra</Link>
+              <span>•</span>
+              <Link href="/policies/shipping" className="hover:text-secondary-fixed transition-colors">Laddu Gopal dress delivery in Noida</Link>
+              <span>•</span>
+              <Link href="/policies/shipping" className="hover:text-secondary-fixed transition-colors">Laddu Gopal dresses in Vrindavan</Link>
+              <span>•</span>
+              <Link href="/policies/shipping" className="hover:text-secondary-fixed transition-colors">Laddu Gopal shringaar shop in Mathura</Link>
+              <span>•</span>
+              <Link href="/policies/shipping" className="hover:text-secondary-fixed transition-colors">Laddu Gopal shringaar delivery across India</Link>
+            </div>
+          </div>
+
           {/* Bottom Disclaimer & Copyright */}
           <div className="border-t border-secondary/20 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-on-primary-container">
             <p>{t.footer.copyright}</p>

@@ -14,7 +14,7 @@ import {
   import Pagination from '@/components/shared/pagination';
   import DeleteDialog from '@/components/shared/delete-dialog';
   import { requireAdmin } from '@/lib/auth-guard';
-  import { Printer } from 'lucide-react';
+  import { Printer, HeartHandshake } from 'lucide-react';
   
   export const metadata: Metadata = {
     title: 'Admin Orders',
@@ -101,10 +101,15 @@ import {
                       <Button asChild variant='outline' size='sm' className="h-8 px-2.5">
                         <Link href={`/admin/orders/${order.id}`}>Details</Link>
                       </Button>
-                      <Button asChild variant='outline' size='sm' className="h-8 px-2.5 bg-neutral-50 hover:bg-neutral-100 border-neutral-300 text-neutral-800" title="Print Tax Invoice & Packing Slip">
+                      <Button asChild variant='outline' size='sm' className="h-8 px-2.5 bg-neutral-50 hover:bg-neutral-100 border-neutral-300 text-neutral-800" title="Print 80mm Thermal Tax Invoice">
                         <Link href={`/admin/orders/${order.id}/invoice`}>
                           <Printer className="w-3.5 h-3.5 mr-1 text-[#003020]" />
                           Invoice
+                        </Link>
+                      </Button>
+                      <Button asChild variant='outline' size='sm' className="h-8 px-2 bg-amber-50/80 hover:bg-amber-100 border-amber-300 text-amber-900" title="Print 80mm Sacred Thank You Note">
+                        <Link href={`/admin/orders/${order.id}/thank-you`}>
+                          <HeartHandshake className="w-3.5 h-3.5 text-amber-700" />
                         </Link>
                       </Button>
                       <DeleteDialog id={order.id} action={deleteOrder} />

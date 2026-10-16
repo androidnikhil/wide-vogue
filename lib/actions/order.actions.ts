@@ -77,12 +77,15 @@ export async function createOrder() {
     // You only earn points on the subtotal minus discounts, but let's keep it simple: based on itemsPrice or totalPrice
     const pointsEarned = LOYALTY_CONFIG.calculatePointsEarned(Number(cart.totalPrice));
 
+    const isZeroTotal = Number(cart.totalPrice) <= 0;
+    const finalPaymentMethod = isZeroTotal ? 'GiftCard' : paymentMethod;
+
     // Create order object
     const order = insertOrderSchema.parse({
       userId: userId || null,
       guestEmail: userAddress.guestEmail || null,
       shippingAddress: userAddress,
-      paymentMethod: paymentMethod,
+      paymentMethod: finalPaymentMethod,
       itemsPrice: cart.itemsPrice,
       shippingPrice: cart.shippingPrice,
       taxPrice: cart.taxPrice,
@@ -98,8 +101,13 @@ export async function createOrder() {
 
     // Create a transaction to create order and order items in database
     const insertedOrderId = await prisma.$transaction(async (tx) => {
-      // Create order
-      const insertedOrder = await tx.order.create({ data: order as any });
+      // Create order with paid status if zero amount
+      const orderData: any = {
+        ...order,
+        isPaid: isZeroTotal ? true : false,
+        paidAt: isZeroTotal ? new Date() : null,
+      };
+      const insertedOrder = await tx.order.create({ data: orderData });
       
       // Process order items securely
       for (const item of cart.items as CartItem[]) {
@@ -216,10 +224,10 @@ export async function createOrder() {
           console.error("Admin order alert failed:", err)
         );
 
-        // 2. If Cash on Delivery, send purchase receipt to customer immediately
-        if (createdOrder.paymentMethod === 'CashOnDelivery') {
+        // 2. If Paid (e.g. Gift Card zero amount) or Cash on Delivery, send purchase receipt to customer immediately
+        if (createdOrder.isPaid || createdOrder.paymentMethod === 'CashOnDelivery') {
           sendPurchaseReceipt({ order: createdOrder }).catch((err) =>
-            console.error("Customer COD receipt email failed:", err)
+            console.error("Customer receipt email failed:", err)
           );
         }
       }
@@ -965,6 +973,9 @@ export async function createRazorpayOrderFromCart() {
     }
 
     const amountInPaise = Math.round(Number(cart.totalPrice) * 100);
+    if (amountInPaise <= 0) {
+      return { success: false, message: "Order total is ₹0. No online payment required." };
+    }
 
     const options = {
       amount: amountInPaise,

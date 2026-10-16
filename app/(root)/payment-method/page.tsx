@@ -20,6 +20,18 @@ const PaymentMethod = async () => {
     }
 
     const cart = await getMyCart();
+    if (!cart || cart.items.length === 0) {
+      return redirect('/cart');
+    }
+
+    // Dynamic Zero-Payment Case:
+    // If Gift Card or discounts cover 100% of order (Total = ₹0), bypass payment selection
+    if (Number(cart.totalPrice) <= 0) {
+      const { updateUserPaymentMethod } = await import('@/lib/actions/user.actions');
+      await updateUserPaymentMethod({ type: 'GiftCard' });
+      return redirect('/place-order');
+    }
+
     let paymentMethod = cart?.paymentMethod || '';
 
     if (userId) {

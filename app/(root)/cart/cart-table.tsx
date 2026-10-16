@@ -157,50 +157,86 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                     <span>Items ({cart.items.reduce((a, c) => a + c.qty, 0)}):</span>
                     <span>{formatCurrency(cart.itemsPrice)}</span>
                   </div>
-                  <div className="flex justify-between text-on-surface-variant font-body-md pb-4 border-b border-secondary/20">
-                    <span>Shipping calculated at checkout. Taxes included.</span>
+
+                  {/* Delivery Charges with Free Delivery above 999 */}
+                  <div className="flex justify-between text-on-surface-variant font-body-md py-1">
+                    <span>Delivery Charges:</span>
+                    {Number(cart.itemsPrice) >= 999 ? (
+                      <span className="text-emerald-700 font-semibold flex items-center gap-1.5">
+                        <span className="line-through text-xs text-neutral-400 font-normal">₹50</span>
+                        <span>FREE</span>
+                      </span>
+                    ) : (
+                      <span className="font-semibold text-neutral-800">{formatCurrency(50)}</span>
+                    )}
                   </div>
 
+                  {/* Free Shipping Progress / Status Banner */}
+                  {Number(cart.itemsPrice) < 999 ? (
+                    <div className="p-2.5 rounded-lg bg-amber-50/80 border border-amber-200/80 text-xs text-amber-900 space-y-1.5">
+                      <div className="flex items-center justify-between font-medium">
+                        <span className="flex items-center gap-1">
+                          <span>🚚</span>
+                          <span>Add <strong>{formatCurrency(999 - Number(cart.itemsPrice))}</strong> more for <strong>FREE Delivery</strong></span>
+                        </span>
+                        <span className="text-[11px] text-amber-700 font-bold">{Math.round((Number(cart.itemsPrice) / 999) * 100)}%</span>
+                      </div>
+                      <div className="w-full bg-amber-200/50 rounded-full h-1.5 overflow-hidden">
+                        <div 
+                          className="bg-amber-600 h-full rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(100, Math.round((Number(cart.itemsPrice) / 999) * 100))}%` }}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-1.5 font-medium">
+                      <span>🎉</span>
+                      <span>Congratulations! You have unlocked <strong>FREE Delivery</strong></span>
+                    </div>
+                  )}
+
                   {cart.isGiftWrapped && (
-                    <div className="flex justify-between text-on-surface-variant font-body-md py-2">
+                    <div className="flex justify-between text-on-surface-variant font-body-md py-1">
                       <span>Gift Wrapping:</span>
                       <span>{formatCurrency(50)}</span>
                     </div>
                   )}
 
                   {Number(cart.discountPrice) > 0 && (
-                    <div className="flex justify-between text-emerald-600 font-body-md py-2 font-medium">
+                    <div className="flex justify-between text-emerald-600 font-body-md py-1 font-medium">
                       <span>Discount (Code: {cart.couponCode}):</span>
                       <span>-{formatCurrency(cart.discountPrice || "0")}</span>
                     </div>
                   )}
 
                   {Number(cart.giftCardAmount) > 0 && (
-                    <div className="flex justify-between text-emerald-600 font-body-md py-2 font-medium">
+                    <div className="flex justify-between text-emerald-600 font-body-md py-1 font-medium">
                       <span>Gift Card ({cart.giftCardCode}):</span>
                       <span>-{formatCurrency(cart.giftCardAmount || "0")}</span>
                     </div>
                   )}
 
                   {Number(cart.pointsToRedeem) > 0 && (
-                    <div className="flex justify-between text-orange-600 font-body-md py-2 font-medium">
+                    <div className="flex justify-between text-orange-600 font-body-md py-1 font-medium">
                       <span>Bhakti Points ({cart.pointsToRedeem}):</span>
                       <span>-{formatCurrency(LOYALTY_CONFIG.calculateDiscountForPoints(cart.pointsToRedeem || 0).toString())}</span>
                     </div>
                   )}
                   
-                  <div className="flex justify-between font-bold text-lg text-primary pt-2 pb-6 border-t border-secondary/20">
-                    <span>Subtotal:</span>
-                    <span className="font-bold">{formatCurrency(
-                      (
+                  <div className="flex justify-between font-bold text-lg text-primary pt-3 pb-2 border-t border-secondary/20">
+                    <span>Order Total:</span>
+                    <span className="font-bold text-xl text-primary">{formatCurrency(
+                      Math.max(0, (
                         Number(cart.itemsPrice) + 
+                        (Number(cart.itemsPrice) >= 999 ? 0 : 50) +
                         (cart.isGiftWrapped ? 50 : 0) - 
                         Number(cart.discountPrice || 0) - 
                         Number(cart.giftCardAmount || 0) - 
                         LOYALTY_CONFIG.calculateDiscountForPoints(Number(cart.pointsToRedeem || 0))
-                      ).toString()
+                      )).toString()
                     )}</span>
                   </div>
+                  <p className="text-[11px] text-muted-foreground pb-2">Inclusive of all taxes & delivery charges</p>
 
                   <div className="pb-4 border-b border-secondary/20">
                     <GiftWrapToggle isGiftWrapped={cart.isGiftWrapped || false} />

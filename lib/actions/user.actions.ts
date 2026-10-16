@@ -55,6 +55,21 @@ export async function signOutUser() {
   await signOut();
 }
 
+// Check if email already exists in database
+export async function checkEmailAvailability(email: string) {
+  try {
+    if (!email || !email.includes('@')) return { exists: false };
+    const cleanEmail = email.toLowerCase().trim();
+    const existingUser = await prisma.user.findFirst({
+      where: { email: cleanEmail },
+      select: { id: true },
+    });
+    return { exists: !!existingUser };
+  } catch {
+    return { exists: false };
+  }
+}
+
 // Sign up user
 export async function signUpUser(prevState: unknown, formData: FormData) {
   try {
@@ -65,24 +80,37 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       confirmPassword: formData.get('confirmPassword'),
     });
 
-    const plainPassword = user.password;
+    const cleanEmail = user.email.toLowerCase().trim();
 
+    // Check if user already exists
+    const existingUser = await prisma.user.findFirst({
+      where: { email: cleanEmail },
+    });
+
+    if (existingUser) {
+      return {
+        success: false,
+        message: 'An account with this email address already exists. Please sign in instead.',
+      };
+    }
+
+    const plainPassword = user.password;
     user.password = await hash(user.password);
 
     await prisma.user.create({
       data: {
         name: user.name,
-        email: user.email,
+        email: cleanEmail,
         password: user.password,
       },
     });
 
-    sendWelcomeEmail({ name: user.name, email: user.email }).catch((err) =>
+    sendWelcomeEmail({ name: user.name, email: cleanEmail }).catch((err) =>
       console.error('Failed to send welcome email:', err)
     );
 
     await signIn('credentials', {
-      email: user.email,
+      email: cleanEmail,
       password: plainPassword,
     });
 

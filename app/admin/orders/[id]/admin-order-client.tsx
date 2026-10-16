@@ -24,6 +24,8 @@ import {
   AlertCircle,
   ShieldCheck,
   Send,
+  HeartHandshake,
+  Receipt,
 } from 'lucide-react';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
 import { updateOrderStatus, updateOrderToPaidCOD, dispatchManualCourier } from '@/lib/actions/order.actions';
@@ -180,9 +182,20 @@ export default function AdminOrderClient({ order }: AdminOrderClientProps) {
             size="sm"
             className="bg-[#003020] hover:bg-[#002518] text-[#F3D98F] text-xs font-bold gap-1.5 shadow-sm h-9 px-3.5"
           >
-            <Link href={`/admin/orders/${order.id}/invoice`} title="View & Print Single-Page A4 Invoice inside Admin Portal">
-              <Printer className="w-4 h-4 text-[#F3D98F]" />
-              Print Tax Invoice (A4)
+            <Link href={`/admin/orders/${order.id}/invoice`} title="Print 80mm Thermal POS Tax Invoice">
+              <Receipt className="w-4 h-4 text-[#F3D98F]" />
+              80mm Thermal Invoice
+            </Link>
+          </Button>
+
+          <Button
+            asChild
+            size="sm"
+            className="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs font-bold gap-1.5 shadow-xs h-9 px-3.5"
+          >
+            <Link href={`/admin/orders/${order.id}/thank-you`} title="Print 80mm Sacred Devotional Thank You Note">
+              <HeartHandshake className="w-4 h-4 text-amber-700" />
+              80mm Thank You Note
             </Link>
           </Button>
 
@@ -194,7 +207,7 @@ export default function AdminOrderClient({ order }: AdminOrderClientProps) {
           >
             <Link href={`/order/${order.id}`} target="_blank" title="Preview customer-facing storefront view in new tab">
               <ExternalLink className="w-3.5 h-3.5 text-neutral-600" />
-              Preview Storefront
+              Storefront View
             </Link>
           </Button>
         </div>

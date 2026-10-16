@@ -8,6 +8,11 @@ import { compare } from './lib/encrypt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { sendWelcomeEmail } from '@/email';
 import { isDummyPhoneEmail } from '@/lib/constants';
+import {
+  checkLoginLockout,
+  recordFailedLogin,
+  clearLoginAttempts,
+} from '@/lib/actions/auth-limiter.actions';
 
 export { isDummyPhoneEmail };
 
@@ -150,11 +155,19 @@ export const config = {
       },
       async authorize(credentials) {
         if (credentials == null) return null;
+        const email = String(credentials.email || '').trim().toLowerCase();
+        if (!email) return null;
+
+        // 1. Check if account is locked out for 1 hour
+        const lockout = await checkLoginLockout(email);
+        if (lockout.isLocked) {
+          throw new Error(lockout.message || 'Account is locked for 1 hour due to too many failed attempts.');
+        }
 
         // Find user in database
         const user = await prisma.user.findFirst({
           where: {
-            email: credentials.email as string,
+            email: email,
           },
         });
 
@@ -165,8 +178,9 @@ export const config = {
             user.password
           );
 
-          // If password is correct, return user
+          // If password is correct, clear attempts and return user
           if (isMatch) {
+            await clearLoginAttempts(email);
             return {
               id: user.id,
               name: user.name,
@@ -175,7 +189,10 @@ export const config = {
             };
           }
         }
-        return null;
+
+        // Incorrect password or user not found -> Record failed attempt
+        const failRes = await recordFailedLogin(email);
+        throw new Error(failRes.message);
       },
     }),
   ],

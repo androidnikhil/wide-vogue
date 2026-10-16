@@ -25,7 +25,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    template: `%s | Madhav Shringaar - Agra & Noida`,
+    template: `%s | Madhav Shringaar`,
     default: DEFAULT_SEO_TITLE,
   },
   description: DEFAULT_SEO_DESCRIPTION,
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_IN',
     url: APP_URL,
-    siteName: 'Madhav Shringaar | Agra & Noida',
+    siteName: 'Madhav Shringaar',
     title: DEFAULT_SEO_TITLE,
     description: DEFAULT_SEO_DESCRIPTION,
     images: [
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
         url: '/images/devotional/complete_shringar.webp',
         width: 1200,
         height: 630,
-        alt: 'Madhav Shringaar - Divine Laddu Gopal Ji Poshak & Shringaar Agra Noida',
+        alt: 'Madhav Shringaar - Laddu Gopal Dress, Poshak & Shringaar Online',
       },
     ],
   },
@@ -117,7 +117,12 @@ const jsonLdLocalBusiness = {
       addressCountry: 'IN',
     },
   ],
-  sameAs: ['https://wa.me/917982160480'],
+  sameAs: [
+    'https://www.instagram.com/madhav.shringaar',
+    'https://www.facebook.com/share/1CLPMdGbhJ/',
+    'https://pin.it/51M0t5Fs5',
+    'https://wa.me/917982160480',
+  ],
 };
 
 const jsonLdWebSite = {

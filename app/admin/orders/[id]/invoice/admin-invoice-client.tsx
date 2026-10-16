@@ -137,19 +137,17 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
 
             {/* Header */}
             <div className="text-center space-y-0.5 pb-1">
-              <div className="flex justify-center pb-0.5">
+              <div className="flex justify-center pb-1">
                 <Image
                   src="/images/logo.png"
                   alt="Madhav Shringaar"
-                  width={110}
-                  height={32}
-                  className="h-7 w-auto object-contain filter grayscale contrast-200"
+                  width={200}
+                  height={60}
+                  className="h-14 w-auto object-contain"
                   priority
                   unoptimized
                 />
               </div>
-              <h1 className="text-sm font-black uppercase tracking-wide">MADHAV SHRINGAAR</h1>
-              <p className="text-[9px] uppercase font-semibold">Madhav Shringaar Pvt Ltd</p>
               <p className="text-[8px] text-neutral-700">Hubs: Noida &bull; Agra &bull; Vrindavan</p>
               <p className="text-[8px] font-mono">GSTIN: 09EHFPP7126A1ZE</p>
               <p className="text-[8px]">Helpline: +91 79821 60480</p>
@@ -322,18 +320,17 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
               {/* Header */}
               <div className="flex items-start justify-between gap-4 pb-2.5 border-b-2 border-[#003020]">
                 <div className="space-y-0.5 max-w-md">
-                  <div className="flex items-center gap-2 pb-0.5">
+                  <div className="flex items-center gap-2 pb-1">
                     <Image
                       src="/images/logo.png"
                       alt="Madhav Shringaar"
-                      width={150}
-                      height={44}
-                      className="h-10 w-auto object-contain"
+                      width={220}
+                      height={65}
+                      className="h-14 w-auto object-contain"
                       priority
                       unoptimized
                     />
                   </div>
-                  <p className="font-bold text-[#003020] text-xs leading-tight">Madhav Shringaar Private Limited</p>
                   <p className="text-[10px] text-neutral-600 leading-tight">
                     Operating Hubs: <strong>Agra &amp; Noida</strong> (Uttar Pradesh / Delhi NCR)
                   </p>

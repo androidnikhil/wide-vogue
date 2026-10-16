@@ -72,7 +72,7 @@ export default async function Homepage({
               <span className="font-bold text-xs uppercase tracking-[0.2em] text-[#003020]">{t.home.divineEssentials}</span>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-[6.5rem] text-[#003020] font-bold tracking-tight leading-[1.05] md:leading-[1] lg:leading-[0.95] font-serif mb-6 relative z-10 drop-shadow-sm">
+            <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-[5.5rem] text-[#003020] font-bold tracking-tight leading-[1.05] md:leading-[1] lg:leading-[0.95] font-serif mb-6 relative z-10 drop-shadow-sm">
               {isHindi ? (
                 <>
                   सजाएं अपने <br />
@@ -80,8 +80,8 @@ export default async function Homepage({
                 </>
               ) : (
                 <>
-                  Adorn Your <br />
-                  <span className="inline-block transform -rotate-3 text-[#0F6F74] italic font-medium bg-[#E6C16A]/20 px-3 sm:px-4 rounded-3xl mt-2">Beloved</span> Kanha
+                  Laddu Gopal Dress, <br />
+                  <span className="inline-block transform -rotate-3 text-[#0F6F74] italic font-medium bg-[#E6C16A]/20 px-3 sm:px-4 rounded-3xl mt-2">Poshak</span> & Shringaar Online
                 </>
               )}
             </h1>
@@ -528,6 +528,122 @@ export default async function Homepage({
                ))}
             </div>
          </div>
+      </section>
+
+      {/* 11B. DEVOTIONAL SEVA DIRECTORY & POPULAR SEARCHES */}
+      <section className="py-16 bg-[#FDFBF7] border-t border-[#003020]/10">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="text-[#C88A20] font-bold text-xs uppercase tracking-[0.2em]">{isHindi ? 'भक्ति एवं सेवा केंद्र' : 'DEVOTIONAL SHOPPING & SEVA GUIDE'}</span>
+            <h2 className="text-3xl md:text-4xl font-serif text-[#003020] font-bold mt-2 mb-4">
+              {isHindi ? 'लड्डू गोपाल जी पोशाक व श्रृंगार ऑनलाइन' : 'Laddu Gopal Dress, Poshak & Shringaar Online'}
+            </h2>
+            <p className="text-sm md:text-base text-[#003020]/70 leading-relaxed font-serif">
+              {isHindi 
+                ? 'माधव श्रृंगार पर पाएं कान्हा जी की सुंदर पोशाकें, मुकुट, बांसुरी, माला और संपूर्ण श्रृंगार किट। आगरा, मथुरा, वृन्दावन एवं नोएडा से सम्पूर्ण भारत में शीघ्र डिलीवरी उपलब्ध है।' 
+                : 'Shop beautiful Laddu Gopal dresses, Kanha Ji poshak, mukut, mala and shringaar accessories at Madhav Shringaar. Explore traditional designs, deity dresses with COD, free delivery over ₹999, and convenient online shopping across India.'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-sm">
+            {/* Category 1: Laddu Gopal Dresses */}
+            <div className="bg-white p-6 rounded-2xl border border-[#003020]/10 shadow-xs hover:shadow-md transition-shadow">
+              <h3 className="font-serif font-bold text-base text-[#003020] mb-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-base text-[#C88A20]">checkroom</span>
+                {isHindi ? 'लड्डू गोपाल ड्रेसेस व पोशाक' : 'Laddu Gopal Dress & Poshak'}
+              </h3>
+              <ul className="space-y-1.5 text-xs text-[#003020]/80">
+                <li><Link href="/search?category=Poshak" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress online</Link></li>
+                <li><Link href="/search?category=Poshak" className="hover:text-[#C88A20] transition-colors">• Handmade Laddu Gopal poshak</Link></li>
+                <li><Link href="/search?category=Poshak" className="hover:text-[#C88A20] transition-colors">• Kanha Ji dress online</Link></li>
+                <li><Link href="/search?category=Designer+Poshak" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal designer dress</Link></li>
+                <li><Link href="/search?category=Winter+Woolen+Poshak" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal winter dress & woollen poshak</Link></li>
+                <li><Link href="/search?category=Cotton+Summer+Poshak" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal summer dress</Link></li>
+                <li><Link href="/size-chart" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress size 0 to 6</Link></li>
+                <li><Link href="/search?category=Poshak" className="hover:text-[#C88A20] transition-colors">• Small Kanha Ji dress & dress price</Link></li>
+              </ul>
+            </div>
+
+            {/* Category 2: Mukut, Mala & Jewellery */}
+            <div className="bg-white p-6 rounded-2xl border border-[#003020]/10 shadow-xs hover:shadow-md transition-shadow">
+              <h3 className="font-serif font-bold text-base text-[#003020] mb-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-base text-[#C88A20]">diamond</span>
+                {isHindi ? 'मुकुट, माला एवं आभूषण' : 'Mukut, Mala & Jewellery'}
+              </h3>
+              <ul className="space-y-1.5 text-xs text-[#003020]/80">
+                <li><Link href="/search?category=Mukut+%26+Pagdi" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal mukut online</Link></li>
+                <li><Link href="/search?category=Mukut+%26+Pagdi" className="hover:text-[#C88A20] transition-colors">• Kanha Ji mukut online</Link></li>
+                <li><Link href="/search?category=Jewellery+%26+Mala" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal jewellery set</Link></li>
+                <li><Link href="/search?category=Jewellery+%26+Mala" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal mala & kanthi mala</Link></li>
+                <li><Link href="/search?category=Mukut+%26+Pagdi" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal mor pankh mukut</Link></li>
+                <li><Link href="/search?category=Bansuri" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal bansuri</Link></li>
+                <li><Link href="/search?category=Singhasan" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal singhasan decoration</Link></li>
+                <li><Link href="/search?category=Jewellery+%26+Mala" className="hover:text-[#C88A20] transition-colors">• Kanha Ji shringaar items</Link></li>
+              </ul>
+            </div>
+
+            {/* Category 3: Shringaar Kits & Sets */}
+            <div className="bg-white p-6 rounded-2xl border border-[#003020]/10 shadow-xs hover:shadow-md transition-shadow">
+              <h3 className="font-serif font-bold text-base text-[#003020] mb-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-base text-[#C88A20]">loyalty</span>
+                {isHindi ? 'श्रृंगार सेट एवं उपहार' : 'Complete Shringaar Sets'}
+              </h3>
+              <ul className="space-y-1.5 text-xs text-[#003020]/80">
+                <li><Link href="/search?category=Complete+Shringar" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal shringaar online & set</Link></li>
+                <li><Link href="/search?category=Complete+Shringar" className="hover:text-[#C88A20] transition-colors">• Kanha Ji shringaar online</Link></li>
+                <li><Link href="/search?category=Festive+Sets" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress and jewellery set</Link></li>
+                <li><Link href="/search?category=Complete+Shringar" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal complete shringaar kit</Link></li>
+                <li><Link href="/search?category=Festive+Sets" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal poshak with mukut and mala</Link></li>
+                <li><Link href="/search?category=Festive+Sets" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal gift set</Link></li>
+                <li><Link href="/search?category=Festive+Sets" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress for Janmashtami</Link></li>
+                <li><Link href="/search?category=Poshak" className="hover:text-[#C88A20] transition-colors">• Thakur Ji poshak online & Banke Bihari shringaar items</Link></li>
+                <li><Link href="/search?category=Poshak" className="hover:text-[#C88A20] transition-colors">• Krishna Ji dress online</Link></li>
+              </ul>
+            </div>
+
+            {/* Category 4: Pan-India Delivery & Local Hubs */}
+            <div className="bg-white p-6 rounded-2xl border border-[#003020]/10 shadow-xs hover:shadow-md transition-shadow">
+              <h3 className="font-serif font-bold text-base text-[#003020] mb-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-base text-[#C88A20]">local_shipping</span>
+                {isHindi ? 'डिलीवरी एवं सेवा केंद्र' : 'Express Delivery & Hubs'}
+              </h3>
+              <ul className="space-y-1.5 text-xs text-[#003020]/80">
+                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Buy Laddu Gopal dress online in India</Link></li>
+                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress with free delivery (₹999+)</Link></li>
+                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dresses with COD</Link></li>
+                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress shop in Agra & poshak in Agra</Link></li>
+                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Kanha Ji dress shop near me</Link></li>
+                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress delivery in Noida</Link></li>
+                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal shringaar shop in Mathura</Link></li>
+                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dresses in Vrindavan</Link></li>
+                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal shringaar delivery across India</Link></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Devotional Community & Search Tags */}
+          <div className="mt-8 pt-8 border-t border-[#003020]/10 flex flex-wrap items-center justify-center gap-2 text-xs text-[#003020]/70">
+            <span className="font-semibold text-[#003020]">Devotional Tags:</span>
+            {[
+              'Laddu Gopal daily darshan',
+              'Krishna bhakti India',
+              'Vrindavan bhakti',
+              'Laddu Gopal collection',
+              'Laddu Gopal devotees',
+              'Krishna bhakti group India',
+              'Laddu Gopal poshak shopping',
+              'Thakur Ji shringaar',
+              'Vrindavan devotees',
+              'Indian devotional shopping',
+              'Affordable Laddu Gopal shringaar set',
+              'Laddu Gopal poshak wholesale'
+            ].map((tag, i) => (
+              <span key={i} className="bg-white px-2.5 py-1 rounded-full border border-[#003020]/10 shadow-2xs">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* 12. FINAL CTA — VISUALLY MEMORABLE */}

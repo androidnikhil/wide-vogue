@@ -32,13 +32,15 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
   const [isPending, startTransition] = useTransition();
   const [showDiscounts, setShowDiscounts] = useState(false);
 
-  // Shiprocket live rate calculation state
+  // Pincode live delivery calculation state
   const [pincode, setPincode] = useState<string>(((cart as any)?.shippingAddress)?.postalCode || "");
   const [shippingQuote, setShippingQuote] = useState<{
     courierName: string;
     rate: number;
     days: string;
     isFree: boolean;
+    destinationCity?: string;
+    pickupCity?: string;
   } | null>(null);
   const [isCheckingPincode, setIsCheckingPincode] = useState(false);
 
@@ -58,13 +60,16 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
           rate: res.data.actualCourierRate,
           days: res.data.estimatedDays,
           isFree: res.data.isFree,
+          destinationCity: res.data.destinationCity,
+          pickupCity: res.data.pickupCity,
         });
-        toast.success(`Shiprocket delivery available to ${cleanPincode} via ${res.data.courierName}`);
+        const cityLabel = res.data.destinationCity ? `${res.data.destinationCity} (${cleanPincode})` : cleanPincode;
+        toast.success(`Delivery available to ${cityLabel} • Est. ${res.data.estimatedDays}`);
       } else {
-        toast.error(res.message || "Failed to calculate courier rate for this PIN code.");
+        toast.error(res.message || "Failed to check delivery for this PIN code.");
       }
     } catch {
-      toast.error("Unable to connect to courier service. Standard delivery charges apply.");
+      toast.error("Unable to verify delivery time right now. Standard delivery applies.");
     } finally {
       setIsCheckingPincode(false);
     }
@@ -205,25 +210,23 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                     {Number(cart.itemsPrice) >= 999 ? (
                       <span className="text-emerald-700 font-semibold flex items-center gap-1.5">
                         <span className="line-through text-xs text-neutral-400 font-normal">
-                          {shippingQuote ? formatCurrency(shippingQuote.rate) : '₹50'}
+                          ₹50
                         </span>
                         <span>FREE</span>
                       </span>
-                    ) : shippingQuote ? (
-                      <span className="font-semibold text-neutral-800">{formatCurrency(shippingQuote.rate)}</span>
                     ) : (
                       <span className="font-semibold text-neutral-800">{formatCurrency(50)}</span>
                     )}
                   </div>
 
-                  {/* Shiprocket Live Pincode Estimator */}
+                  {/* Pincode Delivery Estimator */}
                   <div className="p-3 rounded-xl bg-surface-container/40 border border-secondary/15 space-y-2">
                     <div className="flex items-center justify-between text-xs font-semibold text-primary">
                       <span className="flex items-center gap-1.5">
                         <Truck className="w-3.5 h-3.5 text-secondary" />
-                        Check Delivery &amp; Courier Rate
+                        Check Delivery
                       </span>
-                      <span className="text-[10px] text-muted-foreground font-medium">via Shiprocket</span>
+                      <span className="text-[10px] text-muted-foreground font-medium">Enter PIN code</span>
                     </div>
 
                     <div className="flex gap-2">
@@ -247,22 +250,24 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                     </div>
 
                     {shippingQuote && (
-                      <div className="pt-1 text-[11px] text-neutral-700 space-y-0.5">
+                      <div className="pt-2 text-[11px] text-neutral-700 space-y-1 border-t border-secondary/15 mt-2">
                         <div className="flex items-center justify-between font-medium">
-                          <span className="text-emerald-700 flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            {shippingQuote.courierName}
+                          <span className="text-emerald-700 flex items-center gap-1 font-semibold">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            Delivery Available to {shippingQuote.destinationCity || pincode}
                           </span>
-                          <span className="font-bold">
-                            {shippingQuote.isFree ? (
-                              <span className="text-emerald-700">FREE ({formatCurrency(shippingQuote.rate)} saved)</span>
-                            ) : (
-                              formatCurrency(shippingQuote.rate)
-                            )}
-                          </span>
+                          {shippingQuote.isFree ? (
+                            <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60 text-[10px]">
+                              FREE
+                            </span>
+                          ) : (
+                            <span className="text-neutral-600 text-[10px] font-medium">
+                              Standard Delivery
+                            </span>
+                          )}
                         </div>
-                        <p className="text-[10px] text-muted-foreground">
-                          Estimated Delivery: <strong>{shippingQuote.days}</strong> (Noida to {pincode})
+                        <p className="text-[10px] text-neutral-600">
+                          Estimated Delivery: <strong>{shippingQuote.days}</strong> ({shippingQuote.pickupCity || 'Noida'} to {shippingQuote.destinationCity || pincode})
                         </p>
                       </div>
                     )}

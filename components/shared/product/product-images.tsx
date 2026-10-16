@@ -1,13 +1,19 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { Maximize2, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import { Maximize2, X, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 
 const Productimages = ({ images }: { images: string[] }) => {
   const [current, setCurrent] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const safeImages = images && images.length > 0 ? images : ['/images/devotional/complete_shringar.webp'];
 
@@ -64,17 +70,10 @@ const Productimages = ({ images }: { images: string[] }) => {
             setIsLightboxOpen(true);
           }}
           className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-neutral-200/80 text-neutral-800 hover:text-primary flex items-center gap-1.5 text-xs font-semibold transition-all hover:scale-105 active:scale-95"
-          title="Click to view full uncropped image"
         >
           <Maximize2 className="w-3.5 h-3.5 text-amber-700" />
           <span>Full View</span>
         </button>
-
-        {/* Micro-hint on hover */}
-        <div className="absolute top-3 left-3 bg-black/50 text-white text-[11px] font-medium px-2.5 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex items-center gap-1">
-          <ZoomIn className="w-3 h-3 text-amber-300" />
-          <span>Click to enlarge uncropped</span>
-        </div>
       </div>
 
       {/* Thumbnails strip */}
@@ -105,64 +104,76 @@ const Productimages = ({ images }: { images: string[] }) => {
         </div>
       )}
 
-      {/* Full-Screen Lightbox Modal */}
-      {isLightboxOpen && (
+      {/* Full-Screen Lightbox Modal — Portal directly into document.body to break out of all parent stacking contexts */}
+      {isLightboxOpen && mounted && typeof document !== 'undefined' && createPortal(
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 bg-black/92 backdrop-blur-md flex flex-col justify-between p-3 sm:p-6 animate-in fade-in-50 duration-200"
+          className="fixed inset-0 z-[99999] bg-black/95 flex flex-col justify-between p-4 sm:p-6 animate-in fade-in duration-200 select-none"
           onClick={() => setIsLightboxOpen(false)}
         >
           {/* Top Bar Controls */}
           <div
-            className="flex items-center justify-between text-white z-20 pb-2"
+            className="flex items-center justify-between text-white z-30 pb-2 w-full max-w-7xl mx-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center gap-2">
-              <span className="text-xs sm:text-sm font-semibold tracking-wider text-amber-300">
-                Madhav Shringaar
-              </span>
-              <span className="text-neutral-400 text-xs">•</span>
-              <span className="text-xs text-neutral-300 bg-white/10 px-2 py-0.5 rounded-full font-mono">
-                {current + 1} / {safeImages.length}
-              </span>
-            </div>
-
+            {/* Prominent Back Button */}
             <button
               type="button"
               onClick={() => setIsLightboxOpen(false)}
-              className="p-2 sm:p-2.5 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white transition-all flex items-center justify-center shadow-lg"
-              title="Close (Esc)"
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all border border-white/20 shadow-lg cursor-pointer"
+              title="Back to Product (Esc)"
             >
-              <X className="w-5 h-5 sm:w-6 sm:h-6" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Back</span>
+            </button>
+
+            {/* Image Counter */}
+            {safeImages.length > 1 && (
+              <span className="text-xs sm:text-sm text-neutral-300 bg-white/10 px-3 py-1 rounded-full font-mono border border-white/10 shadow-xs">
+                {current + 1} / {safeImages.length}
+              </span>
+            )}
+
+            {/* Prominent Close Button */}
+            <button
+              type="button"
+              onClick={() => setIsLightboxOpen(false)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all border border-white/20 shadow-lg cursor-pointer"
+              title="Close Full View (Esc)"
+            >
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Close</span>
             </button>
           </div>
 
-          {/* Central Full Uncropped Image View */}
+          {/* Central Full View: Pure Product Image Only */}
           <div
-            className="relative flex-1 flex items-center justify-center min-h-0 py-2 sm:py-4"
-            onClick={(e) => e.stopPropagation()}
+            className="relative flex-1 flex items-center justify-center min-h-0 py-2 sm:py-4 overflow-hidden"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsLightboxOpen(false);
+            }}
           >
             {/* Prev Button */}
             {safeImages.length > 1 && (
               <button
                 type="button"
                 onClick={handlePrev}
-                className="absolute left-2 sm:left-4 z-20 p-2 sm:p-3 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 transition-all hover:scale-110 active:scale-95 shadow-xl"
+                className="absolute left-2 sm:left-6 z-30 p-3 sm:p-3.5 rounded-full bg-black/60 hover:bg-black/90 active:scale-95 text-white border border-white/20 transition-all shadow-2xl cursor-pointer"
                 title="Previous Image (Left Arrow)"
               >
                 <ChevronLeft className="w-5 h-5 sm:w-7 sm:h-7" />
               </button>
             )}
 
-            <div className="relative max-h-[75vh] sm:max-h-[82vh] max-w-[92vw] sm:max-w-[85vw] flex items-center justify-center">
+            <div className="relative max-h-[82vh] max-w-[92vw] flex items-center justify-center">
               <Image
                 src={safeImages[current]}
                 alt="Full-size divine product view"
                 width={1600}
                 height={1600}
                 sizes="95vw"
-                className="max-h-[75vh] sm:max-h-[82vh] max-w-[92vw] sm:max-w-[85vw] w-auto h-auto object-contain rounded-lg drop-shadow-2xl select-none"
+                className="max-h-[82vh] max-w-[92vw] w-auto h-auto object-contain rounded-xl drop-shadow-2xl select-none"
                 priority
               />
             </div>
@@ -172,7 +183,7 @@ const Productimages = ({ images }: { images: string[] }) => {
               <button
                 type="button"
                 onClick={handleNext}
-                className="absolute right-2 sm:right-4 z-20 p-2 sm:p-3 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 transition-all hover:scale-110 active:scale-95 shadow-xl"
+                className="absolute right-2 sm:right-6 z-30 p-3 sm:p-3.5 rounded-full bg-black/60 hover:bg-black/90 active:scale-95 text-white border border-white/20 transition-all shadow-2xl cursor-pointer"
                 title="Next Image (Right Arrow)"
               >
                 <ChevronRight className="w-5 h-5 sm:w-7 sm:h-7" />
@@ -180,10 +191,10 @@ const Productimages = ({ images }: { images: string[] }) => {
             )}
           </div>
 
-          {/* Bottom Thumbnails Strip inside Lightbox */}
+          {/* Bottom Thumbnails Strip (only if multiple images) */}
           {safeImages.length > 1 && (
             <div
-              className="flex items-center justify-center gap-2 pt-2 z-20 overflow-x-auto py-1"
+              className="flex items-center justify-center gap-2 pt-2 z-30 overflow-x-auto py-1"
               onClick={(e) => e.stopPropagation()}
             >
               {safeImages.map((image, index) => (
@@ -192,7 +203,7 @@ const Productimages = ({ images }: { images: string[] }) => {
                   type="button"
                   onClick={() => setCurrent(index)}
                   className={cn(
-                    'w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden border-2 transition-all p-0.5 bg-white shrink-0',
+                    'w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden border-2 transition-all p-0.5 bg-white shrink-0 cursor-pointer',
                     index === current
                       ? 'border-amber-400 scale-105 shadow-md ring-2 ring-amber-400/40'
                       : 'border-white/20 opacity-50 hover:opacity-90'
@@ -209,7 +220,8 @@ const Productimages = ({ images }: { images: string[] }) => {
               ))}
             </div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

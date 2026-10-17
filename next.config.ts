@@ -2,9 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: process.env.DOCKER_BUILD === '1' ? 'standalone' : undefined,
+  compress: true,
+  poweredByHeader: false,
   images: {
-    formats: ['image/webp'],
-    qualities: [85],
+    formats: ['image/avif', 'image/webp'],
+    qualities: [75, 85],
     remotePatterns: [
       {
         protocol: "https",
@@ -39,6 +41,15 @@ const nextConfig: NextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
+          },
+        ],
+      },
+      {
+        source: '/images/:all*(svg|jpg|jpeg|png|webp|avif|ico)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },

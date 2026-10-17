@@ -256,23 +256,23 @@ export default function AddToCart({
           </div>
         ) : (
           <Button 
-            className="flex-1 h-12 py-3 gold-gradient-btn text-primary-container font-bold rounded-xl hover:brightness-105 active:scale-98 transition-all text-sm md:text-base flex items-center justify-center gap-2 shadow-sm" 
+            className="flex-1 min-w-0 h-12 py-3 gold-gradient-btn text-primary-container font-bold rounded-xl hover:brightness-105 active:scale-98 transition-all text-xs sm:text-sm md:text-base flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm px-3 sm:px-4" 
             type="button" 
             onClick={handleAddToCart} 
             disabled={isPending}
           >
             {isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin shrink-0" />
             ) : (
-              <ShoppingBag className="w-4 h-4" />
+              <ShoppingBag className="w-4 h-4 shrink-0" />
             )}
-            <span>{t.product.addToCart}</span>
-            {effectivePrice > 0 && <span className="font-extrabold">• ₹{effectivePrice}</span>}
+            <span className="truncate">{t.product.addToCart}</span>
+            {effectivePrice > 0 && <span className="font-extrabold shrink-0">• ₹{effectivePrice}</span>}
           </Button>
         )}
         <WishlistButton 
           productId={item.productId} 
-          className="h-12 w-12 flex-shrink-0 bg-surface-container-low border border-outline-variant/40 hover:bg-surface-container rounded-xl shadow-xs active:scale-95 transition-all flex items-center justify-center text-on-surface-variant hover:text-secondary"
+          className="h-12 w-12 shrink-0 bg-white border border-outline-variant/60 hover:bg-neutral-50 rounded-xl shadow-xs active:scale-95 transition-all flex items-center justify-center text-neutral-600 hover:text-rose-600"
         />
       </div>
     </div>

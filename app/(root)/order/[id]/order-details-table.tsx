@@ -35,6 +35,7 @@ import { LOYALTY_CONFIG } from '@/lib/loyalty.config';
 import ReturnRequestModal from '@/components/shared/order/return-request-modal';
 import AdminReturnAction from '@/components/admin/admin-return-action';
 import { Copy, Check, FileText, ChevronRight, Phone, MessageSquare, Printer } from 'lucide-react';
+import CopyButton from '@/components/shared/copy-button';
 
 const OrderDetailsTable = ({
   order,
@@ -244,7 +245,10 @@ const OrderDetailsTable = ({
           <span>&gt;</span>
           <Link href="/user/orders" className="hover:text-[#003020] hover:underline">My Orders</Link>
           <span>&gt;</span>
-          <span className="text-neutral-800 font-semibold font-mono">{cleanOrderId}</span>
+          <span className="text-neutral-800 font-semibold font-mono inline-flex items-center gap-1">
+            {cleanOrderId}
+            <CopyButton text={cleanOrderId} title="Copy Order ID" size="xs" />
+          </span>
         </nav>
 
         <Button
@@ -478,13 +482,19 @@ const OrderDetailsTable = ({
               
               {Number(discountPrice) > 0 && (
                 <div className='flex justify-between items-center text-emerald-600 font-medium pt-2 pb-2'>
-                  <span>Discount (Code: {couponCode})</span>
+                  <span className='flex items-center gap-1.5'>
+                    Discount (Code: {couponCode})
+                    <CopyButton text={couponCode || ''} title="Copy Promo Code" size="xs" />
+                  </span>
                   <span>-{formatCurrency(discountPrice || "0")}</span>
                 </div>
               )}
               {Number(giftCardAmount) > 0 && (
                 <div className='flex justify-between items-center text-emerald-600 font-medium pt-2 pb-2'>
-                  <span>Gift Card ({giftCardCode})</span>
+                  <span className='flex items-center gap-1.5'>
+                    Gift Card ({giftCardCode})
+                    <CopyButton text={giftCardCode || ''} title="Copy Gift Card Code" size="xs" />
+                  </span>
                   <span>-{formatCurrency(giftCardAmount || "0")}</span>
                 </div>
               )}

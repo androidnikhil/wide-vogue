@@ -12,8 +12,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cart = await getMyCart();
-  const { t } = await getServerTranslations();
+  const [cart, { t }] = await Promise.all([
+    getMyCart(),
+    getServerTranslations(),
+  ]);
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -81,7 +83,7 @@ export default async function RootLayout({
                  </div>
                  {cart && cart.items.length > 0 && (
                    <span className="absolute -top-0.5 right-1.5 w-5 h-5 bg-[#C88A20] text-white rounded-full text-[11px] flex items-center justify-center font-bold shadow-xs z-10">
-                     {cart.items.reduce((a, c) => a + c.qty, 0)}
+                     {cart.items.reduce((a: number, c: any) => a + Number(c.qty || 0), 0)}
                    </span>
                  )}
                  <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 group-hover:text-[#003020] transition-colors">{t.header.sidebarCart}</span>

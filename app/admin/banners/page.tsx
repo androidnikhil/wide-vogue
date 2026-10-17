@@ -12,9 +12,14 @@ export const metadata: Metadata = {
 };
 
 const BannersPage = async () => {
-  const banners = await prisma.banner.findMany({
-    orderBy: { position: 'asc' },
-  });
+  let banners: any[] = [];
+  try {
+    banners = await prisma.banner.findMany({
+      orderBy: { position: 'asc' },
+    });
+  } catch (error) {
+    console.error('Failed to load banners:', error);
+  }
 
   return (
     <div className='space-y-6'>

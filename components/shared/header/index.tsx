@@ -13,49 +13,68 @@ import LanguageSwitcher from './language-switcher';
 import { getServerTranslations } from '@/lib/i18n/server';
 
 export default async function Header() {
-  const session = await auth();
-  const cart = await getMyCart();
-  const wishlistRes = await getWishlist();
+  const [session, cart, wishlistRes, { t }] = await Promise.all([
+    auth(),
+    getMyCart(),
+    getWishlist(),
+    getServerTranslations(),
+  ]);
   const wishlistItems = wishlistRes.success ? wishlistRes.data : [];
-  const { t } = await getServerTranslations();
 
   return (
     <>
-      <div className="bg-primary-container text-on-primary font-label-md text-label-md py-1.5 px-4 md:px-8 border-b border-secondary/20 max-sm:bg-gradient-to-r max-sm:from-[#003A2C] max-sm:via-[#064936] max-sm:to-[#003A2C] max-sm:text-[#F7EAC7] max-sm:border-b-[#C2A66A]/60 max-sm:py-2 max-sm:px-2">
-        <div className="max-w-7xl mx-auto flex justify-between items-center text-xs max-sm:grid max-sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] max-sm:gap-1">
-          <div className="flex items-center gap-2 max-sm:min-w-0 max-sm:gap-1">
-            <span className="material-symbols-outlined text-secondary-fixed text-base max-sm:shrink-0 max-sm:text-[#E6C16A] max-sm:text-[15px]">local_shipping</span>
-            <span className="hidden sm:inline">{t.header.freeShipping}</span>
-            <span className="sm:hidden max-sm:whitespace-nowrap max-sm:text-[7px] max-sm:font-semibold max-sm:leading-tight max-sm:tracking-tight">{t.header.freeShippingMobile}</span>
+      {/* Top Devotional & Shipping Bar — Shown strictly in Desktop view */}
+      <div className="hidden lg:block bg-primary-container text-on-primary font-label-md text-label-md py-1.5 px-6 lg:px-8 border-b border-secondary/20 shadow-2xs">
+        <div className="max-w-7xl mx-auto flex justify-between items-center text-xs">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-secondary-fixed text-base">local_shipping</span>
+            <span>{t.header.freeShipping}</span>
           </div>
-          <div className="font-headline-sm text-secondary-fixed text-sm md:text-base tracking-widest font-bold animate-pulse max-sm:whitespace-nowrap max-sm:text-[9px] max-sm:tracking-normal max-sm:text-[#E6C16A] max-sm:[animation:none]">
+          <div className="font-headline-sm text-secondary-fixed text-sm md:text-base tracking-widest font-bold animate-pulse">
             {t.header.radheRadhe}
           </div>
-          <div className="flex min-w-0 items-center gap-2.5 sm:gap-4 text-primary-fixed max-sm:justify-self-end max-sm:gap-1 max-sm:-translate-x-1 max-sm:text-[#F7EAC7]">
-            <div className="flex items-center gap-1">
-              <span className="material-symbols-outlined shrink-0 text-secondary-fixed text-base max-sm:hidden" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
-              <span className="hidden md:inline">{t.header.trustedDevotees}</span>
-              <span className="md:hidden max-sm:whitespace-nowrap max-sm:text-[7px] max-sm:font-semibold max-sm:leading-tight max-sm:tracking-tight">{t.header.trustedDevoteesMobile}</span>
+          <div className="flex items-center gap-4 text-primary-fixed">
+            <div className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined shrink-0 text-secondary-fixed text-base" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+              <span>{t.header.trustedDevotees}</span>
             </div>
             <LanguageSwitcher variant="topbar" />
           </div>
         </div>
       </div>
 
-      <header id="main-header" className="sticky top-0 w-full z-50 border-b border-outline-variant/10 py-2 bg-[#FBF7EE]/95 shadow-sm backdrop-blur-lg">
-        <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 flex flex-col gap-2 max-sm:px-2">
-          <div className="flex items-center justify-between gap-2 sm:gap-3 md:gap-4 w-full">
+      <header id="main-header" className="sticky top-0 w-full z-50 border-b border-outline-variant/10 py-1.5 sm:py-2 bg-[#FBF7EE]/95 shadow-sm backdrop-blur-lg">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-2.5 flex flex-col gap-2 max-sm:px-2">
+          <div className="relative flex items-center justify-between gap-2 sm:gap-3 md:gap-4 w-full">
 
-            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 md:gap-2.5">
-              <MobileMenu sessionUser={session?.user} />
-              <Link className="shrink-0 flex items-center" href="/">
+            {/* Left: Hamburger (Mobile) and Logo (Desktop) */}
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 md:gap-2.5 z-10">
+              <div className="md:hidden">
+                <MobileMenu sessionUser={session?.user} />
+              </div>
+              <Link className="hidden md:flex shrink-0 items-center" href="/">
                 <Image
                   alt="Madhav Shringaar"
-                  className="h-9 sm:h-10 md:h-11 lg:h-13 xl:h-14 w-auto object-contain shrink-0"
+                  className="h-16 md:h-[74px] lg:h-[80px] xl:h-[86px] w-auto object-contain shrink-0 transition-transform duration-300 hover:scale-[1.02]"
                   src="/images/logo.webp"
-                  width={220}
-                  height={75}
-                  quality={90}
+                  width={340}
+                  height={108}
+                  quality={95}
+                  priority
+                />
+              </Link>
+            </div>
+
+            {/* Mobile Centered Logo */}
+            <div className="md:hidden absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-auto">
+              <Link className="flex items-center" href="/">
+                <Image
+                  alt="Madhav Shringaar"
+                  className="h-12 sm:h-13 w-auto object-contain shrink-0 transition-transform duration-300 hover:scale-[1.02]"
+                  src="/images/logo.webp"
+                  width={250}
+                  height={80}
+                  quality={95}
                   priority
                 />
               </Link>
@@ -81,7 +100,7 @@ export default async function Header() {
               </form>
             </div>
 
-            <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 md:gap-2 lg:gap-4">
+            <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 md:gap-2 lg:gap-4 z-10">
               <MobileSearch />
 
               <div className="hidden lg:flex items-center">
@@ -101,7 +120,7 @@ export default async function Header() {
                 )}
               </Link>
 
-              <CartTrigger cartItemCount={cart ? cart.items.reduce((a, c) => a + c.qty, 0) : 0} cartPrice={cart ? cart.itemsPrice : '0'} />
+              <CartTrigger cartItemCount={cart ? cart.items.reduce((a: number, c: any) => a + Number(c.qty || 0), 0) : 0} cartPrice={cart ? cart.itemsPrice : '0'} />
             </div>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader, Ticket } from 'lucide-react';
+import CopyButton from '@/components/shared/copy-button';
 
 export default function CouponForm({ 
   initialCode 
@@ -53,18 +54,21 @@ export default function CouponForm({
           placeholder="Enter code"
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
-          className="uppercase bg-surface focus-visible:ring-secondary"
+          className="uppercase bg-surface focus-visible:ring-secondary font-mono font-semibold"
           disabled={isPending || !!initialCode}
         />
         {initialCode ? (
-          <Button 
-            type="button" 
-            variant="destructive" 
-            onClick={handleRemove}
-            disabled={isPending}
-          >
-            {isPending ? <Loader className="w-4 h-4 animate-spin" /> : 'Remove'}
-          </Button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <CopyButton text={initialCode} title="Copy Promo Code" variant="default" size="sm" />
+            <Button 
+              type="button" 
+              variant="destructive" 
+              onClick={handleRemove}
+              disabled={isPending}
+            >
+              {isPending ? <Loader className="w-4 h-4 animate-spin" /> : 'Remove'}
+            </Button>
+          </div>
         ) : (
           <Button 
             type="submit" 

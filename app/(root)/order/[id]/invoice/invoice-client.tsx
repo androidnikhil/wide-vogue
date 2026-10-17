@@ -76,18 +76,17 @@ export default function InvoiceClient({ order }: InvoiceClientProps) {
             {/* Header & Letterhead */}
             <div className="flex items-start justify-between gap-4 pb-2.5 border-b-2 border-[#003020]">
               <div className="space-y-0.5 max-w-md">
-                <div className="flex items-center gap-2 pb-0.5">
+                <div className="flex items-center gap-2 pb-1">
                   <Image
                     src="/images/logo.png"
                     alt="Madhav Shringaar"
-                    width={150}
-                    height={44}
-                    className="h-10 w-auto object-contain"
+                    width={220}
+                    height={65}
+                    className="h-14 w-auto object-contain"
                     priority
                     unoptimized
                   />
                 </div>
-                <p className="font-bold text-[#003020] text-xs leading-tight">Madhav Shringaar Private Limited</p>
                 <p className="text-[10px] text-neutral-600 leading-tight">
                   Operating Hubs: <strong>Agra & Noida</strong> (Uttar Pradesh / Delhi NCR)
                 </p>

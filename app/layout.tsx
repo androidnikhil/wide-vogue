@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Inter, Playfair_Display } from "next/font/google";
 import "@/assets/styles/globals.css";
 import { APP_NAME, APP_URL, DEFAULT_SEO_TITLE, DEFAULT_SEO_DESCRIPTION, SEO_KEYWORDS } from "@/lib/constants";
 import { ThemeProvider } from "next-themes";
@@ -6,10 +7,25 @@ import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from "@/components/ui/sonner";
 import { LanguageProvider } from "@/lib/i18n/language-context";
 
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-playfair",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    template: `%s | Madhav Shringaar - Agra & Noida`,
+    template: `%s | Madhav Shringaar`,
     default: DEFAULT_SEO_TITLE,
   },
   description: DEFAULT_SEO_DESCRIPTION,
@@ -29,7 +45,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_IN',
     url: APP_URL,
-    siteName: 'Madhav Shringaar | Agra & Noida',
+    siteName: 'Madhav Shringaar',
     title: DEFAULT_SEO_TITLE,
     description: DEFAULT_SEO_DESCRIPTION,
     images: [
@@ -37,7 +53,7 @@ export const metadata: Metadata = {
         url: '/images/devotional/complete_shringar.webp',
         width: 1200,
         height: 630,
-        alt: 'Madhav Shringaar - Divine Laddu Gopal Ji Poshak & Shringaar Agra Noida',
+        alt: 'Madhav Shringaar - Laddu Gopal Dress, Poshak & Shringaar Online',
       },
     ],
   },
@@ -101,7 +117,12 @@ const jsonLdLocalBusiness = {
       addressCountry: 'IN',
     },
   ],
-  sameAs: ['https://wa.me/917982160480'],
+  sameAs: [
+    'https://www.instagram.com/madhav.shringaar',
+    'https://www.facebook.com/share/1CLPMdGbhJ/',
+    'https://pin.it/51M0t5Fs5',
+    'https://wa.me/917982160480',
+  ],
 };
 
 const jsonLdWebSite = {
@@ -126,7 +147,6 @@ export default function RootLayout({
       <head>
         <link href="https://fonts.googleapis.com" rel="preconnect"/>
         <link crossOrigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect"/>
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
         <script
           type="application/ld+json"
@@ -138,7 +158,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="font-body-lg antialiased bg-background text-on-background"
+        className={`${inter.className} ${playfair.variable} font-body-lg antialiased bg-background text-on-background`}
         suppressHydrationWarning
       >
         <NextTopLoader color="#b8860b" showSpinner={false} />

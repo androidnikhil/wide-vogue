@@ -29,7 +29,8 @@ export default function PlaceOrderForm({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const isCOD = paymentMethod === 'CashOnDelivery';
+  const isZeroAmount = totalAmount <= 0 || paymentMethod === 'GiftCard';
+  const isCOD = !isZeroAmount && paymentMethod === 'CashOnDelivery';
 
   const loadScript = (src: string) => {
     return new Promise<boolean>((resolve) => {
@@ -42,6 +43,23 @@ export default function PlaceOrderForm({
       script.onerror = () => resolve(false);
       document.body.appendChild(script);
     });
+  };
+
+  const handlePlaceOrderZeroAmount = async () => {
+    setLoading(true);
+    try {
+      const res = await createOrder();
+      if (res.redirectTo) {
+        toast.success('Sacred order placed successfully! (100% covered by Gift Card / Discount)');
+        router.push(res.redirectTo);
+      } else if (!res.success) {
+        toast.error(res.message);
+        setLoading(false);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to place order. Please try again.');
+      setLoading(false);
+    }
   };
 
   const handlePlaceOrderCOD = async () => {
@@ -147,7 +165,9 @@ export default function PlaceOrderForm({
     e.preventDefault();
     if (loading) return;
 
-    if (isCOD) {
+    if (isZeroAmount) {
+      handlePlaceOrderZeroAmount();
+    } else if (isCOD) {
       handlePlaceOrderCOD();
     } else {
       handleOnlinePaymentRazorpay();
@@ -164,7 +184,12 @@ export default function PlaceOrderForm({
         {loading ? (
           <>
             <Loader className="w-5 h-5 animate-spin" />
-            <span>{isCOD ? 'Placing Order...' : 'Connecting to Gateway...'}</span>
+            <span>Confirming Order...</span>
+          </>
+        ) : isZeroAmount ? (
+          <>
+            <Check className="w-5 h-5 stroke-[2.5]" />
+            <span>Confirm Order (₹0 - 100% Paid)</span>
           </>
         ) : isCOD ? (
           <>
@@ -178,7 +203,11 @@ export default function PlaceOrderForm({
           </>
         )}
       </Button>
-      {!isCOD && (
+      {isZeroAmount ? (
+        <p className="text-[11px] text-center text-emerald-700 mt-2 font-medium flex items-center justify-center gap-1">
+          ✓ Entire order covered by Gift Card / Discount. No payment required.
+        </p>
+      ) : !isCOD && (
         <p className="text-[11px] text-center text-on-surface-variant mt-2 flex items-center justify-center gap-1">
           <CreditCard className="w-3.5 h-3.5 text-secondary" />
           100% Secure 256-Bit SSL Encrypted Razorpay Checkout

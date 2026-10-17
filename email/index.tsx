@@ -14,6 +14,7 @@ import OrderOutForDeliveryEmail from './order-out-for-delivery';
 import OrderDeliveredEmail from './order-delivered';
 import ReturnRequestAlertEmail from './return-request-alert';
 import ReturnStatusUpdateEmail from './return-status-update';
+import EmailOtpTemplate from './email-otp';
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.hostinger.com',
@@ -312,5 +313,32 @@ export const sendReturnStatusUpdateEmail = async ({
     console.log(`Return status update email sent to customer ${recipientEmail}`);
   } catch (error) {
     console.error('Failed to send return status update email:', error);
+  }
+};
+
+// 9. Send Email OTP Verification Code to Customer
+export const sendOtpEmail = async ({
+  email,
+  otp,
+}: {
+  email: string;
+  otp: string;
+}) => {
+  try {
+    const cleanEmail = email.toLowerCase().trim();
+    const emailHtml = await render(<EmailOtpTemplate otp={otp} email={cleanEmail} />);
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM || `${APP_NAME} Security <${SENDER_EMAIL}>`,
+      to: cleanEmail,
+      subject: `${otp} is your Madhav Shringaar Verification Code`,
+      html: emailHtml,
+      attachments: getLogoAttachment(),
+    });
+    console.log(`OTP verification email successfully sent to ${cleanEmail}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to send OTP email:', error);
+    return { success: false, error };
   }
 };

@@ -25,6 +25,7 @@ import {
   HelpCircle,
   Sparkle
 } from 'lucide-react';
+import CopyButton from '@/components/shared/copy-button';
 import { toast } from 'sonner';
 import { 
   checkGiftCardBalance, 
@@ -400,9 +401,12 @@ export default function GiftCardHub({
                       <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                       Verified Gift Card
                     </span>
-                    <span className="font-mono text-xs font-bold text-neutral-600">
-                      {verifiedCard.code}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-xs font-bold text-neutral-600">
+                        {verifiedCard.code}
+                      </span>
+                      <CopyButton text={verifiedCard.code} title="Copy Gift Card Code" size="xs" />
+                    </div>
                   </div>
 
                   <div className="flex items-baseline justify-between pt-1 border-t border-emerald-200">
@@ -638,10 +642,11 @@ export default function GiftCardHub({
                             <p className="text-[10px] text-[#f5d061]/90 uppercase tracking-widest mb-1.5">
                               Redeem Code
                             </p>
-                            <div className="bg-white/10 px-3.5 py-1.5 rounded-lg border border-white/20 backdrop-blur-md shadow-inner">
+                            <div className="bg-white/10 px-3.5 py-1.5 rounded-lg border border-white/20 backdrop-blur-md shadow-inner flex items-center gap-2">
                               <p className="font-mono font-bold text-lg tracking-wider text-white drop-shadow-sm select-all">
                                 {createdVoucher.code}
                               </p>
+                              <CopyButton text={createdVoucher.code} title="Copy Gift Card Code" variant="light" size="xs" />
                             </div>
                           </div>
                           <div className="text-right">

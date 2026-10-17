@@ -19,6 +19,7 @@ import {
 import Image from 'next/image';
 import { formatCurrency } from '@/lib/utils';
 import PlaceOrderForm from './place-order-form';
+import CopyButton from '@/components/shared/copy-button';
 
 export const metadata: Metadata = {
   title: 'Place Order',
@@ -88,14 +89,23 @@ const PlaceOrderPage = async () => {
               <CardContent className='p-6'>
                 <div className="flex justify-between items-start mb-4">
                   <h2 className='text-xl font-semibold text-primary'>Payment Method</h2>
-                  <Link href='/payment-method'>
-                    <Button variant='outline' size="sm" className="rounded-full text-secondary border-secondary/50 hover:bg-secondary/10">
-                      Edit
-                    </Button>
-                  </Link>
+                  {Number(cart.totalPrice) > 0 && (
+                    <Link href='/payment-method'>
+                      <Button variant='outline' size="sm" className="rounded-full text-secondary border-secondary/50 hover:bg-secondary/10">
+                        Edit
+                      </Button>
+                    </Link>
+                  )}
                 </div>
                 <div className="text-on-surface-variant">
-                  <p className="font-medium text-on-surface">{paymentMethod}</p>
+                  {Number(cart.totalPrice) <= 0 || paymentMethod === 'GiftCard' ? (
+                    <div className="flex items-center gap-2 text-emerald-700 font-medium">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                      <span>Gift Card / 100% Discount (₹0.00 - Fully Covered)</span>
+                    </div>
+                  ) : (
+                    <p className="font-medium text-on-surface">{paymentMethod}</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -168,13 +178,19 @@ const PlaceOrderPage = async () => {
                   )}
                   {Number(cart.discountPrice) > 0 && (
                     <div className='flex justify-between items-center text-emerald-600 font-medium'>
-                      <span>Discount (Code: {cart.couponCode})</span>
+                      <span className='flex items-center gap-1.5'>
+                        Discount (Code: {cart.couponCode})
+                        <CopyButton text={cart.couponCode || ''} title="Copy Promo Code" size="xs" />
+                      </span>
                       <span>-{formatCurrency(cart.discountPrice || "0")}</span>
                     </div>
                   )}
                   {Number(cart.giftCardAmount) > 0 && (
                     <div className='flex justify-between items-center text-emerald-600 font-medium'>
-                      <span>Gift Card ({cart.giftCardCode})</span>
+                      <span className='flex items-center gap-1.5'>
+                        Gift Card ({cart.giftCardCode})
+                        <CopyButton text={cart.giftCardCode || ''} title="Copy Gift Card Code" size="xs" />
+                      </span>
                       <span>-{formatCurrency(cart.giftCardAmount || "0")}</span>
                     </div>
                   )}

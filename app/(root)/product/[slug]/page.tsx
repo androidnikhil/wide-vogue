@@ -28,22 +28,43 @@ export async function generateMetadata(props: {
   }
 
   const ogImage = product.images?.[0] || '/images/devotional/complete_shringar.webp';
-  const title = `${product.name} | Laddu Gopal Poshak & Shringaar - Agra & Noida`;
-  const description = `${product.name} - Handcrafted ${product.category} for Shri Laddu Gopal Ji. Authentic Vrindavan craftsmanship, deity-safe fabric. Express delivery in Agra, Noida, Delhi NCR & across India. Price: ₹${product.price}.`;
+  const title = `${product.name} Online | Laddu Gopal Dress & Poshak - Madhav Shringaar`;
+  const description = `Buy ${product.name} (${product.category}) for Shri Laddu Gopal Ji online at Madhav Shringaar. Authentic Vrindavan craftsmanship, traditional designs, Cash on Delivery (COD), free delivery over ₹999 & express delivery across India. Price: ₹${product.price}.`;
 
   return {
     title,
     description,
     keywords: [
       product.name,
-      `${product.category} Agra`,
-      `${product.category} Noida`,
-      'Laddu Gopal poshak Agra',
-      'Laddu Gopal dress Noida',
-      'Kanha ji poshak online',
+      `${product.name} online`,
+      'Laddu Gopal dress online',
+      'Laddu Gopal poshak',
+      'Laddu Gopal Ji dress',
+      'Kanha Ji dress online',
+      'Laddu Gopal designer dress',
+      'Handmade Laddu Gopal poshak',
+      'Laddu Gopal dress price',
+      'Small Kanha Ji dress',
+      'Laddu Gopal mukut online',
+      'Laddu Gopal mala online',
+      'Laddu Gopal jewellery set',
+      'Laddu Gopal shringaar online',
+      'Thakur Ji poshak online',
+      'Banke Bihari shringaar items',
+      'Krishna Ji dress online',
+      'Buy Laddu Gopal dress online in India',
+      'Laddu Gopal poshak with mukut and mala',
+      'Laddu Gopal dress size 0 to 6',
+      'Laddu Gopal dress with free delivery',
+      'Laddu Gopal dresses with COD',
+      'Laddu Gopal dress shop in Agra',
+      'Laddu Gopal poshak in Agra',
+      'Laddu Gopal dress delivery in Noida',
+      'Laddu Gopal shringaar delivery across India',
       'Braj devotional shringaar',
       'Madhav Shringaar Agra Noida',
       ...(product.sizes || []).map((s: string) => `Size ${s} Laddu Gopal poshak`),
+      ...(product.sizes || []).map((s: string) => `Laddu Gopal dress size ${s}`),
     ],
     alternates: {
       canonical: `/product/${product.slug}`,

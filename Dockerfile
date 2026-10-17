@@ -14,7 +14,7 @@ RUN apk add --no-cache libc6-compat openssl
 FROM base AS deps
 COPY package.json package-lock.json .npmrc* ./
 COPY prisma ./prisma/
-RUN npm ci --legacy-peer-deps
+RUN --mount=type=cache,target=/root/.npm npm ci --legacy-peer-deps
 
 # ------------------------------------------------------------------------------
 # Development stage

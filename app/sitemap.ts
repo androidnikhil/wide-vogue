@@ -19,6 +19,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${APP_URL}/about`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${APP_URL}/blogs`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
       url: `${APP_URL}/size-chart`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
@@ -101,5 +113,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error fetching products for sitemap:', error);
   }
 
-  return [...staticRoutes, ...categoryRoutes, ...productRoutes];
+  let blogRoutes: MetadataRoute.Sitemap = [];
+  try {
+    const posts = await (prisma as any).blogPost.findMany({
+      where: { isPublished: true },
+      select: { slug: true, updatedAt: true },
+    });
+
+    blogRoutes = posts.map((post: any) => ({
+      url: `${APP_URL}/blogs/${post.slug}`,
+      lastModified: post.updatedAt ? new Date(post.updatedAt) : currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }));
+  } catch (error) {
+    console.error('Error fetching blogs for sitemap:', error);
+  }
+
+  return [...staticRoutes, ...categoryRoutes, ...productRoutes, ...blogRoutes];
 }

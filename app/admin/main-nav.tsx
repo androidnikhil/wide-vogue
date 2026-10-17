@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import React from 'react';
-import { LayoutDashboard, Package, ShoppingCart, Users, Gift, Image as ImageIcon, Tag } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Gift, Image as ImageIcon, Tag, BookOpen } from 'lucide-react';
 
 const links = [
   {
@@ -40,6 +40,11 @@ const links = [
     title: 'Banners',
     href: '/admin/banners',
     icon: ImageIcon,
+  },
+  {
+    title: 'Blogs',
+    href: '/admin/blogs',
+    icon: BookOpen,
   },
 ];
 

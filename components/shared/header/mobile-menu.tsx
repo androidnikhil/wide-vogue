@@ -18,6 +18,7 @@ import {
   ChevronRight,
   ShieldCheck,
   Ruler,
+  BookOpen,
   LogOut,
 } from 'lucide-react';
 import { isDummyPhoneEmail } from '@/lib/constants';
@@ -99,6 +100,12 @@ export default function MobileMenu({ sessionUser }: MobileMenuProps) {
       icon: Ruler,
       tag: isHindi ? '0–6 नाप' : '0–6 Sizes',
     },
+    {
+      href: '/blogs',
+      label: t.header.navBlogs,
+      icon: BookOpen,
+      tag: isHindi ? 'कथा व गाइड' : 'Guides',
+    },
   ];
 
   return (
@@ -134,7 +141,6 @@ export default function MobileMenu({ sessionUser }: MobileMenuProps) {
                   width={220}
                   height={78}
                   className="h-13 sm:h-14 w-auto object-contain drop-shadow-xs"
-                  priority
                 />
               </Link>
               <button

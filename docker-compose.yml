@@ -1,10 +1,10 @@
 # ==============================================================================
 # Docker Compose configuration for Madhav Shringar E-Commerce
-# 
+#
 # Usage:
 #   Local Development:
 #     docker compose up web-dev --build
-# 
+#
 #   Production-Build Testing:
 #     docker compose --profile prod up web-prod --build
 # ==============================================================================
@@ -24,7 +24,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-shringaarwebsite}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-shringaarwebsite}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -42,6 +42,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    env_file:
+      - .env
+
     environment:
       NODE_ENV: development
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgrespassword}@db:5432/${POSTGRES_DB:-shringaarwebsite}?schema=public
@@ -62,7 +65,7 @@ services:
       context: .
       target: runner
     container_name: madhav-shringar-prod
-    profiles: ["prod"]
+    profiles: [ "prod" ]
     restart: unless-stopped
     ports:
       - "${PROD_APP_PORT:-3001}:3000"
@@ -86,7 +89,7 @@ services:
       context: .
       target: deps
     container_name: madhav-shringar-dbsync
-    profiles: ["tools"]
+    profiles: [ "tools" ]
     depends_on:
       db:
         condition: service_healthy

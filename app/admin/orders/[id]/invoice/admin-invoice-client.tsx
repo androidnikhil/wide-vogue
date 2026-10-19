@@ -29,6 +29,7 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
   const discountTotal = Number(order.discountPrice || 0);
   const giftCardTotal = Number(order.giftCardAmount || 0);
   const grandTotal = Number(order.totalPrice || 0);
+  const orderItemsList = (order.orderitems?.length ? order.orderitems : order.orderItems?.length ? order.orderItems : order.items) || [];
 
   return (
     <div className="space-y-4 pb-12">
@@ -65,11 +66,10 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
           <button
             type="button"
             onClick={() => setPrintFormat('thermal')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-              printFormat === 'thermal'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${printFormat === 'thermal'
                 ? 'bg-[#003020] text-[#F3D98F] shadow-xs'
                 : 'text-neutral-600 hover:text-neutral-900'
-            }`}
+              }`}
           >
             <Receipt className="w-3.5 h-3.5" />
             80mm Thermal (POS)
@@ -77,11 +77,10 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
           <button
             type="button"
             onClick={() => setPrintFormat('a4')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              printFormat === 'a4'
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${printFormat === 'a4'
                 ? 'bg-[#003020] text-[#F3D98F] shadow-xs'
                 : 'text-neutral-600 hover:text-neutral-900'
-            }`}
+              }`}
           >
             <FileText className="w-3.5 h-3.5" />
             A4 Standard
@@ -141,14 +140,13 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
                 <Image
                   src="/images/logo.png"
                   alt="Madhav Shringaar"
-                  width={200}
-                  height={60}
-                  className="h-14 w-auto object-contain"
+                  width={220}
+                  height={70}
+                  className="h-16 w-auto object-contain"
                   priority
                   unoptimized
                 />
               </div>
-              <p className="text-[8px] text-neutral-700">Hubs: Noida &bull; Agra &bull; Vrindavan</p>
               <p className="text-[8px] font-mono">GSTIN: 09EHFPP7126A1ZE</p>
               <p className="text-[8px]">Helpline: +91 79821 60480</p>
               <p className="text-[8px]">info@madhavshringaar.com</p>
@@ -175,7 +173,7 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
               </div>
               <div className="flex justify-between">
                 <span>Place of Supply:</span>
-                <span>{address.state || 'UP'}, India (09)</span>
+                <span>{address.state ? `${address.state}, India` : 'India'}</span>
               </div>
             </div>
 
@@ -201,19 +199,25 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
                 <span className="col-span-2 text-center">Qty</span>
                 <span className="col-span-3 text-right">Amt</span>
               </div>
-              {order.orderitems?.map((item: any, idx: number) => (
-                <div key={idx} className="grid grid-cols-12 text-[9px] py-0.5 items-start">
-                  <div className="col-span-7 pr-1">
-                    <p className="font-medium leading-tight">{item.name}</p>
-                    {item.size && <p className="text-[8px] text-neutral-700">Size: {item.size}</p>}
-                    <p className="text-[8px] text-neutral-600">@{formatCurrency(item.price)}</p>
+              {orderItemsList.length > 0 ? (
+                orderItemsList.map((item: any, idx: number) => (
+                  <div key={idx} className="grid grid-cols-12 text-[9px] py-0.5 items-start">
+                    <div className="col-span-7 pr-1">
+                      <p className="font-medium leading-tight">{item.name}</p>
+                      {item.size && <p className="text-[8px] text-neutral-700">Size: {item.size}</p>}
+                      <p className="text-[8px] text-neutral-600">@{formatCurrency(item.price)}</p>
+                    </div>
+                    <span className="col-span-2 text-center font-bold">x{item.qty}</span>
+                    <span className="col-span-3 text-right font-bold">
+                      {formatCurrency(Number(item.price) * item.qty)}
+                    </span>
                   </div>
-                  <span className="col-span-2 text-center font-bold">x{item.qty}</span>
-                  <span className="col-span-3 text-right font-bold">
-                    {formatCurrency(Number(item.price) * item.qty)}
-                  </span>
+                ))
+              ) : (
+                <div className="py-2 text-center text-[9px] text-neutral-500">
+                  No items listed
                 </div>
-              ))}
+              )}
             </div>
 
             <div className="border-b border-dashed border-black my-1.5" />
@@ -324,22 +328,15 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
                     <Image
                       src="/images/logo.png"
                       alt="Madhav Shringaar"
-                      width={220}
-                      height={65}
-                      className="h-14 w-auto object-contain"
+                      width={240}
+                      height={75}
+                      className="h-16 w-auto object-contain"
                       priority
                       unoptimized
                     />
                   </div>
-                  <p className="text-[10px] text-neutral-600 leading-tight">
-                    Operating Hubs: <strong>Agra &amp; Noida</strong> (Uttar Pradesh / Delhi NCR)
-                  </p>
-                  <p className="text-[10px] text-neutral-500 leading-tight">
-                    Sacred Workshop: Raman Reti Road, Vrindavan Dham, Mathura - 281121, UP, India
-                  </p>
                   <p className="text-[10px] text-neutral-600 font-mono pt-0.5">
-                    GSTIN: <strong className="text-neutral-900">09EHFPP7126A1ZE</strong> &bull; MSME:{' '}
-                    <strong className="text-neutral-900">UDYAM-UP-01-0152376</strong>
+                    GSTIN: <strong className="text-neutral-900">09EHFPP7126A1ZE</strong>
                   </p>
                   <p className="text-[10px] text-neutral-600">
                     Helpline: <strong>+91 79821 60480</strong> &bull; Email: info@madhavshringaar.com
@@ -361,7 +358,7 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
                       Order ID: <strong className="font-mono text-neutral-900">{cleanOrderId}</strong>
                     </p>
                     <p>
-                      Place of Supply: <strong>{address.state || 'Uttar Pradesh'}, India (09)</strong>
+                      Place of Supply: <strong>{address.state ? `${address.state}, India` : 'India'}</strong>
                     </p>
                   </div>
                 </div>
@@ -381,25 +378,33 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-200">
-                    {order.orderitems?.map((item: any, index: number) => (
-                      <tr key={item.id || index} className="hover:bg-neutral-50/50">
-                        <td className="py-1.5 px-2 text-center font-mono text-neutral-500 text-[10px]">
-                          {index + 1}
-                        </td>
-                        <td className="py-1.5 px-2">
-                          <p className="font-semibold text-neutral-900">{item.name}</p>
-                          <p className="text-[10px] text-neutral-500 font-mono">HSN: 6204 &bull; GST @ 5% Inclusive</p>
-                        </td>
-                        <td className="py-1.5 px-2 text-center font-medium text-neutral-700">
-                          {item.size || 'Standard'}
-                        </td>
-                        <td className="py-1.5 px-2 text-center font-bold text-neutral-900">{item.qty}</td>
-                        <td className="py-1.5 px-2 text-right font-mono">{formatCurrency(item.price)}</td>
-                        <td className="py-1.5 px-2 text-right font-bold font-mono text-neutral-900">
-                          {formatCurrency(Number(item.price) * item.qty)}
+                    {orderItemsList.length > 0 ? (
+                      orderItemsList.map((item: any, index: number) => (
+                        <tr key={item.id || index} className="hover:bg-neutral-50/50">
+                          <td className="py-1.5 px-2 text-center font-mono text-neutral-500 text-[10px]">
+                            {index + 1}
+                          </td>
+                          <td className="py-1.5 px-2">
+                            <p className="font-semibold text-neutral-900">{item.name}</p>
+                            <p className="text-[10px] text-neutral-500 font-mono">HSN: 6204 &bull; GST @ 5% Inclusive</p>
+                          </td>
+                          <td className="py-1.5 px-2 text-center font-medium text-neutral-700">
+                            {item.size || 'Standard'}
+                          </td>
+                          <td className="py-1.5 px-2 text-center font-bold text-neutral-900">{item.qty}</td>
+                          <td className="py-1.5 px-2 text-right font-mono">{formatCurrency(item.price)}</td>
+                          <td className="py-1.5 px-2 text-right font-bold font-mono text-neutral-900">
+                            {formatCurrency(Number(item.price) * item.qty)}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="py-4 text-center text-neutral-500 text-xs">
+                          No items listed in order
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>

@@ -196,9 +196,9 @@ export default function FAQClient() {
         </div>
       </div>
 
-      {/* Categories Tabs (when not searching) */}
+      {/* Categories Grid (No scrollbar / No slider) */}
       {!searchQuery.trim() && (
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 md:gap-3">
           {faqData.map((cat) => {
             const Icon = cat.icon;
             const isSelected = selectedCat === cat.id;
@@ -206,15 +206,33 @@ export default function FAQClient() {
               <button
                 key={cat.id}
                 type="button"
-                onClick={() => setSelectedCat(cat.id)}
-                className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-semibold flex items-center gap-2 whitespace-nowrap transition-all border ${
+                onClick={() => {
+                  setSelectedCat(cat.id);
+                  setOpenItems((prev) => ({ ...prev, [`${cat.id}-0`]: true }));
+                }}
+                className={`group p-3 sm:p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-200 border cursor-pointer min-h-[95px] ${
                   isSelected
-                    ? 'bg-[#003020] text-[#F3D98F] border-[#003020] shadow-sm'
-                    : 'bg-white text-neutral-700 border-neutral-200/80 hover:bg-neutral-50'
+                    ? 'bg-[#003020] text-white border-[#E6C16A] shadow-md ring-2 ring-[#E6C16A]/30 scale-[1.02]'
+                    : 'bg-white text-neutral-800 border-neutral-200/90 hover:border-[#0F6F74]/50 hover:bg-neutral-50/80 hover:shadow-sm'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isSelected ? 'text-[#E6C16A]' : 'text-[#0F6F74]'}`} />
-                {cat.name}
+                <div
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors mb-2 ${
+                    isSelected
+                      ? 'bg-[#E6C16A]/20 text-[#F3D98F]'
+                      : 'bg-[#0F6F74]/10 text-[#0F6F74] group-hover:bg-[#0F6F74]/15'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                </div>
+
+                <span
+                  className={`block text-xs sm:text-[13px] font-semibold leading-tight ${
+                    isSelected ? 'text-[#F3D98F]' : 'text-[#003020]'
+                  }`}
+                >
+                  {cat.name}
+                </span>
               </button>
             );
           })}

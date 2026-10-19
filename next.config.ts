@@ -4,6 +4,18 @@ const nextConfig: NextConfig = {
   output: process.env.DOCKER_BUILD === '1' ? 'standalone' : undefined,
   compress: true,
   poweredByHeader: false,
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-select',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-slot',
+      'date-fns',
+      'sonner',
+    ],
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     qualities: [75, 85, 95],

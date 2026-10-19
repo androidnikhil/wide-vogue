@@ -193,7 +193,7 @@ export default function AdminOrderClient({ order }: AdminOrderClientProps) {
             size="sm"
             className="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs font-bold gap-1.5 shadow-xs h-9 px-3.5"
           >
-            <Link href={`/admin/orders/${order.id}/thank-you`} title="Print 80mm Sacred Devotional Thank You Note">
+            <Link href={`/admin/orders/${order.id}/thank-you`} title="Print 80mm Thank You Note">
               <HeartHandshake className="w-4 h-4 text-amber-700" />
               80mm Thank You Note
             </Link>

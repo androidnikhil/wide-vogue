@@ -17,3 +17,6 @@ yarn-error.log*
 !docker-entrypoint.sh
 README.md
 docs
+pgsql
+.vercel
+scratch

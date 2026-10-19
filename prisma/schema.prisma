@@ -229,3 +229,22 @@ model Banner {
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @default(now()) @updatedAt
 }
+
+model BlogPost {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title           String
+  slug            String    @unique(map: "blog_slug_idx")
+  excerpt         String?   @db.Text
+  content         String    @db.Text
+  featuredImage   String?
+  category        String    @default("Devotional Seva")
+  tags            String[]  @default([])
+  authorName      String    @default("Madhav Shringaar")
+  isPublished     Boolean   @default(true)
+  readingTime     Int       @default(3)
+  metaTitle       String?
+  metaDescription String?
+  publishedAt     DateTime  @default(now()) @db.Timestamp(6)
+  createdAt       DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime  @updatedAt
+}

@@ -26,6 +26,7 @@ export default function InvoiceClient({ order }: InvoiceClientProps) {
   const discountTotal = Number(order.discountPrice || 0);
   const giftCardTotal = Number(order.giftCardAmount || 0);
   const grandTotal = Number(order.totalPrice || 0);
+  const orderItemsList = (order.orderitems?.length ? order.orderitems : order.orderItems?.length ? order.orderItems : order.items) || [];
 
   return (
     <div className="min-h-screen bg-neutral-100 py-6 print:py-0 print:bg-white text-neutral-900 font-sans">
@@ -72,30 +73,24 @@ export default function InvoiceClient({ order }: InvoiceClientProps) {
           className="w-full max-w-[210mm] bg-white rounded-xl print:rounded-none border border-neutral-200 print:border-none shadow-lg print:shadow-none p-6 print:p-0 text-neutral-900 font-sans"
         >
           <div className="space-y-3 text-xs leading-normal">
-            
+
             {/* Header & Letterhead */}
             <div className="flex items-start justify-between gap-4 pb-2.5 border-b-2 border-[#003020]">
               <div className="space-y-0.5 max-w-md">
-                <div className="flex items-center gap-2 pb-1">
-                  <Image
-                    src="/images/logo.png"
-                    alt="Madhav Shringaar"
-                    width={220}
-                    height={65}
-                    className="h-14 w-auto object-contain"
-                    priority
-                    unoptimized
-                  />
-                </div>
-                <p className="text-[10px] text-neutral-600 leading-tight">
-                  Operating Hubs: <strong>Agra & Noida</strong> (Uttar Pradesh / Delhi NCR)
-                </p>
-                <p className="text-[10px] text-neutral-500 leading-tight">
-                  Sacred Workshop: Raman Reti Road, Vrindavan Dham, Mathura - 281121, UP, India
-                </p>
-                <p className="text-[10px] text-neutral-600 font-mono pt-0.5">
-                  GSTIN: <strong className="text-neutral-900">09EHFPP7126A1ZE</strong> • MSME: <strong className="text-neutral-900">UDYAM-UP-01-0152376</strong>
-                </p>
+                  <div className="flex items-center gap-2 pb-1">
+                    <Image
+                      src="/images/logo.png"
+                      alt="Madhav Shringaar"
+                      width={240}
+                      height={75}
+                      className="h-16 w-auto object-contain"
+                      priority
+                      unoptimized
+                    />
+                  </div>
+                  <p className="text-[10px] text-neutral-600 font-mono pt-0.5">
+                    GSTIN: <strong className="text-neutral-900">09EHFPP7126A1ZE</strong>
+                  </p>
                 <p className="text-[10px] text-neutral-600">
                   Helpline: <strong>+91 79821 60480</strong> • Email: info@madhavshringaar.com
                 </p>
@@ -109,7 +104,7 @@ export default function InvoiceClient({ order }: InvoiceClientProps) {
                   <p>Invoice No: <strong className="font-mono text-neutral-900">{invoiceNumber}</strong></p>
                   <p>Invoice Date: <strong>{orderDate}</strong></p>
                   <p>Order ID: <strong className="font-mono text-neutral-900">{cleanOrderId}</strong></p>
-                  <p>Place of Supply: <strong>{address.state || 'Uttar Pradesh'}, India (09)</strong></p>
+                  <p>Place of Supply: <strong>{address.state ? `${address.state}, India` : 'India'}</strong></p>
                 </div>
               </div>
             </div>
@@ -200,10 +195,6 @@ export default function InvoiceClient({ order }: InvoiceClientProps) {
                   <span className="text-neutral-500">Tracking AWB:</span>
                   <strong className="font-mono">{order.awbNumber || 'Affixed to parcel'}</strong>
                 </p>
-                <p className="flex justify-between">
-                  <span className="text-neutral-500">Fulfillment Hub:</span>
-                  <span>Agra & Noida Dispatch Facility</span>
-                </p>
               </div>
             </div>
 
@@ -221,28 +212,36 @@ export default function InvoiceClient({ order }: InvoiceClientProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-200">
-                {order.orderitems?.map((item: any, idx: number) => {
-                  const unitPrice = Number(item.price);
-                  const itemTotal = unitPrice * item.qty;
-                  return (
-                    <tr key={idx} className="hover:bg-neutral-50/50">
-                      <td className="py-1 px-2 text-center text-neutral-500">{idx + 1}</td>
-                      <td className="py-1 px-2">
-                        <div className="font-semibold text-neutral-900">{item.name}</div>
-                        <div className="text-[9px] text-neutral-500">
-                          Handcrafted Deity Seva Craft{item.size ? ` • Size: ${item.size} No.` : ''}
-                        </div>
-                      </td>
-                      <td className="py-1 px-2 text-center text-neutral-600 font-mono text-[9px]">6204</td>
-                      <td className="py-1 px-2 text-center font-bold text-neutral-900">{item.qty}</td>
-                      <td className="py-1 px-2 text-right font-mono">{formatCurrency(unitPrice)}</td>
-                      <td className="py-1 px-2 text-right font-mono">{formatCurrency(itemTotal)}</td>
-                      <td className="py-1 px-2 text-right font-bold text-neutral-900 font-mono">
-                        {formatCurrency(itemTotal)}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {orderItemsList.length > 0 ? (
+                  orderItemsList.map((item: any, idx: number) => {
+                    const unitPrice = Number(item.price);
+                    const itemTotal = unitPrice * item.qty;
+                    return (
+                      <tr key={idx} className="hover:bg-neutral-50/50">
+                        <td className="py-1 px-2 text-center text-neutral-500">{idx + 1}</td>
+                        <td className="py-1 px-2">
+                          <div className="font-semibold text-neutral-900">{item.name}</div>
+                          <div className="text-[9px] text-neutral-500">
+                            Handcrafted Deity Seva Craft{item.size ? ` • Size: ${item.size} No.` : ''}
+                          </div>
+                        </td>
+                        <td className="py-1 px-2 text-center text-neutral-600 font-mono text-[9px]">6204</td>
+                        <td className="py-1 px-2 text-center font-bold text-neutral-900">{item.qty}</td>
+                        <td className="py-1 px-2 text-right font-mono">{formatCurrency(unitPrice)}</td>
+                        <td className="py-1 px-2 text-right font-mono">{formatCurrency(itemTotal)}</td>
+                        <td className="py-1 px-2 text-right font-bold text-neutral-900 font-mono">
+                          {formatCurrency(itemTotal)}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={7} className="py-4 text-center text-neutral-500 text-xs">
+                      No items listed in order
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
 

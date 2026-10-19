@@ -24,6 +24,7 @@ export interface Translations {
     navSevaEssentials: string;
     navFestiveSets: string;
     navSizeChart: string;
+    navBlogs: string;
     cart: string;
     wishlist: string;
     myAccount: string;
@@ -218,6 +219,7 @@ export const translations: Record<Language, Translations> = {
       navSevaEssentials: 'Seva Essentials',
       navFestiveSets: 'Festive Sets',
       navSizeChart: 'Size Chart (0-6 No.)',
+      navBlogs: 'Blogs',
       cart: 'Seva Cart',
       wishlist: 'Wishlist',
       myAccount: 'My Account',
@@ -410,6 +412,7 @@ export const translations: Record<Language, Translations> = {
       navSevaEssentials: 'सेवा सामग्री',
       navFestiveSets: 'उत्सव कॉम्बो सेट',
       navSizeChart: 'नाप तालिका (0-6 नं.)',
+      navBlogs: 'ब्लॉग एवं कथा',
       cart: 'सेवा टोकरी',
       wishlist: 'पसंदीदा शृंगार',
       myAccount: 'मेरा खाता',

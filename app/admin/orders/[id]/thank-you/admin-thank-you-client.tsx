@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Printer, ArrowLeft } from 'lucide-react';
-import { formatDateTime } from '@/lib/utils';
 
 interface AdminThankYouClientProps {
   order: any;
@@ -16,11 +15,8 @@ export default function AdminThankYouClient({ order }: AdminThankYouClientProps)
     window.print();
   };
 
-  const cleanOrderId = `OD${order.id.replace(/-/g, '').slice(0, 16).toUpperCase()}`;
-  const orderDate = formatDateTime(new Date(order.createdAt)).dateOnly;
   const address = order.shippingAddress || {};
   const customerName = address.fullName || order.user?.name || 'Customer';
-  const customerCity = address.city ? `${address.city}, ${address.state || ''}` : 'India';
 
   return (
     <div className="space-y-4 pb-12">
@@ -97,67 +93,47 @@ export default function AdminThankYouClient({ order }: AdminThankYouClientProps)
           `}</style>
 
           {/* Brand Header with Logo */}
+          {/* Brand Header with Logo */}
           <div className="text-center space-y-1 pb-1">
             <div className="flex justify-center pb-1">
               <Image
                 src="/images/logo.png"
                 alt="Madhav Shringaar"
-                width={200}
-                height={60}
-                className="h-14 w-auto object-contain"
+                width={220}
+                height={70}
+                className="h-16 w-auto object-contain"
                 priority
                 unoptimized
               />
             </div>
-            <p className="text-[9.5px] uppercase font-semibold text-neutral-800 tracking-wider">Premium Handcrafted Collection</p>
-            <p className="text-[8.5px] text-neutral-600">Noida &bull; Agra &bull; Vrindavan</p>
+            <p className="text-[10px] uppercase font-semibold text-neutral-800 tracking-wider">
+              Premium Handcrafted Collection
+            </p>
           </div>
 
-          <div className="border-b border-dashed border-black my-1.5" />
+          <div className="border-b border-dashed border-black my-2" />
 
-          {/* Order Details */}
-          <div className="space-y-0.5 text-[9.5px]">
-            <div className="flex justify-between">
-              <span>Order No:</span>
-              <span className="font-bold">{cleanOrderId}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Date:</span>
-              <span>{orderDate}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Customer Name:</span>
-              <span className="font-bold truncate max-w-[150px]">{customerName}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Delivery City:</span>
-              <span className="truncate max-w-[150px]">{customerCity}</span>
-            </div>
-          </div>
-
-          <div className="border-b border-dashed border-black my-1.5" />
-
-          {/* Customer Appreciation Message (Devoted yet safe from discarding/waste) */}
-          <div className="py-1 space-y-1">
-            <p className="font-bold text-[10px] text-neutral-900">
+          {/* Customer Appreciation */}
+          <div className="py-1 space-y-1.5">
+            <p className="font-bold text-[11px] text-neutral-900">
               Dear {customerName},
             </p>
-            <p className="text-[9px] leading-tight text-neutral-900 font-sans">
-              Thank you for shopping with <strong>Madhav Shringaar</strong>! We deeply appreciate your trust in our handcrafted collections. We hope these items bring joy and elegance to your home.
+            <p className="text-[9.5px] leading-relaxed text-neutral-900 font-sans">
+              Thank you for shopping with <strong>Madhav Shringaar</strong>! We truly appreciate your order and trust in our handcrafted collection. We hope your items bring elegance, beauty, and joy to your home.
             </p>
           </div>
 
-          <div className="border-b border-dashed border-black my-1.5" />
+          <div className="border-b border-dashed border-black my-2" />
 
           {/* Care Instructions */}
           <div className="space-y-1 text-[8.5px] font-sans">
-            <p className="font-bold uppercase tracking-wide text-center font-mono text-[9px]">
-              ★ Product Care Guidelines ★
+            <p className="font-bold uppercase tracking-wide text-center font-mono text-[9.5px]">
+              ★ Product & Fabric Care Guidelines ★
             </p>
-            <ul className="space-y-1 list-none pl-0">
+            <ul className="space-y-1.5 list-none pl-0 pt-0.5">
               <li className="flex items-start gap-1">
                 <span>1.</span>
-                <span><strong>Gentle Handling:</strong> Handle fine fabrics, zari and stone work with clean, dry hands.</span>
+                <span><strong>Gentle Handling:</strong> Handle fine fabrics, embroidery, and delicate stone work with care.</span>
               </li>
               <li className="flex items-start gap-1">
                 <span>2.</span>
@@ -165,7 +141,7 @@ export default function AdminThankYouClient({ order }: AdminThankYouClientProps)
               </li>
               <li className="flex items-start gap-1">
                 <span>3.</span>
-                <span><strong>Safe Storage:</strong> Keep wrapped in clean muslin cloth or butter paper in a moisture-free pouch.</span>
+                <span><strong>Safe Storage:</strong> Keep wrapped in clean cloth or butter paper in a moisture-free pouch.</span>
               </li>
               <li className="flex items-start gap-1">
                 <span>4.</span>
@@ -174,35 +150,20 @@ export default function AdminThankYouClient({ order }: AdminThankYouClientProps)
             </ul>
           </div>
 
-          <div className="border-b border-dashed border-black my-1.5" />
-
-          {/* Items In Order Summary */}
-          <div className="space-y-1 text-[8.5px]">
-            <p className="font-bold uppercase text-[9px]">Items In Your Package:</p>
-            {order.orderitems?.map((item: any, idx: number) => (
-              <div key={idx} className="flex justify-between items-start gap-1 text-[8.5px]">
-                <span className="truncate max-w-[195px]">
-                  {idx + 1}. {item.name} {item.size ? `(${item.size})` : ''}
-                </span>
-                <span className="font-bold shrink-0">x{item.qty}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="border-b border-dashed border-black my-1.5" />
+          <div className="border-b border-dashed border-black my-2" />
 
           {/* Help & Support */}
-          <div className="text-center space-y-0.5 text-[8px]">
-            <p className="font-bold">WhatsApp / Support: +91 79821 60480</p>
+          <div className="text-center space-y-0.5 text-[8.5px]">
+            <p className="font-bold">WhatsApp Support: +91 79821 60480</p>
             <p>Email: info@madhavshringaar.com</p>
             <p className="font-bold">www.madhavshringaar.com</p>
-            <p className="text-[7.5px] text-neutral-600 pt-0.5">
-              Have feedback or need assistance? Reach out to our customer care team anytime!
+            <p className="text-[8px] text-neutral-600 pt-0.5">
+              Have questions, sizing needs or custom requests? We are always here to help!
             </p>
           </div>
 
-          <div className="text-center pt-2">
-            <p className="text-[7px] tracking-widest uppercase">*** THANK YOU FOR YOUR TRUST ***</p>
+          <div className="text-center pt-2.5">
+            <p className="text-[10px] tracking-widest uppercase font-bold">*** THANK YOU ***</p>
           </div>
         </div>
       </div>

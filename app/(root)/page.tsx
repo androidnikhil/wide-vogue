@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/shared/product/product-card';
 import { getAllProducts, getLatestProducts } from '@/lib/actions/product.action';
+import { getAllBlogPosts } from '@/lib/actions/blog.actions';
 import { getServerTranslations } from '@/lib/i18n/server';
 
 const productSizes = new Set(['0', '1', '2', '3', '4', '5', '6', '7']);
@@ -46,6 +47,13 @@ export default async function Homepage({
     }
     return p;
   });
+
+  const blogsRes = await getAllBlogPosts({
+    isPublishedOnly: true,
+    page: 1,
+    limit: 3,
+  });
+  const latestBlogs = blogsRes.posts || [];
 
   return (
     <div className="bg-[#FBF7EE] text-on-surface antialiased font-body-md overflow-x-hidden">
@@ -102,9 +110,9 @@ export default async function Homepage({
 
           {/* RIGHT: Floating Artwork & Organic Layout */}
           <div className="lg:col-span-7 relative h-[420px] sm:h-[500px] lg:h-[750px] w-full flex justify-center lg:justify-end items-center mt-6 lg:mt-0">
-            {/* Organic Blob Background for Image */}
-            <div className="absolute w-[90%] h-[90%] bg-gradient-to-tr from-[#E6C16A] to-[#FDE8DF] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] animate-[spin_30s_linear_infinite] opacity-50 blur-xl"></div>
-            <div className="absolute w-[80%] h-[80%] bg-[#0F6F74] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] animate-[spin_25s_linear_infinite_reverse] opacity-20 blur-2xl"></div>
+            {/* Organic Blob Background for Image - Hardware Accelerated */}
+            <div className="absolute w-[90%] h-[90%] bg-gradient-to-tr from-[#E6C16A] to-[#FDE8DF] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] md:animate-[spin_30s_linear_infinite] opacity-50 blur-xl transform-gpu pointer-events-none will-change-transform"></div>
+            <div className="absolute w-[80%] h-[80%] bg-[#0F6F74] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] md:animate-[spin_25s_linear_infinite_reverse] opacity-20 blur-2xl transform-gpu pointer-events-none will-change-transform"></div>
 
             {/* The Main Artwork - Breaking out slightly */}
             <div className="relative w-full lg:w-[110%] h-[110%] ml-auto z-20 flex items-center justify-center transform lg:translate-x-12">
@@ -113,19 +121,21 @@ export default async function Homepage({
                   src="/images/devotional/hero_krishna.webp"
                   alt="Divine Kanha Artwork" 
                   className="w-full h-full object-cover rounded-[2.5rem] lg:rounded-[5.5rem]"
-                  width={1200}
-                  height={1200}
+                  width={900}
+                  height={900}
                   priority
-                  sizes="(max-width: 1024px) 85vw, 60vw"
+                  loading="eager"
+                  fetchPriority="high"
+                  sizes="(max-width: 640px) 90vw, (max-width: 1024px) 60vw, 650px"
                 />
                 
                 {/* Floating Detail Elements bursting from the frame */}
                 <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white rounded-full flex items-center justify-center p-2 shadow-xl border-4 border-[#FBF7EE] transform -rotate-12 z-30">
-                   <Image src="/images/devotional/mukut.webp" className="w-full h-full object-cover rounded-full" alt="Mukut Detail" width={180} height={180} sizes="128px" />
+                   <Image src="/images/devotional/mukut.webp" className="w-full h-full object-cover rounded-full" alt="Mukut Detail" width={180} height={180} sizes="128px" loading="lazy" />
                 </div>
                 
                 <div className="absolute -top-10 -right-10 w-28 h-28 bg-[#FDFBF7] rounded-[2rem] flex items-center justify-center p-2 shadow-lg border-2 border-[#E6C16A]/50 transform rotate-12 z-30">
-                   <Image src="/images/devotional/bansuri.webp" className="w-full h-full object-cover rounded-[1.5rem]" alt="Bansuri Detail" width={180} height={180} sizes="112px" />
+                   <Image src="/images/devotional/bansuri.webp" className="w-full h-full object-cover rounded-[1.5rem]" alt="Bansuri Detail" width={180} height={180} sizes="112px" loading="lazy" />
                 </div>
               </div>
             </div>
@@ -149,7 +159,7 @@ export default async function Homepage({
         
         <div className="grid grid-cols-2 gap-4 md:h-[560px] md:grid-cols-12 md:grid-rows-3 md:gap-5">
            <Link href="/search?category=Poshak" className="group relative col-span-2 h-[360px] overflow-hidden rounded-[2rem] border-4 border-white bg-white shadow-xl transition-transform active:scale-[0.99] md:col-span-8 md:row-span-3 md:h-full md:rounded-[2.5rem]">
-             <Image src="/images/devotional/poshak.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt={t.home.poshakTitle} width={1200} height={900} sizes="(max-width: 768px) 100vw, 66vw" />
+             <Image src="/images/devotional/poshak.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt={t.home.poshakTitle} width={1200} height={900} sizes="(max-width: 768px) 100vw, 66vw" loading="lazy" />
              <div className="absolute inset-0 bg-gradient-to-t from-[#003020]/80 via-transparent to-transparent"></div>
              <div className="absolute bottom-6 left-6 text-white sm:bottom-8 sm:left-8">
                <h3 className="text-3xl font-serif font-bold sm:text-4xl">{t.home.poshakTitle}</h3>
@@ -159,7 +169,7 @@ export default async function Homepage({
 
            <div className="col-span-2 grid grid-cols-3 gap-3 md:col-span-4 md:row-span-3 md:grid-cols-1 md:grid-rows-3 md:gap-5">
              <Link href="/search?category=Mukut" className="group relative aspect-square overflow-hidden rounded-[1.5rem] border-4 border-white bg-[#E8F3EE] shadow-lg transition-transform duration-300 hover:-translate-y-1 active:scale-[0.98] md:aspect-auto md:min-h-0 md:rounded-[1.75rem]">
-               <Image src="/images/devotional/mukut.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt={t.home.mukutTitle} width={500} height={500} sizes="34vw" />
+               <Image src="/images/devotional/mukut.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt={t.home.mukutTitle} width={500} height={500} sizes="34vw" loading="lazy" />
                <div className="absolute inset-0 bg-gradient-to-br from-[#0F6F74]/70 to-transparent"></div>
                <div className="absolute left-5 top-5 text-white sm:left-6 sm:top-6">
                  <h3 className="text-xl font-serif font-bold sm:text-2xl">{t.home.mukutTitle}</h3>
@@ -167,7 +177,7 @@ export default async function Homepage({
              </Link>
 
              <Link href="/search?category=Bansuri" className="group relative aspect-square overflow-hidden rounded-[1.5rem] border-4 border-white bg-[#FDE8DF] shadow-lg transition-transform duration-300 hover:-translate-y-1 active:scale-[0.98] md:aspect-auto md:min-h-0 md:rounded-[1.75rem]">
-               <Image src="/images/devotional/bansuri.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt={t.home.bansuriTitle} width={500} height={500} sizes="34vw" />
+               <Image src="/images/devotional/bansuri.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt={t.home.bansuriTitle} width={500} height={500} sizes="34vw" loading="lazy" />
                <div className="absolute inset-0 bg-gradient-to-t from-[#003020]/75 to-transparent"></div>
                <div className="absolute bottom-4 right-4 text-right text-white sm:bottom-6 sm:right-6">
                  <h3 className="text-xl font-serif font-bold sm:text-2xl">{t.home.bansuriTitle}</h3>
@@ -175,7 +185,7 @@ export default async function Homepage({
              </Link>
 
              <Link href="/search?category=Jewellery" className="group relative flex aspect-square items-center justify-center overflow-hidden rounded-[1.5rem] border-4 border-white bg-[#FBF7EE] shadow-lg transition-transform duration-300 hover:-translate-y-1 active:scale-[0.98] md:aspect-auto md:min-h-0 md:rounded-[1.75rem]">
-               <Image src="/images/devotional/jewellery.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt={t.home.jewelsTitle} width={500} height={500} sizes="34vw" />
+               <Image src="/images/devotional/jewellery.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt={t.home.jewelsTitle} width={500} height={500} sizes="34vw" loading="lazy" />
                <div className="absolute inset-0 bg-[#C88A20]/20 transition-colors group-hover:bg-transparent"></div>
                <h3 className="absolute rounded-full bg-[#003020]/60 px-3 py-2 text-center font-serif text-base font-bold text-white backdrop-blur-sm sm:px-4 sm:text-xl">{t.home.jewelsTitle}</h3>
              </Link>
@@ -191,7 +201,7 @@ export default async function Homepage({
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 gap-10 items-center relative z-10 lg:grid-cols-2 lg:gap-16">
            <div className="relative group">
               <div className="w-full h-[400px] md:h-[480px] lg:h-[600px] bg-white p-3 rounded-t-[10rem] rounded-b-[2rem] transform -rotate-3 transition-transform group-hover:rotate-0 active:rotate-0 duration-500 shadow-2xl">
-                <Image src="/images/devotional/poshak.webp" className="w-full h-full object-cover rounded-t-[9.5rem] rounded-b-[1.5rem] transition-transform duration-700 group-hover:scale-[1.02] group-active:scale-[1.02]" alt={t.home.hero2Title} width={1000} height={1200} sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/devotional/poshak.webp" className="w-full h-full object-cover rounded-t-[9.5rem] rounded-b-[1.5rem] transition-transform duration-700 group-hover:scale-[1.02] group-active:scale-[1.02]" alt={t.home.hero2Title} width={1000} height={1200} sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" />
               </div>
               <div className="absolute -right-6 top-1/4 bg-[#E6C16A] text-[#003020] w-24 h-24 rounded-full flex items-center justify-center font-bold text-sm sm:text-base text-center p-2 rotate-12 shadow-lg border-4 border-[#003020]">
                  {t.home.newBadge}
@@ -225,11 +235,11 @@ export default async function Homepage({
              <div className="absolute w-[100%] h-[100%] bg-[#FDE8DF] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-80 blur-lg"></div>
              
              <div className="relative z-10 w-[90%] h-[90%] p-4 bg-white rounded-full shadow-2xl border-8 border-[#0F6F74]/20 hover:border-[#0F6F74]/50 transition-colors duration-500">
-               <Image src="/images/devotional/kanhas_world.webp" className="w-full h-full object-cover rounded-full transition-transform duration-700 hover:scale-[1.02] active:scale-[1.02]" alt="Kanha's World Art" width={800} height={800} sizes="(max-width: 1024px) 90vw, 40vw" />
+               <Image src="/images/devotional/kanhas_world.webp" className="w-full h-full object-cover rounded-full transition-transform duration-700 hover:scale-[1.02] active:scale-[1.02]" alt="Kanha's World Art" width={800} height={800} sizes="(max-width: 1024px) 90vw, 40vw" loading="lazy" />
              </div>
              
              <div className="absolute bottom-10 -right-4 w-40 h-40 bg-[#E8F3EE] rounded-full p-2 shadow-xl border-4 border-white z-20">
-               <Image src="/images/devotional/mala.webp" className="w-full h-full object-cover rounded-full" alt="Detail" width={300} height={300} sizes="(max-width: 1024px) 30vw, 20vw" />
+               <Image src="/images/devotional/mala.webp" className="w-full h-full object-cover rounded-full" alt="Detail" width={300} height={300} sizes="(max-width: 1024px) 30vw, 20vw" loading="lazy" />
              </div>
           </div>
           
@@ -320,7 +330,7 @@ export default async function Homepage({
            
            <div className="order-1 lg:order-2">
               <div className="group relative w-[100%] aspect-[4/3] bg-white rounded-[4rem_1rem_4rem_1rem] shadow-2xl p-4 transform rotate-3 hover:rotate-0 active:rotate-0 transition-transform duration-500 border-8 border-white/60">
-                 <Image src="/images/devotional/complete_shringar.webp" className="w-full h-full object-cover rounded-[3rem_0.5rem_3rem_0.5rem] transition-transform duration-700 group-hover:scale-[1.02] group-active:scale-[1.02]" alt="Complete Shringar Arrangement" width={1000} height={900} sizes="(max-width: 768px) 100vw, 50vw" />
+                 <Image src="/images/devotional/complete_shringar.webp" className="w-full h-full object-cover rounded-[3rem_0.5rem_3rem_0.5rem] transition-transform duration-700 group-hover:scale-[1.02] group-active:scale-[1.02]" alt="Complete Shringar Arrangement" width={1000} height={900} sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" />
                  
                  {/* Floating price badge */}
                  <div className="absolute -bottom-6 -left-6 bg-[#0F6F74] text-white p-6 rounded-full shadow-xl rotate-[-15deg] font-serif font-bold text-lg md:text-xl border-4 border-white text-center leading-tight">
@@ -344,7 +354,7 @@ export default async function Homepage({
               { name: t.home.specialDarshan, query: 'Special Darshan', img: '/images/devotional/complete_shringar.webp', color: 'bg-[#FDE8DF]' }
             ].map((occ) => (
               <Link key={occ.query} href={`/search?q=${encodeURIComponent(occ.query)}`} className="group block relative h-64 md:h-80 rounded-[2rem] overflow-hidden shadow-lg hover:-translate-y-3 active:scale-[0.98] transition-all duration-300">
-                <Image src={occ.img} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 group-active:opacity-100 group-active:scale-110 transition-all duration-700" alt={occ.name} width={800} height={800} sizes="(max-width: 768px) 50vw, 25vw" />
+                <Image src={occ.img} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 group-active:opacity-100 group-active:scale-110 transition-all duration-700" alt={occ.name} width={800} height={800} sizes="(max-width: 768px) 50vw, 25vw" loading="lazy" />
                 <div className={`absolute inset-0 bg-gradient-to-t ${occ.color}/90 via-transparent to-transparent`}></div>
                 <div className="absolute bottom-6 left-0 w-full text-center px-4">
                    <h3 className="text-white font-bold font-serif text-xl md:text-2xl drop-shadow-md">{occ.name}</h3>
@@ -491,13 +501,13 @@ export default async function Homepage({
         
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
            <div className="group relative aspect-[4/3] overflow-hidden rounded-[1.75rem] border border-[#E6C16A]/20 bg-[#FBF7EE] shadow-md">
-             <Image src="/images/devotional/kanhas_world.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt="Kanha's world of seva" width={900} height={700} sizes="(max-width: 768px) 100vw, 33vw" />
+             <Image src="/images/devotional/kanhas_world.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt="Kanha's world of seva" width={900} height={700} sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" />
            </div>
            <div className="group relative aspect-[4/3] overflow-hidden rounded-[1.75rem] border border-[#E6C16A]/20 bg-[#E8F3EE] shadow-md">
-             <Image src="/images/devotional/bansuri.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt="Decorative bansuri" width={900} height={700} sizes="(max-width: 768px) 100vw, 33vw" />
+             <Image src="/images/devotional/bansuri.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt="Decorative bansuri" width={900} height={700} sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" />
            </div>
            <div className="group relative aspect-[4/3] overflow-hidden rounded-[1.75rem] border border-[#E6C16A]/20 bg-[#FDE8DF] shadow-md">
-             <Image src="/images/devotional/mala.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt="Decorative mala" width={900} height={700} sizes="(max-width: 768px) 100vw, 33vw" />
+             <Image src="/images/devotional/mala.webp" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105" alt="Decorative mala" width={900} height={700} sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" />
            </div>
         </div>
       </section>
@@ -530,126 +540,167 @@ export default async function Homepage({
          </div>
       </section>
 
-      {/* 11B. DEVOTIONAL SEVA DIRECTORY & POPULAR SEARCHES */}
-      <section className="py-16 bg-[#FDFBF7] border-t border-[#003020]/10">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <span className="text-[#C88A20] font-bold text-xs uppercase tracking-[0.2em]">{isHindi ? 'भक्ति एवं सेवा केंद्र' : 'DEVOTIONAL SHOPPING & SEVA GUIDE'}</span>
-            <h2 className="text-3xl md:text-4xl font-serif text-[#003020] font-bold mt-2 mb-4">
-              {isHindi ? 'लड्डू गोपाल जी पोशाक व श्रृंगार ऑनलाइन' : 'Laddu Gopal Dress, Poshak & Shringaar Online'}
-            </h2>
-            <p className="text-sm md:text-base text-[#003020]/70 leading-relaxed font-serif">
-              {isHindi 
-                ? 'माधव श्रृंगार पर पाएं कान्हा जी की सुंदर पोशाकें, मुकुट, बांसुरी, माला और संपूर्ण श्रृंगार किट। आगरा, मथुरा, वृन्दावन एवं नोएडा से सम्पूर्ण भारत में शीघ्र डिलीवरी उपलब्ध है।' 
-                : 'Shop beautiful Laddu Gopal dresses, Kanha Ji poshak, mukut, mala and shringaar accessories at Madhav Shringaar. Explore traditional designs, deity dresses with COD, free delivery over ₹999, and convenient online shopping across India.'}
-            </p>
+      {/* STRUCTURED DATA FOR SEARCH ENGINES (JSON-LD - Invisible to visitors, indexed by Google) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@graph': [
+              {
+                '@type': 'WebSite',
+                '@id': 'https://www.madhavshringaar.com/#website',
+                url: 'https://www.madhavshringaar.com',
+                name: 'Madhav Shringaar',
+                description:
+                  'Handcrafted Shri Laddu Gopal Ji Poshak, Mukut, Mala & Complete Shringaar Online in India with Cash on Delivery.',
+                potentialAction: {
+                  '@type': 'SearchAction',
+                  target: 'https://www.madhavshringaar.com/search?q={search_term_string}',
+                  'query-input': 'required name=search_term_string',
+                },
+              },
+              {
+                '@type': 'OnlineStore',
+                '@id': 'https://www.madhavshringaar.com/#store',
+                name: 'Madhav Shringaar',
+                url: 'https://www.madhavshringaar.com',
+                logo: 'https://www.madhavshringaar.com/images/logo.png',
+                image: 'https://www.madhavshringaar.com/images/devotional/complete_shringar.webp',
+                description:
+                  'Buy beautiful Laddu Gopal dresses, Kanha Ji poshak, mukut, moti mala, bansuri and handcrafted shringaar kits online across India.',
+                telephone: '+917982160480',
+                email: 'info@madhavshringaar.com',
+                priceRange: '₹99 - ₹4999',
+                paymentAccepted: ['Cash', 'Credit Card', 'Debit Card', 'UPI', 'Net Banking'],
+                currenciesAccepted: 'INR',
+                areaServed: {
+                  '@type': 'Country',
+                  name: 'India',
+                },
+                sameAs: [
+                  'https://www.instagram.com/madhav.shringaar',
+                  'https://www.facebook.com/share/1CLPMdGbhJ/',
+                  'https://pin.it/51M0t5Fs5',
+                ],
+                hasOfferCatalog: {
+                  '@type': 'OfferCatalog',
+                  name: 'Laddu Gopal Ji Poshak & Shringaar Collection',
+                  itemListElement: [
+                    {
+                      '@type': 'OfferCatalog',
+                      name: 'Laddu Gopal Poshak & Dresses',
+                      itemListElement: [
+                        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Laddu Gopal Designer Poshak' } },
+                        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Handmade Laddu Gopal Summer Cotton Poshak' } },
+                        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Laddu Gopal Winter Woollen Dress' } },
+                        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Janmashtami Special Festive Dress' } },
+                      ],
+                    },
+                    {
+                      '@type': 'OfferCatalog',
+                      name: 'Mukut, Pagdi & Jewellery',
+                      itemListElement: [
+                        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Mor Pankh Mukut & Pagdi' } },
+                        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Laddu Gopal Moti Mala & Kanthi Haar' } },
+                        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Golden Carved Bansuri & Flute' } },
+                        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Laddu Gopal Singhasan' } },
+                      ],
+                    },
+                    {
+                      '@type': 'OfferCatalog',
+                      name: 'Complete Shringaar Kits',
+                      itemListElement: [
+                        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Laddu Gopal Complete Shringaar Combo Set' } },
+                        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Daily Seva Poshak & Jewellery Kit' } },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+          }),
+        }}
+      />
+
+
+      {/* 11C. DEVOTIONAL SEVA & BHAKTI BLOGS */}
+      {latestBlogs.length > 0 && (
+        <section className="py-20 max-w-7xl mx-auto px-6 md:px-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#E6C16A]/20 border border-[#E6C16A]/40 text-[#8A5A0A] text-xs font-bold uppercase tracking-wider">
+                <span className="material-symbols-outlined text-sm text-[#C88A20]">menu_book</span>
+                {isHindi ? 'भक्ति एवं सेवा पत्रिका' : 'Bhakti & Seva Journal'}
+              </div>
+              <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-[#003020]">
+                {isHindi ? 'पवित्र सेवा गाइड एवं ब्रज कथा' : 'Sacred Seva Guides & Vrindavan Katha'}
+              </h2>
+              <p className="text-neutral-600 text-sm md:text-base max-w-2xl font-serif">
+                {isHindi
+                  ? 'ठाकुर जी के दैनिक सेवा नियम, शृंगार विधियाँ एवं प्रामाणिक ब्रज परंपराओं से जुड़ें।'
+                  : 'Explore daily rituals, poshak sizing guides, and timeless teachings on adorning Shri Laddu Gopal Ji.'}
+              </p>
+            </div>
+            <Link
+              href="/blogs"
+              className="inline-flex items-center gap-2 bg-[#003020] text-[#F3D98F] px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-[#002518] hover:shadow-md transition-all shrink-0 self-start md:self-auto"
+            >
+              <span>{isHindi ? 'सभी लेख पढ़ें' : 'View All Blogs'}</span>
+              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-sm">
-            {/* Category 1: Laddu Gopal Dresses */}
-            <div className="bg-white p-6 rounded-2xl border border-[#003020]/10 shadow-xs hover:shadow-md transition-shadow">
-              <h3 className="font-serif font-bold text-base text-[#003020] mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-base text-[#C88A20]">checkroom</span>
-                {isHindi ? 'लड्डू गोपाल ड्रेसेस व पोशाक' : 'Laddu Gopal Dress & Poshak'}
-              </h3>
-              <ul className="space-y-1.5 text-xs text-[#003020]/80">
-                <li><Link href="/search?category=Poshak" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress online</Link></li>
-                <li><Link href="/search?category=Poshak" className="hover:text-[#C88A20] transition-colors">• Handmade Laddu Gopal poshak</Link></li>
-                <li><Link href="/search?category=Poshak" className="hover:text-[#C88A20] transition-colors">• Kanha Ji dress online</Link></li>
-                <li><Link href="/search?category=Designer+Poshak" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal designer dress</Link></li>
-                <li><Link href="/search?category=Winter+Woolen+Poshak" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal winter dress & woollen poshak</Link></li>
-                <li><Link href="/search?category=Cotton+Summer+Poshak" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal summer dress</Link></li>
-                <li><Link href="/size-chart" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress size 0 to 6</Link></li>
-                <li><Link href="/search?category=Poshak" className="hover:text-[#C88A20] transition-colors">• Small Kanha Ji dress & dress price</Link></li>
-              </ul>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {latestBlogs.map((post: any) => (
+              <Link
+                key={post.id}
+                href={`/blogs/${post.slug}`}
+                className="group bg-white rounded-3xl overflow-hidden border border-[#003020]/10 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+              >
+                <div className="relative w-full h-52 sm:h-56 aspect-[16/10] overflow-hidden bg-neutral-100">
+                  <Image
+                    src={post.featuredImage || '/images/devotional/complete_shringar.webp'}
+                    alt={post.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                  <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-xs px-3 py-1 rounded-full text-[11px] font-bold text-[#003020] shadow-xs border border-[#E6C16A]/40">
+                    {post.category}
+                  </div>
+                </div>
 
-            {/* Category 2: Mukut, Mala & Jewellery */}
-            <div className="bg-white p-6 rounded-2xl border border-[#003020]/10 shadow-xs hover:shadow-md transition-shadow">
-              <h3 className="font-serif font-bold text-base text-[#003020] mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-base text-[#C88A20]">diamond</span>
-                {isHindi ? 'मुकुट, माला एवं आभूषण' : 'Mukut, Mala & Jewellery'}
-              </h3>
-              <ul className="space-y-1.5 text-xs text-[#003020]/80">
-                <li><Link href="/search?category=Mukut+%26+Pagdi" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal mukut online</Link></li>
-                <li><Link href="/search?category=Mukut+%26+Pagdi" className="hover:text-[#C88A20] transition-colors">• Kanha Ji mukut online</Link></li>
-                <li><Link href="/search?category=Jewellery+%26+Mala" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal jewellery set</Link></li>
-                <li><Link href="/search?category=Jewellery+%26+Mala" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal mala & kanthi mala</Link></li>
-                <li><Link href="/search?category=Mukut+%26+Pagdi" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal mor pankh mukut</Link></li>
-                <li><Link href="/search?category=Bansuri" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal bansuri</Link></li>
-                <li><Link href="/search?category=Singhasan" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal singhasan decoration</Link></li>
-                <li><Link href="/search?category=Jewellery+%26+Mala" className="hover:text-[#C88A20] transition-colors">• Kanha Ji shringaar items</Link></li>
-              </ul>
-            </div>
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                  <div className="space-y-2">
+                    <span className="text-[11px] text-neutral-400 font-medium">
+                      {post.readingTime || 3} min read
+                    </span>
+                    <h3 className="font-serif font-bold text-lg text-[#003020] group-hover:text-[#C88A20] transition-colors line-clamp-2 leading-snug">
+                      {post.title}
+                    </h3>
+                    <p className="text-xs text-neutral-600 line-clamp-2 leading-relaxed">
+                      {post.excerpt}
+                    </p>
+                  </div>
 
-            {/* Category 3: Shringaar Kits & Sets */}
-            <div className="bg-white p-6 rounded-2xl border border-[#003020]/10 shadow-xs hover:shadow-md transition-shadow">
-              <h3 className="font-serif font-bold text-base text-[#003020] mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-base text-[#C88A20]">loyalty</span>
-                {isHindi ? 'श्रृंगार सेट एवं उपहार' : 'Complete Shringaar Sets'}
-              </h3>
-              <ul className="space-y-1.5 text-xs text-[#003020]/80">
-                <li><Link href="/search?category=Complete+Shringar" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal shringaar online & set</Link></li>
-                <li><Link href="/search?category=Complete+Shringar" className="hover:text-[#C88A20] transition-colors">• Kanha Ji shringaar online</Link></li>
-                <li><Link href="/search?category=Festive+Sets" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress and jewellery set</Link></li>
-                <li><Link href="/search?category=Complete+Shringar" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal complete shringaar kit</Link></li>
-                <li><Link href="/search?category=Festive+Sets" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal poshak with mukut and mala</Link></li>
-                <li><Link href="/search?category=Festive+Sets" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal gift set</Link></li>
-                <li><Link href="/search?category=Festive+Sets" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress for Janmashtami</Link></li>
-                <li><Link href="/search?category=Poshak" className="hover:text-[#C88A20] transition-colors">• Thakur Ji poshak online & Banke Bihari shringaar items</Link></li>
-                <li><Link href="/search?category=Poshak" className="hover:text-[#C88A20] transition-colors">• Krishna Ji dress online</Link></li>
-              </ul>
-            </div>
-
-            {/* Category 4: Pan-India Delivery & Local Hubs */}
-            <div className="bg-white p-6 rounded-2xl border border-[#003020]/10 shadow-xs hover:shadow-md transition-shadow">
-              <h3 className="font-serif font-bold text-base text-[#003020] mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-base text-[#C88A20]">local_shipping</span>
-                {isHindi ? 'डिलीवरी एवं सेवा केंद्र' : 'Express Delivery & Hubs'}
-              </h3>
-              <ul className="space-y-1.5 text-xs text-[#003020]/80">
-                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Buy Laddu Gopal dress online in India</Link></li>
-                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress with free delivery (₹999+)</Link></li>
-                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dresses with COD</Link></li>
-                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress shop in Agra & poshak in Agra</Link></li>
-                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Kanha Ji dress shop near me</Link></li>
-                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dress delivery in Noida</Link></li>
-                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal shringaar shop in Mathura</Link></li>
-                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal dresses in Vrindavan</Link></li>
-                <li><Link href="/policies/shipping" className="hover:text-[#C88A20] transition-colors">• Laddu Gopal shringaar delivery across India</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Devotional Community & Search Tags */}
-          <div className="mt-8 pt-8 border-t border-[#003020]/10 flex flex-wrap items-center justify-center gap-2 text-xs text-[#003020]/70">
-            <span className="font-semibold text-[#003020]">Devotional Tags:</span>
-            {[
-              'Laddu Gopal daily darshan',
-              'Krishna bhakti India',
-              'Vrindavan bhakti',
-              'Laddu Gopal collection',
-              'Laddu Gopal devotees',
-              'Krishna bhakti group India',
-              'Laddu Gopal poshak shopping',
-              'Thakur Ji shringaar',
-              'Vrindavan devotees',
-              'Indian devotional shopping',
-              'Affordable Laddu Gopal shringaar set',
-              'Laddu Gopal poshak wholesale'
-            ].map((tag, i) => (
-              <span key={i} className="bg-white px-2.5 py-1 rounded-full border border-[#003020]/10 shadow-2xs">
-                #{tag}
-              </span>
+                  <span className="text-xs font-bold text-[#003020] group-hover:text-[#C88A20] flex items-center gap-1.5 pt-2 border-t border-neutral-100">
+                    <span>{isHindi ? 'पूरा लेख पढ़ें' : 'Read Article'}</span>
+                    <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">
+                      arrow_forward
+                    </span>
+                  </span>
+                </div>
+              </Link>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 12. FINAL CTA — VISUALLY MEMORABLE */}
       <section className="py-32 bg-[#003020] text-white relative overflow-hidden rounded-t-[4rem]">
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-10"></div>
-        <Image src="/images/devotional/hero_krishna.webp" className="absolute inset-0 w-full h-full object-cover object-top opacity-30 blur-sm" alt="Background" width={1600} height={1000} sizes="100vw" />
+        <Image src="/images/devotional/hero_krishna.webp" className="absolute inset-0 w-full h-full object-cover object-top opacity-30 blur-sm" alt="Background" width={1600} height={1000} sizes="100vw" loading="lazy" />
         
         <div className="relative z-20 max-w-4xl mx-auto px-6 text-center flex flex-col items-center">
           <span className="material-symbols-outlined text-[#E6C16A] text-6xl mb-6">favorite</span>

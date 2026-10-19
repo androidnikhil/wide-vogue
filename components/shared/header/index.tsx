@@ -59,7 +59,7 @@ export default async function Header() {
                   src="/images/logo.webp"
                   width={340}
                   height={108}
-                  quality={95}
+                  quality={85}
                   priority
                 />
               </Link>
@@ -74,7 +74,7 @@ export default async function Header() {
                   src="/images/logo.webp"
                   width={250}
                   height={80}
-                  quality={95}
+                  quality={85}
                   priority
                 />
               </Link>
@@ -168,6 +168,11 @@ export default async function Header() {
               <li>
                 <Link className="text-on-surface-variant font-label-lg text-label-lg hover:text-primary transition-colors" href="/size-chart">
                   {t.header.navSizeChart}
+                </Link>
+              </li>
+              <li>
+                <Link className="text-on-surface-variant font-label-lg text-label-lg hover:text-primary transition-colors" href="/blogs">
+                  {t.header.navBlogs}
                 </Link>
               </li>
             </ul>

@@ -90,8 +90,8 @@ export const getOtpEmailHtml = (otp: string) => `
         <h1 style="color: ${BRAND_COLOR}; font-size: 24px; margin-bottom: 20px; text-align: center;">Your Verification Code</h1>
         <p style="text-align: center;">Please use the following OTP to verify your identity. This code will expire in 10 minutes.</p>
         <div style="text-align: center; margin: 30px 0;">
-          <div style="display: inline-block; background-color: ${BG_COLOR}; border: 2px dashed ${BRAND_COLOR}; padding: 15px 30px; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #333; border-radius: 8px;">
-            ${otp}
+          <div style="display: inline-block; background-color: ${BG_COLOR}; border: 2px dashed ${BRAND_COLOR}; padding: 15px 30px; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #333; border-radius: 8px; white-space: nowrap; word-break: keep-all;">
+            ${(otp || '').replace(/\s+/g, '')}
           </div>
         </div>
         <p style="text-align: center; font-size: 14px; color: #666;">If you didn't request this code, you can safely ignore this email.</p>

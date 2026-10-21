@@ -109,8 +109,8 @@ export default function OrderOutForDeliveryEmail({ order }: OrderOutForDeliveryE
               <Text style={{ fontSize: '12px', color: BRAND_COLORS.textMuted, lineHeight: '1.5', margin: '0 0 4px 0' }}>
                 {(order.shippingAddress as any)?.streetAddress}, {(order.shippingAddress as any)?.city} - {(order.shippingAddress as any)?.postalCode}
               </Text>
-              <Text style={{ fontSize: '12px', color: BRAND_COLORS.primary, fontWeight: 600, margin: 0 }}>
-                📞 +91 {(order.shippingAddress as any)?.contactNumber}
+              <Text style={{ fontSize: '12px', color: BRAND_COLORS.primary, fontWeight: 600, margin: 0, whiteSpace: 'nowrap', wordBreak: 'keep-all' }}>
+                📞 +91&nbsp;{(order.shippingAddress as any)?.contactNumber}
               </Text>
             </Section>
 

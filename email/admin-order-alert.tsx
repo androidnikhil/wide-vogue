@@ -90,7 +90,7 @@ export default function AdminOrderAlertEmail({ order }: AdminOrderAlertEmailProp
                 {customerName}
               </Text>
               <Text style={{ fontSize: '12px', color: '#374151', margin: '0 0 4px 0' }}>
-                📞 <strong>+91 {customerPhone}</strong> • ✉️ {customerEmail}
+                <span style={{ whiteSpace: 'nowrap', wordBreak: 'keep-all' }}>📞 <strong>+91&nbsp;{customerPhone}</strong></span> • ✉️ {customerEmail}
               </Text>
               {address && (
                 <Text style={{ fontSize: '12px', color: '#4B5563', lineHeight: '1.5', margin: '4px 0 0 0' }}>

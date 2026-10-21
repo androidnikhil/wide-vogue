@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import { signInWithCredentials } from '@/lib/actions/user.actions';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Eye, EyeOff, ShieldAlert, Lock } from 'lucide-react';
+import { Eye, EyeOff, ShieldAlert, Lock, Phone, Mail } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   checkLoginLockout,
@@ -363,8 +363,14 @@ const CredentialsSignInForm = () => {
       <div id="recaptcha-container"></div>
       <Tabs defaultValue="phone" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="phone">Login using Number</TabsTrigger>
-          <TabsTrigger value="email">Email</TabsTrigger>
+          <TabsTrigger value="phone" className="text-xs sm:text-sm whitespace-nowrap flex items-center justify-center gap-1.5 py-2">
+            <Phone className="w-3.5 h-3.5 shrink-0" />
+            <span>Mobile OTP</span>
+          </TabsTrigger>
+          <TabsTrigger value="email" className="text-xs sm:text-sm whitespace-nowrap flex items-center justify-center gap-1.5 py-2">
+            <Mail className="w-3.5 h-3.5 shrink-0" />
+            <span>Email</span>
+          </TabsTrigger>
         </TabsList>
 
         {/* PHONE TAB */}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { createRazorpayOrder, approveRazorpayOrder } from '@/lib/actions/order.actions';
+import { RAZORPAY_LOGO_URL } from '@/lib/constants';
 import { toast } from 'sonner';
 
 export default function RazorpayPayment({
@@ -62,7 +63,7 @@ export default function RazorpayPayment({
       currency: 'INR',
       name: 'Madhav Shringaar',
       description: 'Devotional Purchase',
-      image: '/images/logo.png',
+      image: RAZORPAY_LOGO_URL,
       order_id: rzpOrderId,
       handler: async function (response: any) {
         // 4. Verify payment on backend

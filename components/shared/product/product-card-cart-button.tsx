@@ -233,17 +233,17 @@ export default function ProductCardCartButton({ product }: ProductCardCartButton
       type="button"
       onClick={handleAddDirect}
       disabled={isPending}
-      className="w-full py-2 px-3 gold-gradient-btn text-primary-container rounded-lg font-bold text-xs hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 shadow-sm"
+      className="w-full py-2 px-2 gold-gradient-btn text-primary-container rounded-lg font-bold text-xs hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap min-w-0"
     >
       {loadingSize === 'direct' && isPending ? (
-        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
       ) : (
-        <ShoppingBag className="w-3.5 h-3.5" />
+        <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
       )}
-      <span>{t.product.addToCart}</span>
+      <span className="truncate">{t.product.addToCart}</span>
       {hasSizes && (
-        <span className="text-[10px] opacity-80 font-normal">
-          ({product.sizes!.length} {t.product.sizesCount})
+        <span className="text-[10px] opacity-85 font-normal shrink-0">
+          ({product.sizes!.length} {isHindi ? 'साइज़' : (product.sizes!.length === 1 ? 'Size' : 'Sizes')})
         </span>
       )}
     </button>

@@ -116,6 +116,9 @@ export const config = {
               where: { email },
             });
 
+            const adminEmailNormalized = (process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com').toLowerCase().trim();
+            const isAdmin = email.toLowerCase().trim() === adminEmailNormalized;
+
             if (!user) {
               user = await prisma.user.create({
                 data: {
@@ -123,7 +126,7 @@ export const config = {
                   name,
                   image: firebaseUser.photoURL || null,
                   password: '',
-                  role: 'user',
+                  role: isAdmin ? 'admin' : 'user',
                 },
               });
 
@@ -131,6 +134,11 @@ export const config = {
               sendWelcomeEmail({ name, email }).catch((err) =>
                 console.error("Welcome email failed:", err)
               );
+            } else if (isAdmin && user.role !== 'admin') {
+              user = await prisma.user.update({
+                where: { id: user.id },
+                data: { role: 'admin' },
+              });
             }
 
             return {

@@ -1,12 +1,9 @@
 # ==============================================================================
 # Docker Compose configuration for Madhav Shringar E-Commerce
 #
-# Usage:
-#   Local Development:
-#     docker compose up web-dev --build
-#
-#   Production-Build Testing:
-#     docker compose --profile prod up web-prod --build
+# Single Command Usage:
+#   Start Application:  docker compose up --build
+#   Stop Application:   docker compose down
 # ==============================================================================
 
 services:
@@ -31,11 +28,11 @@ services:
     networks:
       - madhav-network
 
-  web-dev:
+  web:
     build:
       context: .
       target: development
-    container_name: madhav-shringar-dev
+    container_name: madhav-shringar-web
     restart: unless-stopped
     ports:
       - "${APP_PORT:-3000}:3000"
@@ -43,11 +40,15 @@ services:
       db:
         condition: service_healthy
     env_file:
-      - .env
-
+      - path: .env
+        required: false
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgrespassword}@db:5432/${POSTGRES_DB:-shringaarwebsite}?schema=public
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+      AUTH_TRUST_HOST: "true"
+      AUTH_URL: ${AUTH_URL:-http://localhost:3000}
+      DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgrespassword}@db:5432/${POSTGRES_DB:-shringaarwebsite}?schema=public}
       AUTH_SECRET: ${AUTH_SECRET:-development-auth-secret-key-min-32-chars-long}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
@@ -57,45 +58,6 @@ services:
       - /app/node_modules
       - /app/.next
     command: sh -c "npx prisma generate && npx prisma db push && npm run dev"
-    networks:
-      - madhav-network
-
-  web-prod:
-    build:
-      context: .
-      target: runner
-    container_name: madhav-shringar-prod
-    profiles: [ "prod" ]
-    restart: unless-stopped
-    ports:
-      - "${PROD_APP_PORT:-3001}:3000"
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgrespassword}@db:5432/${POSTGRES_DB:-shringaarwebsite}?schema=public
-      AUTH_SECRET: ${AUTH_SECRET:-production-testing-auth-secret-key-32-chars}
-      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
-      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3001}
-      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Madhav Shringar}
-      PORT: "3000"
-      HOSTNAME: "0.0.0.0"
-    networks:
-      - madhav-network
-
-  db-sync:
-    build:
-      context: .
-      target: deps
-    container_name: madhav-shringar-dbsync
-    profiles: [ "tools" ]
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgrespassword}@db:5432/${POSTGRES_DB:-shringaarwebsite}?schema=public
-    command: sh -c "npx prisma generate && npx prisma db push"
     networks:
       - madhav-network
 

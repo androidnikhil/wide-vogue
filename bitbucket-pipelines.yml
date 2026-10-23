@@ -21,13 +21,17 @@ definitions:
         name: Sync to GitHub Mirror
         image: atlassian/default-image:4
         script:
-          - if [ -z "$GITHUB_TOKEN" ]; then echo "ERROR: GITHUB_TOKEN is not defined in Bitbucket repository variables." >&2; exit 1; fi
-          - git remote add github https://github.com/androidnikhil/wide-vogue.git 2>/dev/null || git remote set-url github https://github.com/androidnikhil/wide-vogue.git
-          - AUTH_HEADER="AUTHORIZATION: basic $(printf "x-access-token:%s" "$GITHUB_TOKEN" | base64 | tr -d '\n')"
-          - git config --local http.https://github.com/.extraheader "$AUTH_HEADER"
-          - trap 'git config --local --unset-all http.https://github.com/.extraheader 2>/dev/null || true; git remote remove github 2>/dev/null || true' EXIT
-          - REMOTE_REF=$(git ls-remote --heads github main)
           - |
+            set -e
+            if [ -z "$GITHUB_TOKEN" ]; then
+              echo "ERROR: GITHUB_TOKEN is not defined in Bitbucket repository variables." >&2
+              exit 1
+            fi
+            git remote add github https://github.com/androidnikhil/wide-vogue.git 2>/dev/null || git remote set-url github https://github.com/androidnikhil/wide-vogue.git
+            AUTH_HEADER="AUTHORIZATION: basic $(printf "x-access-token:%s" "$GITHUB_TOKEN" | base64 | tr -d '\n')"
+            git config --local http.https://github.com/.extraheader "$AUTH_HEADER"
+            trap 'git config --local --unset-all http.https://github.com/.extraheader 2>/dev/null || true; git remote remove github 2>/dev/null || true' EXIT
+            REMOTE_REF=$(git ls-remote --heads github main)
             if [ -z "$REMOTE_REF" ]; then
               echo "GitHub main branch does not exist yet (empty repository). Performing initial push."
               git push github HEAD:main

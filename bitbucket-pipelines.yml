@@ -1,0 +1,67 @@
+image: node:20
+
+definitions:
+  caches:
+    npm: ~/.npm
+  services:
+    docker:
+      memory: 2048
+  steps:
+    - step: &validate-and-test
+        name: Code Quality & Automated Tests
+        caches:
+          - npm
+        script:
+          - npm ci --legacy-peer-deps
+          - npm run lint
+          - npm run type-check
+          - npm test
+
+    - step: &sync-to-github
+        name: Sync to GitHub Mirror
+        image: atlassian/default-image:4
+        script:
+          - |
+            set -e
+            if [ -z "$GITHUB_TOKEN" ]; then
+              echo "ERROR: GITHUB_TOKEN is not defined in Bitbucket repository variables." >&2
+              exit 1
+            fi
+            git remote add github https://github.com/androidnikhil/wide-vogue.git 2>/dev/null || git remote set-url github https://github.com/androidnikhil/wide-vogue.git
+            AUTH_HEADER="AUTHORIZATION: basic $(printf "x-access-token:%s" "$GITHUB_TOKEN" | base64 | tr -d '\n')"
+            git config --local http.https://github.com/.extraheader "$AUTH_HEADER"
+            trap 'git config --local --unset-all http.https://github.com/.extraheader 2>/dev/null || true; git remote remove github 2>/dev/null || true' EXIT
+            REMOTE_REF=$(git ls-remote --heads github main)
+            if [ -z "$REMOTE_REF" ]; then
+              echo "GitHub main branch does not exist yet (empty repository). Performing initial push."
+              git push github HEAD:main
+            else
+              git fetch github main
+              if ! git merge-base --is-ancestor FETCH_HEAD HEAD; then
+                echo "ERROR: GitHub main has diverged from Bitbucket main." >&2
+                echo "Remote GitHub commit $(git rev-parse FETCH_HEAD) is not an ancestor of local commit $(git rev-parse HEAD)." >&2
+                echo "Manual reconciliation is required. Fast-forward push aborted to prevent data loss." >&2
+                exit 1
+              fi
+              git push github HEAD:main
+            fi
+
+    - step: &docker-build-check
+        name: Docker Build Verification (On-Demand)
+        services:
+          - docker
+        script:
+          - docker build --target development -t madhav-shringar-dev:ci .
+
+pipelines:
+  # Trigger ONLY when code is pushed to the main branch
+  # Zero build minutes wasted on feature/bugfix branches
+  branches:
+    main:
+      - step: *validate-and-test
+      - step: *sync-to-github
+
+  # Manual on-demand trigger (never runs automatically)
+  custom:
+    docker-verify:
+      - step: *docker-build-check

@@ -1,0 +1,70 @@
+# ==============================================================================
+# Docker Compose configuration for Madhav Shringar E-Commerce
+#
+# Single Command Usage:
+#   Start Application:  docker compose up --build
+#   Stop Application:   docker compose down
+# ==============================================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: madhav-shringar-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgrespassword}
+      POSTGRES_DB: ${POSTGRES_DB:-shringaarwebsite}
+    ports:
+      # Exposes port 5433 on host by default to prevent conflicts with local Postgres installations
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-shringaarwebsite}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - madhav-network
+
+  web:
+    build:
+      context: .
+      target: development
+    container_name: madhav-shringar-web
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: development
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+      AUTH_TRUST_HOST: "true"
+      AUTH_URL: ${AUTH_URL:-http://localhost:3000}
+      DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgrespassword}@db:5432/${POSTGRES_DB:-shringaarwebsite}?schema=public}
+      AUTH_SECRET: ${AUTH_SECRET:-development-auth-secret-key-min-32-chars-long}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Madhav Shringar}
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: sh -c "npx prisma generate && npx prisma db push && npm run dev"
+    networks:
+      - madhav-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  madhav-network:
+    driver: bridge

@@ -191,8 +191,8 @@ export default function PurchaseReceiptEmail({ order }: PurchaseReceiptEmailProp
                 <Text style={{ fontSize: '12px', color: BRAND_COLORS.textMuted, lineHeight: '1.5', margin: '0 0 4px 0' }}>
                   {address.streetAddress}, {address.city}, {address.state} - {address.postalCode}, {address.country}
                 </Text>
-                <Text style={{ fontSize: '12px', color: BRAND_COLORS.primary, fontWeight: 600, margin: 0 }}>
-                  📞 +91 {address.contactNumber}
+                <Text style={{ fontSize: '12px', color: BRAND_COLORS.primary, fontWeight: 600, margin: 0, whiteSpace: 'nowrap', wordBreak: 'keep-all' }}>
+                  📞 +91&nbsp;{address.contactNumber}
                 </Text>
               </Section>
             )}

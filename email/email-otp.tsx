@@ -20,12 +20,12 @@ interface EmailOtpProps {
 }
 
 export default function EmailOtpTemplate({ otp = '123456', email = '' }: EmailOtpProps) {
-  const formattedOtp = otp.split('').join('  ');
+  const cleanOtp = (otp || '123456').toString().replace(/\s+/g, '');
 
   return (
     <Html>
       <Head />
-      <Preview>Your Madhav Shringaar Verification Code: {otp}</Preview>
+      <Preview>Your Madhav Shringaar Verification Code: {cleanOtp}</Preview>
       <Tailwind>
         <Body
           style={{
@@ -100,10 +100,10 @@ export default function EmailOtpTemplate({ otp = '123456', email = '' }: EmailOt
                 }}
               >
                 Thank you for joining <strong>Madhav Shringaar</strong>. Please enter the 6-digit One-Time Password (OTP) below to verify your email address{' '}
-                {email ? <strong style={{ color: BRAND_COLORS.textDark }}>({email})</strong> : ''}.
+                {email ? <strong style={{ color: BRAND_COLORS.textDark, wordBreak: 'break-all' }}>({email})</strong> : ''}.
               </Text>
 
-              {/* OTP Display Card */}
+              {/* OTP Display Card - Guaranteed 1-Line Container */}
               <div
                 style={{
                   backgroundColor: BRAND_COLORS.primary,
@@ -122,29 +122,37 @@ export default function EmailOtpTemplate({ otp = '123456', email = '' }: EmailOt
                     color: BRAND_COLORS.goldLight,
                     letterSpacing: '2px',
                     textTransform: 'uppercase',
-                    margin: '0 0 6px 0',
+                    margin: '0 0 8px 0',
                   }}
                 >
                   Your Verification Code
                 </Text>
-                <div
-                  style={{
-                    fontFamily: "'Courier New', Courier, monospace",
-                    fontSize: '32px',
-                    fontWeight: 800,
-                    color: '#FFFFFF',
-                    letterSpacing: '8px',
-                    lineHeight: '1.2',
-                    padding: '4px 0',
-                  }}
-                >
-                  {formattedOtp}
-                </div>
+                <table role="presentation" border={0} cellPadding={0} cellSpacing={0} style={{ margin: '0 auto', textAlign: 'center' }}>
+                  <tr>
+                    <td
+                      align="center"
+                      style={{
+                        fontFamily: "'Courier New', Courier, monospace",
+                        fontSize: '30px',
+                        fontWeight: 800,
+                        color: '#FFFFFF',
+                        letterSpacing: '6px',
+                        lineHeight: '1.2',
+                        whiteSpace: 'nowrap',
+                        wordBreak: 'keep-all',
+                        padding: '4px 12px',
+                        textAlign: 'center',
+                      }}
+                    >
+                      {cleanOtp}
+                    </td>
+                  </tr>
+                </table>
                 <Text
                   style={{
                     fontSize: '10.5px',
                     color: BRAND_COLORS.goldLight,
-                    margin: '6px 0 0 0',
+                    margin: '8px 0 0 0',
                   }}
                 >
                   Valid for 5 minutes only

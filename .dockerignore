@@ -1,22 +1,36 @@
+# Dependencies and local builds
 node_modules
 .next
+out
+build
+.swc
+*.tsbuildinfo
+
+# Local database installation and scratch files
+pgsql/
+scratch/
+.vercel
+
+# Version control and IDE metadata
 .git
 .gitignore
 .vscode
-.swc
-*.tsbuildinfo
+.idea
+.DS_Store
+
+# Test and coverage artifacts
 coverage
-out
-build
+
+# Environment and secrets (never bake secrets into images)
+.env*
 *.pem
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-.env*
-!docker-entrypoint.sh
+
+# Documentation
 README.md
 docs
-pgsql
-.vercel
-scratch

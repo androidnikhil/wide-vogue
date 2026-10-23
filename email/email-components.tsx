@@ -129,24 +129,69 @@ export function EmailContactFooter() {
           Our dedicated devotee support team is always delighted to assist you.
         </Text>
 
-        <Row style={{ width: '100%' }}>
-          <Column style={{ width: '50%', textAlign: 'center', padding: '4px' }}>
-            <Text style={{ fontSize: '12px', color: BRAND_COLORS.textDark, margin: '0', fontWeight: 600 }}>
-              📞 Call / WhatsApp:
-            </Text>
-            <Text style={{ fontSize: '13px', color: BRAND_COLORS.primary, margin: '2px 0 0 0', fontWeight: 700 }}>
-              +91 79821 60480
-            </Text>
-          </Column>
-          <Column style={{ width: '50%', textAlign: 'center', padding: '4px' }}>
-            <Text style={{ fontSize: '12px', color: BRAND_COLORS.textDark, margin: '0', fontWeight: 600 }}>
-              ✉️ Email Support:
-            </Text>
-            <Text style={{ fontSize: '12px', color: BRAND_COLORS.primary, margin: '2px 0 0 0', fontWeight: 700 }}>
+        <div style={{ margin: '14px auto 6px auto', textAlign: 'center' }}>
+          <div
+            style={{
+              display: 'inline-block',
+              backgroundColor: BRAND_COLORS.white,
+              border: `1px solid ${BRAND_COLORS.border}`,
+              borderRadius: '8px',
+              padding: '8px 14px',
+              margin: '4px 6px',
+              whiteSpace: 'nowrap',
+              wordBreak: 'keep-all',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+            }}
+          >
+            <span style={{ fontSize: '12px', fontWeight: 600, color: BRAND_COLORS.textDark, whiteSpace: 'nowrap' }}>
+              📞 Call / WhatsApp:&nbsp;
+            </span>
+            <a
+              href="tel:+917982160480"
+              style={{
+                fontSize: '12.5px',
+                fontWeight: 700,
+                color: BRAND_COLORS.primary,
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+                wordBreak: 'keep-all',
+              }}
+            >
+              +91&#8209;79821&#8209;60480
+            </a>
+          </div>
+
+          <div
+            style={{
+              display: 'inline-block',
+              backgroundColor: BRAND_COLORS.white,
+              border: `1px solid ${BRAND_COLORS.borderLight}`,
+              borderRadius: '8px',
+              padding: '8px 14px',
+              margin: '4px 6px',
+              whiteSpace: 'nowrap',
+              wordBreak: 'keep-all',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+            }}
+          >
+            <span style={{ fontSize: '12px', fontWeight: 600, color: BRAND_COLORS.textDark, whiteSpace: 'nowrap' }}>
+              ✉️ Email:&nbsp;
+            </span>
+            <a
+              href="mailto:info@madhavshringaar.com"
+              style={{
+                fontSize: '12px',
+                fontWeight: 600,
+                color: BRAND_COLORS.primary,
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+                wordBreak: 'keep-all',
+              }}
+            >
               info@madhavshringaar.com
-            </Text>
-          </Column>
-        </Row>
+            </a>
+          </div>
+        </div>
 
         <Text
           style={{

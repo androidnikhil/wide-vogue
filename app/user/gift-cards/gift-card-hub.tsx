@@ -33,6 +33,7 @@ import {
   createRazorpayGiftCardOrder,
   verifyAndCreatePaidGiftVoucher
 } from '@/lib/actions/giftcard.actions';
+import { RAZORPAY_LOGO_URL } from '@/lib/constants';
 
 interface GiftCardHubProps {
   bhaktiPoints: number;
@@ -192,7 +193,7 @@ export default function GiftCardHub({
         currency: 'INR',
         name: 'Madhav Shringaar',
         description: `Auspicious Gift Voucher for ${recipientName}`,
-        image: '/images/logo.png',
+        image: RAZORPAY_LOGO_URL,
         order_id: rzpOrderId,
         prefill: {
           name: userName !== 'Devotee' ? userName : recipientName,

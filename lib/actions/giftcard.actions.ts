@@ -84,7 +84,7 @@ export async function getAllGiftCards({
 
   const codes = data.map((gc) => gc.code);
   
-  // Find which orders used these gift cards
+  // Find which orders used these gift cards (Option B: Reusable Debit Balance across multiple orders)
   const usedOrders = await prisma.order.findMany({
     where: {
       giftCardCode: { in: codes }
@@ -92,17 +92,20 @@ export async function getAllGiftCards({
     select: {
       id: true,
       giftCardCode: true,
-      createdAt: true
-    }
+      createdAt: true,
+      totalPrice: true,
+    },
+    orderBy: { createdAt: 'desc' },
   });
 
   const dataWithOrders = data.map((gc) => {
-    // If a gift card is one time use, it should only have 1 order
-    const order = usedOrders.find((o) => o.giftCardCode === gc.code);
+    const matchingOrders = usedOrders.filter((o) => o.giftCardCode === gc.code);
     return {
       ...gc,
-      usedOrderId: order?.id,
-      usedAt: order?.createdAt,
+      orders: matchingOrders,
+      usedCount: matchingOrders.length,
+      usedOrderId: matchingOrders[0]?.id,
+      usedAt: matchingOrders[0]?.createdAt,
     };
   });
 

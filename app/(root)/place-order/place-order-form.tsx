@@ -9,6 +9,7 @@ import {
   createRazorpayOrderFromCart, 
   createPaidOrderWithRazorpay 
 } from '@/lib/actions/order.actions';
+import { RAZORPAY_LOGO_URL } from '@/lib/constants';
 import { toast } from 'sonner';
 
 interface PlaceOrderFormProps {
@@ -107,7 +108,7 @@ export default function PlaceOrderForm({
         currency: 'INR',
         name: 'Madhav Shringaar',
         description: `Order Payment (${paymentMethod})`,
-        image: '/images/logo.png',
+        image: RAZORPAY_LOGO_URL,
         order_id: rzpOrderId,
         handler: async function (response: any) {
           toast.loading('Payment received! Confirming your sacred order...', { id: 'verify-payment' });

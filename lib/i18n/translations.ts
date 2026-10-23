@@ -321,7 +321,7 @@ export const translations: Record<Language, Translations> = {
       ctaBtn: 'Shop Madhav Shringaar',
     },
     product: {
-      addToCart: 'Add to Devotional Cart',
+      addToCart: 'Add to Cart',
       addedToCart: 'Added to Seva Cart',
       buyNow: 'Buy Now & Adorn',
       selectSize: 'Select Gopal Ji Size (0–6 No.)',
@@ -514,7 +514,7 @@ export const translations: Record<Language, Translations> = {
       ctaBtn: 'माधव शृंगार से जुड़ें',
     },
     product: {
-      addToCart: 'सेवा टोकरी में जोड़ें',
+      addToCart: 'टोकरी में जोड़ें',
       addedToCart: 'सेवा टोकरी में जोड़ा गया',
       buyNow: 'अभी ऑर्डर करें',
       selectSize: 'गोपाल जी का साइज़ चुनें (0–6 नं.)',

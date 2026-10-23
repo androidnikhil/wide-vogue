@@ -1,6 +1,12 @@
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Madhav Shringaar';
 export const APP_DESCRIPTION = process.env.NEXT_PUBLIC_APP_DESCRIPTION || 'Handcrafted Shri Laddu Gopal Ji poshak, designer mukut, bansuri, moti haar, and devotional shringaar operating from Agra & Noida with express pan-India delivery.';
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'production' ? 'https://www.madhavshringaar.com' : 'http://localhost:3000');
+export const RAZORPAY_LOGO_URL =
+  process.env.NEXT_PUBLIC_APP_URL &&
+  process.env.NEXT_PUBLIC_APP_URL.startsWith('https://') &&
+  !process.env.NEXT_PUBLIC_APP_URL.includes('localhost')
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/images/logo.png`
+    : 'https://www.madhavshringaar.com/images/logo.png';
 export const LATEST_PRODUCT_LIMIT = Number(process.env.LATEST_PRODUCT_LIMIT) || 4;
 
 export const DEFAULT_SEO_TITLE = 'Madhav Shringaar | Laddu Gopal Dress & Poshak Online';

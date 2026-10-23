@@ -56,8 +56,8 @@ import {
                 <TableHead>DATE</TableHead>
                 <TableHead>BUYER</TableHead>
                 <TableHead>TOTAL</TableHead>
-                <TableHead>PAID</TableHead>
-                <TableHead>STATUS</TableHead>
+                <TableHead>PAYMENT</TableHead>
+                <TableHead>FULFILLMENT</TableHead>
                 <TableHead>ACTIONS</TableHead>
               </TableRow>
             </TableHeader>
@@ -74,18 +74,41 @@ import {
                     {formatDateTime(order.createdAt).dateTime}
                   </TableCell>
                   <TableCell>{order.user?.name || "Guest"}</TableCell>
-                  <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
+                  <TableCell className="font-bold">{formatCurrency(order.totalPrice)}</TableCell>
                   <TableCell>
-                    {order.isPaid && order.paidAt
-                      ? formatDateTime(order.paidAt).dateTime
-                      : 'Not Paid'}
+                    {order.isPaid ? (
+                      <div className="flex flex-col items-start gap-0.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          ✓ Paid
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {order.paymentMethod || 'Online'}
+                          {order.paidAt && ` • ${formatDateTime(order.paidAt).dateOnly}`}
+                        </span>
+                      </div>
+                    ) : order.paymentMethod === 'CashOnDelivery' ? (
+                      <div className="flex flex-col items-start gap-0.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                          COD (Pay on Delivery)
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">Cash On Delivery</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-start gap-0.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                          ⏳ Unpaid
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">{order.paymentMethod || 'Pending'}</span>
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1 items-start">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                        order.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
-                        order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' :
-                        order.status === 'OUT_FOR_DELIVERY' ? 'bg-yellow-100 text-yellow-800' :
+                        order.status === 'DELIVERED' ? 'bg-green-100 text-green-800 border border-green-300' :
+                        order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800 border border-blue-300' :
+                        order.status === 'OUT_FOR_DELIVERY' ? 'bg-yellow-100 text-yellow-800 border border-yellow-300' :
+                        order.status === 'PROCESSING' ? 'bg-purple-100 text-purple-800 border border-purple-300' :
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {order.status || 'PENDING'}

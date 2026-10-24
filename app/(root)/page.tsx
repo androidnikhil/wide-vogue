@@ -111,8 +111,8 @@ export default async function Homepage({
           {/* RIGHT: Floating Artwork & Organic Layout */}
           <div className="lg:col-span-7 relative h-[420px] sm:h-[500px] lg:h-[750px] w-full flex justify-center lg:justify-end items-center mt-6 lg:mt-0">
             {/* Organic Blob Background for Image - Hardware Accelerated */}
-            <div className="absolute w-[90%] h-[90%] bg-gradient-to-tr from-[#E6C16A] to-[#FDE8DF] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] md:animate-[spin_30s_linear_infinite] opacity-50 blur-xl transform-gpu pointer-events-none will-change-transform"></div>
-            <div className="absolute w-[80%] h-[80%] bg-[#0F6F74] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] md:animate-[spin_25s_linear_infinite_reverse] opacity-20 blur-2xl transform-gpu pointer-events-none will-change-transform"></div>
+            <div className="absolute w-[90%] h-[90%] bg-gradient-to-tr from-[#E6C16A] to-[#FDE8DF] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-50 blur-xl pointer-events-none"></div>
+            <div className="absolute w-[80%] h-[80%] bg-[#0F6F74] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] opacity-20 blur-2xl pointer-events-none"></div>
 
             {/* The Main Artwork - Breaking out slightly */}
             <div className="relative w-full lg:w-[110%] h-[110%] ml-auto z-20 flex items-center justify-center transform lg:translate-x-12">
@@ -569,7 +569,7 @@ export default async function Homepage({
                 image: 'https://www.madhavshringaar.com/images/devotional/complete_shringar.webp',
                 description:
                   'Buy beautiful Laddu Gopal dresses, Kanha Ji poshak, mukut, moti mala, bansuri and handcrafted shringaar kits online across India.',
-                telephone: '+917982160480',
+                telephone: '+918755518488',
                 email: 'info@madhavshringaar.com',
                 priceRange: '₹99 - ₹4999',
                 paymentAccepted: ['Cash', 'Credit Card', 'Debit Card', 'UPI', 'Net Banking'],

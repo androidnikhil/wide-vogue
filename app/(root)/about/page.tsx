@@ -163,14 +163,14 @@ export default function AboutUsPage() {
               </p>
               <div className="flex flex-wrap gap-4 pt-2 text-xs font-semibold text-neutral-800">
                 <span className="inline-flex items-center gap-1.5"><MapPin className="w-4 h-4 text-[#C88A20]" /> Dispatch Hubs: Agra &amp; Noida</span>
-                <span className="inline-flex items-center gap-1.5"><Phone className="w-4 h-4 text-[#25D366]" /> WhatsApp: +91 79821 60480</span>
+                <span className="inline-flex items-center gap-1.5"><Phone className="w-4 h-4 text-[#25D366]" /> WhatsApp: +91 87555 18488</span>
                 <span className="inline-flex items-center gap-1.5"><Mail className="w-4 h-4 text-[#003020]" /> info@madhavshringaar.com</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-3 justify-center items-center md:items-end">
               <Button asChild className="w-full sm:w-auto bg-[#25D366] hover:bg-[#1EBE5D] text-white rounded-full font-bold px-6 shadow-sm">
-                <a href="https://wa.me/917982160480?text=Radhe%20Radhe!%20I%20would%20like%20to%20learn%20more%20about%20Madhav%20Shringaar." target="_blank" rel="noopener noreferrer">
+                <a href="https://wa.me/918755518488?text=Radhe%20Radhe!%20I%20would%20like%20to%20learn%20more%20about%20Madhav%20Shringaar." target="_blank" rel="noopener noreferrer">
                   Chat on WhatsApp
                 </a>
               </Button>

@@ -205,17 +205,31 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                   </div>
 
                   {/* Delivery Charges with Free Delivery above 999 */}
-                  <div className="flex justify-between text-on-surface-variant font-body-md py-1">
-                    <span>Delivery Charges:</span>
+                  <div className="flex justify-between items-start text-on-surface-variant font-body-md py-1">
+                    <div>
+                      <span>Delivery Charges:</span>
+                      <p className="text-[10px] text-muted-foreground font-normal">
+                        *(Only delivery charge • Item price separate)
+                      </p>
+                    </div>
                     {Number(cart.itemsPrice) >= 999 ? (
                       <span className="text-emerald-700 font-semibold flex items-center gap-1.5">
                         <span className="line-through text-xs text-neutral-400 font-normal">
-                          ₹50
+                          ₹{shippingQuote ? shippingQuote.rate : 90}
                         </span>
                         <span>FREE</span>
                       </span>
                     ) : (
-                      <span className="font-semibold text-neutral-800">{formatCurrency(50)}</span>
+                      <div className="text-right">
+                        <span className="font-semibold text-neutral-800">
+                          {formatCurrency(shippingQuote ? shippingQuote.rate : 50)}
+                        </span>
+                        {shippingQuote && (
+                          <div className="text-[10px] text-emerald-600 font-medium">
+                            Live Rate Applied
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
 
@@ -250,25 +264,30 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                     </div>
 
                     {shippingQuote && (
-                      <div className="pt-2 text-[11px] text-neutral-700 space-y-1 border-t border-secondary/15 mt-2">
+                      <div className="pt-2 text-[11px] text-neutral-700 space-y-1.5 border-t border-secondary/15 mt-2">
                         <div className="flex items-center justify-between font-medium">
                           <span className="text-emerald-700 flex items-center gap-1 font-semibold">
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                            Delivery Available to {shippingQuote.destinationCity || pincode}
+                            Delivery to {shippingQuote.destinationCity || pincode}
                           </span>
                           {shippingQuote.isFree ? (
                             <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60 text-[10px]">
                               FREE
                             </span>
                           ) : (
-                            <span className="text-neutral-600 text-[10px] font-medium">
-                              Standard Delivery
+                            <span className="text-neutral-900 font-bold text-xs">
+                              ₹{shippingQuote.rate}
                             </span>
                           )}
                         </div>
                         <p className="text-[10px] text-neutral-600">
                           Estimated Delivery: <strong>{shippingQuote.days}</strong> ({shippingQuote.pickupCity || 'Noida'} to {shippingQuote.destinationCity || pincode})
                         </p>
+                        {!shippingQuote.isFree && (
+                          <p className="text-[10px] text-amber-800 bg-amber-50/80 px-2 py-1 rounded border border-amber-200/60 font-medium">
+                            *This ₹{shippingQuote.rate} is only delivery charge (item price separate).
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>

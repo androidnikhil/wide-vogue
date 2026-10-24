@@ -177,7 +177,7 @@ export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshrin
 export const SUPPORT_PHONE = process.env.SUPPORT_PHONE || '+91 70782 11946';
 export const CALLING_PHONE = process.env.CALLING_PHONE || '+91 70782 11946';
 export const CALLING_NUMBER = '7078211946';
-export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '7982160480';
+export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '8755518488';
 export const COMPANY_GSTIN = process.env.COMPANY_GSTIN || '09EHFPP7126A1ZE';
 export const COMPANY_MSME = process.env.COMPANY_MSME || 'UDYAM-UP-01-0152376';
 

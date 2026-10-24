@@ -376,13 +376,13 @@ export default function MobileMenu({ sessionUser }: MobileMenuProps) {
           {/* Devotee Care & WhatsApp Support Footer */}
           <div className="p-3 bg-white border-t border-[#E6C16A]/30 shrink-0 space-y-2">
             <a
-              href="https://wa.me/917982160480?text=Radhe%20Radhe!%20Need%20help%20with%20my%20order%20on%20Madhav%20Shringaar."
+              href="https://wa.me/918755518488?text=Radhe%20Radhe!%20Need%20help%20with%20my%20order%20on%20Madhav%20Shringaar."
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-2.5 px-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-[#075E54] rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition-all shadow-xs active:scale-98"
             >
               <MessageSquare className="w-4 h-4 text-[#25D366]" />
-              <span>{isHindi ? 'व्हाट्सऐप: +91 79821 60480' : 'WhatsApp: +91 79821 60480'}</span>
+              <span>{isHindi ? 'व्हाट्सऐप: +91 87555 18488' : 'WhatsApp: +91 87555 18488'}</span>
             </a>
 
             <div className="flex items-center justify-between text-[10px] text-neutral-500 px-1 pt-0.5">

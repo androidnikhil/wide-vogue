@@ -10,7 +10,7 @@ interface WhatsAppFloatingButtonProps {
 }
 
 export default function WhatsAppFloatingButton({
-  phoneNumber = WHATSAPP_NUMBER || '7982160480',
+  phoneNumber = WHATSAPP_NUMBER || '8755518488',
   defaultMessage,
 }: WhatsAppFloatingButtonProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -46,7 +46,7 @@ export default function WhatsAppFloatingButton({
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Direct WhatsApp Support +91 79821 60480"
+        aria-label="Direct WhatsApp Support +91 87555 18488"
         className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 ring-4 ring-[#25D366]/20"
       >
         {/* Subtle Pulse Rings */}

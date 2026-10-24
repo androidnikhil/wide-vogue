@@ -53,15 +53,21 @@ export async function checkDeliveryPincode(pincode: string): Promise<PincodeChec
 
     try {
       const pickupPin = process.env.DISPATCH_PINCODE || "201301"; // Noida dispatch hub
-      const shiprocketRes = await checkShiprocketServiceability(pickupPin, cleanPin, true, 0.5);
+      const shiprocketRes = await checkShiprocketServiceability(pickupPin, cleanPin, false, 0.5);
 
       if (shiprocketRes && shiprocketRes.data?.available_courier_companies?.length > 0) {
-        const couriers = shiprocketRes.data.available_courier_companies;
+        const couriers = [...shiprocketRes.data.available_courier_companies];
+        // Sort couriers by rate ascending to get the most economical service
+        couriers.sort((a: any, b: any) => Number(a.rate) - Number(b.rate));
         const bestCourier = couriers[0];
-        courierName = bestCourier.courier_name || "Shiprocket Express";
+        
+        // Hide partner company name (e.g. Shadowfax, Delhivery) from customer UI
+        courierName = "Standard Express Delivery";
         codAvailable = Boolean(bestCourier.cod === 1);
         if (bestCourier.rate) {
-          shippingRate = Math.round(Number(bestCourier.rate));
+          const rawRate = Number(bestCourier.rate);
+          // Round up to nearest 10 (e.g. 85.72 -> 90) as requested
+          shippingRate = Math.ceil(rawRate / 10) * 10;
         }
         
         if (bestCourier.etd_hours) {

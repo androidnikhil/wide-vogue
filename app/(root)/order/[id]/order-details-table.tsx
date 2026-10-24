@@ -290,18 +290,29 @@ const OrderDetailsTable = ({
               <p className="text-xs text-neutral-500">
                 Seller: <strong className="text-neutral-700">Madhav Shringaar Vrindavan</strong>
               </p>
-              <div className="flex items-center gap-3 pt-1">
+              <div className="flex items-center gap-3 pt-1 flex-wrap">
                 <span className="font-bold text-lg text-[#003020] font-mono">
-                  {formatCurrency(totalPrice)}
+                  {formatCurrency(orderitems[0]?.price || totalPrice)}
                 </span>
-                <span className="text-xs text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/60 font-semibold">
-                  Free Pan-India Delivery
-                </span>
+                {orderitems[0]?.qty > 1 && (
+                  <span className="text-xs text-neutral-500 font-medium">
+                    Qty: {orderitems[0]?.qty}
+                  </span>
+                )}
+                {Number(shippingPrice) === 0 ? (
+                  <span className="text-xs text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/60 font-semibold">
+                    Free Pan-India Delivery
+                  </span>
+                ) : (
+                  <span className="text-xs text-neutral-700 bg-neutral-100 px-2.5 py-0.5 rounded-full border border-neutral-200 font-medium">
+                    Delivery: {formatCurrency(shippingPrice)}
+                  </span>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Flipkart Delivery details & Price details */}
+          {/* Delivery details & Price details */}
           <div className="space-y-3 bg-[#FAF7F0]/60 p-4 rounded-xl border border-neutral-200/60 text-xs">
             <div>
               <span className="text-neutral-500 block uppercase tracking-wider text-[10px] font-bold">
@@ -350,7 +361,7 @@ const OrderDetailsTable = ({
 
       <div className='grid lg:grid-cols-3 gap-6 lg:gap-8'>
         <div className='col-span-2 space-y-6 overflow-x-auto pb-10'>
-          {/* Flipkart-Style Timeline Card */}
+          {/* Order Timeline Card */}
           <Card className="border-neutral-200/80 shadow-xs rounded-2xl overflow-hidden bg-white">
             <div className="bg-[#FAF7F0]/80 p-4 border-b border-neutral-200/70 flex items-center justify-between">
               <h2 className='font-bold text-sm text-[#003020] flex items-center gap-2'>
@@ -475,9 +486,20 @@ const OrderDetailsTable = ({
                 <span>Taxes</span>
                 <span className="font-medium text-on-surface">{formatCurrency(taxPrice)}</span>
               </div>
-              <div className='flex justify-between items-center text-on-surface-variant pb-4 border-b border-outline-variant/30'>
-                <span>Shipping</span>
-                <span className="font-medium text-on-surface">{formatCurrency(shippingPrice)}</span>
+              <div className='flex justify-between items-start text-on-surface-variant pb-4 border-b border-outline-variant/30'>
+                <div>
+                  <span>Delivery Charges</span>
+                  <p className="text-[10px] text-muted-foreground font-normal">
+                    *(Only delivery charge • Item price separate)
+                  </p>
+                </div>
+                <span className="font-medium text-on-surface">
+                  {Number(shippingPrice) === 0 ? (
+                    <span className="text-emerald-700 font-semibold">FREE</span>
+                  ) : (
+                    formatCurrency(shippingPrice)
+                  )}
+                </span>
               </div>
               
               {Number(discountPrice) > 0 && (

@@ -85,7 +85,7 @@ const jsonLdLocalBusiness = {
   url: APP_URL,
   logo: `${APP_URL}/images/logo.png`,
   image: `${APP_URL}/images/devotional/complete_shringar.webp`,
-  telephone: '+917982160480',
+  telephone: '+918755518488',
   email: 'info@madhavshringaar.com',
   taxID: '09EHFPP7126A1ZE',
   priceRange: '₹₹',
@@ -121,7 +121,7 @@ const jsonLdLocalBusiness = {
     'https://www.instagram.com/madhav.shringaar',
     'https://www.facebook.com/share/1CLPMdGbhJ/',
     'https://pin.it/51M0t5Fs5',
-    'https://wa.me/917982160480',
+    'https://wa.me/918755518488',
   ],
 };
 
@@ -147,6 +147,11 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preload"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          as="style"
+        />
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"

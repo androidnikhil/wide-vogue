@@ -261,7 +261,7 @@ const OrderTimeline = ({ order }: OrderTimelineProps) => {
       {/* Quick Support & Help Row */}
       <div className="flex items-center justify-between flex-wrap gap-3 pt-1">
         <a
-          href={`https://wa.me/917982160480?text=Hare%20Krishna!%20I%20need%20assistance%20with%20my%20Order%20%23${order.id.slice(0, 8).toUpperCase()}`}
+          href={`https://wa.me/918755518488?text=Hare%20Krishna!%20I%20need%20assistance%20with%20my%20Order%20%23${order.id.slice(0, 8).toUpperCase()}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 text-xs font-semibold text-[#0F6F74] hover:text-[#003020] bg-white border border-neutral-200 px-4 py-2 rounded-xl hover:border-[#0F6F74] transition-colors"

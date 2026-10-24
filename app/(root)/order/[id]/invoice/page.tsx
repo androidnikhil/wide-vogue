@@ -28,5 +28,5 @@ export default async function InvoicePage(props: {
     redirect(`/sign-in?callbackUrl=/order/${id}/invoice`);
   }
 
-  return <InvoiceClient order={order} />;
+  return <InvoiceClient order={order} isAdmin={isAdmin} />;
 }

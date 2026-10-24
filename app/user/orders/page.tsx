@@ -39,7 +39,7 @@ const OrdersPage = async (props: {
           variant="outline"
           className="rounded-xl border-neutral-300 text-xs self-start sm:self-auto gap-2"
         >
-          <Link href="/track-order">
+          <Link href="/user/tracking">
             <Truck className="w-4 h-4 text-[#0F6F74]" />
             Live AWB Tracking
           </Link>

@@ -154,7 +154,7 @@ export default function AdminThankYouClient({ order }: AdminThankYouClientProps)
 
           {/* Help & Support */}
           <div className="text-center space-y-0.5 text-[8.5px]">
-            <p className="font-bold">WhatsApp Support: +91 79821 60480</p>
+            <p className="font-bold">WhatsApp Support: +91 87555 18488</p>
             <p>Email: info@madhavshringaar.com</p>
             <p className="font-bold">www.madhavshringaar.com</p>
             <p className="text-[8px] text-neutral-600 pt-0.5">

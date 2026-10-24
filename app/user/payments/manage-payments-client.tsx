@@ -179,13 +179,8 @@ export default function ManagePaymentsClient({
             Saved Payment Methods
           </h1>
           <p className="text-xs md:text-sm text-neutral-500 mt-1">
-            Manage your tokenized debit/credit cards and UPI IDs just like on Flipkart for 1-click sacred checkouts.
+            Manage your saved debit/credit cards and UPI IDs for fast, secure checkouts.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2 bg-emerald-50 text-emerald-800 px-3.5 py-1.5 rounded-full border border-emerald-200 text-xs font-semibold self-start md:self-auto">
-          <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          100% RBI Token Vault
         </div>
       </div>
 
@@ -507,13 +502,6 @@ export default function ManagePaymentsClient({
         )}
       </div>
 
-      {/* Trust & RBI Compliance Footnote */}
-      <div className="bg-[#FAF7F0] rounded-2xl p-5 border border-[#E6C16A]/40 flex items-center gap-3.5">
-        <Lock className="w-5 h-5 text-[#C88A20] flex-shrink-0" />
-        <p className="text-xs text-neutral-700 leading-relaxed">
-          <strong className="text-[#003020]">Bank-Grade Vault Guarantee:</strong> All payment details are processed under PCI-DSS Level 1 certification with 256-bit SSL encryption. We follow RBI tokenization guidelines and never store plain CVVs or complete card details.
-        </p>
-      </div>
     </div>
   );
 }

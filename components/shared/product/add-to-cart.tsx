@@ -266,8 +266,8 @@ export default function AddToCart({
             ) : (
               <ShoppingBag className="w-4 h-4 shrink-0" />
             )}
-            <span className="truncate">{t.product.addToCart}</span>
-            {effectivePrice > 0 && <span className="font-extrabold shrink-0">• ₹{effectivePrice}</span>}
+            <span className="whitespace-nowrap font-bold text-xs sm:text-sm">{t.product.addToCart}</span>
+            {effectivePrice > 0 && <span className="font-extrabold shrink-0 text-xs sm:text-sm">• ₹{effectivePrice}</span>}
           </Button>
         )}
         <WishlistButton 

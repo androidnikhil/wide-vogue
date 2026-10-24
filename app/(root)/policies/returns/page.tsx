@@ -32,7 +32,7 @@ export default function ReturnsPolicyPage() {
         <p>You will be responsible for paying for your own shipping costs for returning your item. Shipping costs are non-refundable. If you receive a refund, the cost of return shipping will be deducted from your refund.</p>
 
         <h3 className="font-bold text-xl mt-6">5. Contact Us</h3>
-        <p>If you have any questions on how to return your item to us, contact us at <strong>info@madhavshringaar.com</strong> or WhatsApp us at <strong>+91 70782 11946</strong>.</p>
+        <p>If you have any questions on how to return your item to us, contact us at <strong>info@madhavshringaar.com</strong> or WhatsApp us at <strong>+91 87555 18488</strong>.</p>
       </div>
     </div>
   );

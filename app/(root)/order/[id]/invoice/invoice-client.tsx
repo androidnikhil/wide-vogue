@@ -9,9 +9,10 @@ import { formatCurrency, formatDateTime } from '@/lib/utils';
 
 interface InvoiceClientProps {
   order: any;
+  isAdmin?: boolean;
 }
 
-export default function InvoiceClient({ order }: InvoiceClientProps) {
+export default function InvoiceClient({ order, isAdmin = false }: InvoiceClientProps) {
   const handlePrint = () => {
     window.print();
   };
@@ -33,17 +34,31 @@ export default function InvoiceClient({ order }: InvoiceClientProps) {
       {/* Top Action Bar (Hidden when printing) */}
       <div className="max-w-4xl mx-auto mb-4 px-4 print:hidden flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-            className="rounded-xl border-neutral-300 text-xs font-semibold gap-1.5 bg-white hover:bg-neutral-50 shadow-xs text-neutral-800"
-          >
-            <Link href={`/admin/orders/${order.id}`}>
-              <ArrowLeft className="w-3.5 h-3.5 text-[#003020]" />
-              Admin Portal
-            </Link>
-          </Button>
+          {isAdmin ? (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="rounded-xl border-neutral-300 text-xs font-semibold gap-1.5 bg-white hover:bg-neutral-50 shadow-xs text-neutral-800"
+            >
+              <Link href={`/admin/orders/${order.id}`}>
+                <ArrowLeft className="w-3.5 h-3.5 text-[#003020]" />
+                Admin Portal
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="rounded-xl border-neutral-300 text-xs font-semibold gap-1.5 bg-white hover:bg-neutral-50 shadow-xs text-neutral-800"
+            >
+              <Link href="/user/orders">
+                <ArrowLeft className="w-3.5 h-3.5 text-[#003020]" />
+                My Orders
+              </Link>
+            </Button>
+          )}
           <Button
             asChild
             variant="ghost"
@@ -92,7 +107,7 @@ export default function InvoiceClient({ order }: InvoiceClientProps) {
                     GSTIN: <strong className="text-neutral-900">09EHFPP7126A1ZE</strong>
                   </p>
                 <p className="text-[10px] text-neutral-600">
-                  Helpline: <strong>+91 79821 60480</strong> • Email: info@madhavshringaar.com
+                  Helpline: <strong>+91 87555 18488</strong> • Email: info@madhavshringaar.com
                 </p>
               </div>
 

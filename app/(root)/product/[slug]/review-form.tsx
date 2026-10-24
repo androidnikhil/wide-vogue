@@ -124,13 +124,13 @@ const ReviewForm = ({
 
       if (uploadedUrls.length > 0) {
         form.setValue("images", [...currentImages, ...uploadedUrls]);
-        toast.success(`${uploadedUrls.length} photo(s) converted to WebP and added!`, { id: toastId });
+        toast.success(`${uploadedUrls.length} photo(s) added successfully!`, { id: toastId });
       } else {
         toast.dismiss(toastId);
       }
     } catch (err: any) {
       console.error("Review image upload error:", err);
-      toast.error("An error occurred during photo optimization", { id: toastId });
+      toast.error("An error occurred while uploading photos", { id: toastId });
     } finally {
       setIsUploadingImages(false);
       if (fileInputRef.current) {
@@ -265,8 +265,8 @@ const ReviewForm = ({
                     <Camera className="w-4 h-4 text-secondary" />
                     <span>Thakur Ji Photos ({currentImages.length}/3)</span>
                   </FormLabel>
-                  <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium border border-emerald-200">
-                    Auto-saved as WebP
+                  <span className="text-[11px] text-muted-foreground font-medium">
+                    JPG, PNG • Max 3
                   </span>
                 </div>
 
@@ -315,12 +315,12 @@ const ReviewForm = ({
                       {isUploadingImages ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin text-[#0F6F74]" />
-                          <span>Converting to WebP & Uploading...</span>
+                          <span>Uploading Photos...</span>
                         </>
                       ) : (
                         <>
                           <Camera className="w-4 h-4 text-[#C88A20]" />
-                          <span>Add Photos of Thakur Ji (JPG, PNG auto-converted to WebP)</span>
+                          <span>Add Photos of Thakur Ji (JPG, PNG)</span>
                         </>
                       )}
                     </Button>

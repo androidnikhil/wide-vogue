@@ -115,7 +115,7 @@ const faqData: FAQCategory[] = [
       },
       {
         q: 'What should I do if an item arrives damaged in transit?',
-        a: 'Please share a photo of the outer box and damaged item via WhatsApp (+91 79821 60480) within 48 hours of delivery. We will promptly dispatch a replacement at zero extra cost to you.',
+        a: 'Please share a photo of the outer box and damaged item via WhatsApp (+91 87555 18488) within 48 hours of delivery. We will promptly dispatch a replacement at zero extra cost to you.',
       },
     ],
   },
@@ -342,7 +342,7 @@ export default function FAQClient() {
             className="bg-[#25D366] hover:bg-[#20ba59] text-white font-semibold rounded-xl text-xs gap-2 shadow-xs"
           >
             <a
-              href="https://wa.me/917982160480?text=Hare%20Krishna!%20I%20have%20a%20question%20regarding%20my%20Madhav%20Shringaar%20order."
+              href="https://wa.me/918755518488?text=Hare%20Krishna!%20I%20have%20a%20question%20regarding%20my%20Madhav%20Shringaar%20order."
               target="_blank"
               rel="noopener noreferrer"
             >

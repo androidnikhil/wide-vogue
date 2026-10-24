@@ -57,8 +57,15 @@ export default async function UserAccountPage() {
         {
           title: 'Track Live Shipment',
           subtitle: 'Real-time AWB delivery tracking via Shiprocket',
-          href: '/track-order',
+          href: '/user/tracking',
           icon: Truck,
+        },
+        {
+          title: 'My Wishlist',
+          subtitle: 'Items saved for Thakur Ji and devotional celebrations',
+          href: '/user/wishlist',
+          icon: Heart,
+          badge: wishlistCount > 0 ? `${wishlistCount} Saved` : undefined,
         },
       ],
     },
@@ -195,7 +202,7 @@ export default async function UserAccountPage() {
             <span className="block text-lg font-bold text-white">{orderCount}</span>
             <span className="text-white/70">Orders</span>
           </Link>
-          <Link href="/wishlist" className="hover:text-[#F3D98F] transition-colors border-x border-white/15">
+          <Link href="/user/wishlist" className="hover:text-[#F3D98F] transition-colors border-x border-white/15">
             <span className="block text-lg font-bold text-white">{wishlistCount}</span>
             <span className="text-white/70">Wishlist</span>
           </Link>

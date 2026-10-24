@@ -16,7 +16,8 @@ import {
   ChevronRight,
   Menu,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  Heart
 } from 'lucide-react';
 import {
   Sheet,
@@ -59,7 +60,7 @@ const navSections: NavSection[] = [
     ],
   },
   {
-    group: 'MY ORDERS',
+    group: 'MY ORDERS & WISHLIST',
     items: [
       {
         title: 'Orders & Invoices',
@@ -68,8 +69,13 @@ const navSections: NavSection[] = [
       },
       {
         title: 'Live Tracking',
-        href: '/track-order',
+        href: '/user/tracking',
         icon: Truck,
+      },
+      {
+        title: 'My Wishlist',
+        href: '/user/wishlist',
+        icon: Heart,
       },
     ],
   },
@@ -247,14 +253,6 @@ export default function UserSidebar({
         {/* Navigation Menu Card */}
         <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs">
           {renderNavList()}
-        </div>
-
-        {/* Security & Seva Trust Badge */}
-        <div className="bg-[#FAF7F0] p-3.5 rounded-2xl border border-[#E6C16A]/40 text-xs text-neutral-600 flex items-start gap-2.5">
-          <ShieldCheck className="w-4 h-4 text-[#C88A20] shrink-0 mt-0.5" />
-          <p className="text-[11px] leading-relaxed">
-            <strong>Sacred Trust:</strong> 256-bit SSL encrypted account vault & authentic Vrindavan artisan provenance.
-          </p>
         </div>
       </aside>
 

@@ -246,8 +246,9 @@ export async function calculateShiprocketRatesForPincode(
       // Sort by rate to find most economical reliable courier
       couriers.sort((a: any, b: any) => Number(a.rate) - Number(b.rate));
       const bestCourier = couriers[0];
-      lowestRate = Math.round(Number(bestCourier.rate));
-      courierName = bestCourier.courier_name || "Express Courier";
+      const rawRate = Number(bestCourier.rate);
+      lowestRate = Math.ceil(rawRate / 10) * 10;
+      courierName = "Standard Express Delivery";
       estimatedDays = bestCourier.etd || `${bestCourier.estimated_delivery_days || 3} Days`;
     } else if (serviceabilityResult && serviceabilityResult.status !== 200) {
       // If Shiprocket explicitly returned non-serviceable

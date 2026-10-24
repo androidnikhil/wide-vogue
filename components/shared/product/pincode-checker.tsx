@@ -121,9 +121,17 @@ export default function PincodeChecker() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-1.5 border-t border-emerald-200/60 text-[11px]">
             <div className="flex items-center gap-1.5 text-emerald-900 font-medium">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Courier: <strong>{result.courierName || 'Shiprocket Express'}</strong> (Rate: ₹{result.shippingRate || 50})</span>
+              <span>
+                {language === 'hi' ? 'डिलीवरी शुल्क:' : 'Delivery Charge:'}{' '}
+                <strong>₹{result.shippingRate || 50}</strong>{' '}
+                <span className="text-emerald-700/85 text-[10px]">
+                  {language === 'hi'
+                    ? '(केवल डिलीवरी शुल्क • वस्तु मूल्य अलग)'
+                    : '(Only delivery charge • Item price separate)'}
+                </span>
+              </span>
             </div>
-            <div className="flex items-center gap-1 text-emerald-800">
+            <div className="flex items-center gap-1 text-emerald-800 shrink-0">
               <Sparkles className="w-3 h-3 text-[#C88A20] shrink-0" />
               <span>{language === 'hi' ? '₹999+ पर मुफ़्त डिलीवरी' : 'FREE Shipping above ₹999'}</span>
             </div>

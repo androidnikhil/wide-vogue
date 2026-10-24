@@ -148,7 +148,7 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
                 />
               </div>
               <p className="text-[8px] font-mono">GSTIN: 09EHFPP7126A1ZE</p>
-              <p className="text-[8px]">Helpline: +91 79821 60480</p>
+              <p className="text-[8px]">Helpline: +91 87555 18488</p>
               <p className="text-[8px]">info@madhavshringaar.com</p>
             </div>
 
@@ -293,7 +293,7 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
             {/* Footer */}
             <div className="text-center space-y-0.5 text-[8px]">
               <p className="font-bold">Thank You For Choosing Madhav Shringaar!</p>
-              <p>www.madhavshringaar.com &bull; +91 79821 60480</p>
+              <p>www.madhavshringaar.com &bull; +91 87555 18488</p>
               <p className="text-[7px] tracking-widest uppercase pt-1">*** THANK YOU FOR YOUR BUSINESS ***</p>
             </div>
           </div>
@@ -339,7 +339,7 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
                     GSTIN: <strong className="text-neutral-900">09EHFPP7126A1ZE</strong>
                   </p>
                   <p className="text-[10px] text-neutral-600">
-                    Helpline: <strong>+91 79821 60480</strong> &bull; Email: info@madhavshringaar.com
+                    Helpline: <strong>+91 87555 18488</strong> &bull; Email: info@madhavshringaar.com
                   </p>
                 </div>
 
@@ -444,7 +444,7 @@ export default function AdminInvoiceClient({ order }: AdminInvoiceClientProps) {
               {/* Business Footer */}
               <div className="text-center pt-4 border-t border-neutral-200 text-neutral-500 text-[10px]">
                 <p className="font-bold text-[#003020]">THANK YOU FOR YOUR BUSINESS</p>
-                <p>For inquiries, support, or order returns, please contact info@madhavshringaar.com or call +91 79821 60480.</p>
+                <p>For inquiries, support, or order returns, please contact info@madhavshringaar.com or call +91 87555 18488.</p>
               </div>
             </div>
           </div>

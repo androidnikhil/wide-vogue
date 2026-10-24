@@ -147,7 +147,7 @@ export function EmailContactFooter() {
               📞 Call / WhatsApp:&nbsp;
             </span>
             <a
-              href="tel:+917982160480"
+              href="tel:+918755518488"
               style={{
                 fontSize: '12.5px',
                 fontWeight: 700,
@@ -157,7 +157,7 @@ export function EmailContactFooter() {
                 wordBreak: 'keep-all',
               }}
             >
-              +91&#8209;79821&#8209;60480
+              +91&#8209;87555&#8209;18488
             </a>
           </div>
 

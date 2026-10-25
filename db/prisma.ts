@@ -1,22 +1,26 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { PrismaNeon } from '@prisma/adapter-neon';
 import { PrismaClient } from '@prisma/client';
-import ws from 'ws';
 
-// Sets up WebSocket connections, which enables Neon to use WebSocket communication.
-neonConfig.webSocketConstructor = ws;
-const connectionString = `${process.env.DATABASE_URL}`;
+if (!process.env.DATABASE_URL && process.env.ms_POSTGRES_PRISMA_URL) {
+  process.env.DATABASE_URL = process.env.ms_POSTGRES_PRISMA_URL;
+}
+if (!process.env.DIRECT_URL && process.env.ms_POSTGRES_URL_NON_POOLING) {
+  process.env.DIRECT_URL = process.env.ms_POSTGRES_URL_NON_POOLING;
+}
+
+const databaseUrl = process.env.DATABASE_URL || process.env.ms_POSTGRES_PRISMA_URL;
 
 function createPrismaClient() {
-  let basePrisma: PrismaClient;
-
-  if (connectionString.includes('neon.tech')) {
-    const pool = new Pool({ connectionString });
-    const adapter = new PrismaNeon(pool);
-    basePrisma = new PrismaClient({ adapter });
-  } else {
-    basePrisma = new PrismaClient();
-  }
+  const basePrisma = new PrismaClient(
+    databaseUrl
+      ? {
+          datasources: {
+            db: {
+              url: databaseUrl,
+            },
+          },
+        }
+      : undefined
+  );
 
   // Extends the PrismaClient with a custom result transformer to convert the price and rating fields to strings.
   return basePrisma.$extends({

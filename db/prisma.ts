@@ -1,13 +1,31 @@
 import { PrismaClient } from '@prisma/client';
 
-if (!process.env.DATABASE_URL && process.env.ms_POSTGRES_PRISMA_URL) {
-  process.env.DATABASE_URL = process.env.ms_POSTGRES_PRISMA_URL;
-}
-if (!process.env.DIRECT_URL && process.env.ms_POSTGRES_URL_NON_POOLING) {
-  process.env.DIRECT_URL = process.env.ms_POSTGRES_URL_NON_POOLING;
+function getDatabaseUrl(): string | undefined {
+  let url = (process.env.DATABASE_URL || process.env.ms_POSTGRES_PRISMA_URL || '').replace(/^["']|["']$/g, '').trim();
+
+  // If URL points to the direct Supabase host (IPv6 only, unreachable from Vercel Lambda),
+  // automatically redirect to the IPv4 connection pooler
+  if (
+    url.includes('db.npadpknpiiwabigsexfb.supabase.co') &&
+    process.env.ms_POSTGRES_PRISMA_URL
+  ) {
+    url = process.env.ms_POSTGRES_PRISMA_URL.replace(/^["']|["']$/g, '').trim();
+  }
+
+  // Ensure pgbouncer and connection_limit are configured for Supabase pooler on port 6543
+  if (url.includes('6543')) {
+    if (!url.includes('pgbouncer=true')) {
+      url += (url.includes('?') ? '&' : '?') + 'pgbouncer=true';
+    }
+    if (!url.includes('connection_limit=')) {
+      url += '&connection_limit=1';
+    }
+  }
+
+  return url || undefined;
 }
 
-const databaseUrl = process.env.DATABASE_URL || process.env.ms_POSTGRES_PRISMA_URL;
+const databaseUrl = getDatabaseUrl();
 
 function createPrismaClient() {
   const basePrisma = new PrismaClient(

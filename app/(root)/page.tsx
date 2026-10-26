@@ -8,6 +8,8 @@ import { getServerTranslations } from '@/lib/i18n/server';
 
 const productSizes = new Set(['0', '1', '2', '3', '4', '5', '6', '7']);
 
+export const maxDuration = 60;
+
 export default async function Homepage({
   searchParams,
 }: {
@@ -18,15 +20,22 @@ export default async function Homepage({
   const isHindi = lang === 'hi';
 
   const selectedSize = size && productSizes.has(size) ? size : undefined;
-  let latestProducts = selectedSize
-    ? (
-        await getAllProducts({
+  const [productsData, blogsRes] = await Promise.all([
+    selectedSize
+      ? getAllProducts({
           query: 'all',
           page: 1,
           size: selectedSize,
-        })
-      ).data
-    : await getLatestProducts();
+        }).then((res) => res.data)
+      : getLatestProducts(),
+    getAllBlogPosts({
+      isPublishedOnly: true,
+      page: 1,
+      limit: 3,
+    }),
+  ]);
+
+  let latestProducts = productsData;
   
   // Intercept dummy image data
   latestProducts = latestProducts.map((p: any) => {
@@ -48,11 +57,6 @@ export default async function Homepage({
     return p;
   });
 
-  const blogsRes = await getAllBlogPosts({
-    isPublishedOnly: true,
-    page: 1,
-    limit: 3,
-  });
   const latestBlogs = blogsRes.posts || [];
 
   return (

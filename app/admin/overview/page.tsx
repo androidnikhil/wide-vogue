@@ -20,11 +20,15 @@ export const metadata: Metadata = {
   title: 'Admin Dashboard',
 };
 
+export const maxDuration = 60;
+
 const AdminOverviewPage = async () => {
   await requireAdmin();
 
-  const analytics = await getDashboardAnalytics();
-  const summary = await getOrderSummary(); // We use the existing one for latest sales
+  const [analytics, summary] = await Promise.all([
+    getDashboardAnalytics(),
+    getOrderSummary(),
+  ]);
 
   return (
     <div className='space-y-6'>

@@ -13,7 +13,7 @@ function getDatabaseUrl(): string | undefined {
     url = process.env.ms_POSTGRES_PRISMA_URL.replace(/^["']|["']$/g, '').trim();
   }
 
-  // Ensure pgbouncer and connection_limit are configured for Supabase pooler on port 6543
+  // Ensure pgbouncer, connection_limit, and healthy timeouts are configured for Supabase pooler on port 6543
   if (url.includes('6543')) {
     if (!url.includes('pgbouncer=true')) {
       url += (url.includes('?') ? '&' : '?') + 'pgbouncer=true';
@@ -21,20 +21,30 @@ function getDatabaseUrl(): string | undefined {
     if (!url.includes('connection_limit=')) {
       url += '&connection_limit=1';
     }
+    if (!url.includes('connect_timeout=')) {
+      url += '&connect_timeout=15';
+    }
+    if (!url.includes('pool_timeout=')) {
+      url += '&pool_timeout=15';
+    }
   }
 
   return url || undefined;
 }
 
-const databaseUrl = getDatabaseUrl();
-
 function createPrismaClient() {
+  const url = getDatabaseUrl();
+  if (process.env.NODE_ENV === 'production') {
+    const masked = url ? url.replace(/:[^:@]+@/, ':****@') : 'NONE';
+    console.log('[Prisma Init] Target database URL:', masked);
+  }
+
   const basePrisma = new PrismaClient(
-    databaseUrl
+    url
       ? {
           datasources: {
             db: {
-              url: databaseUrl,
+              url,
             },
           },
         }

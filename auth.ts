@@ -116,8 +116,12 @@ export const config = {
               where: { email },
             });
 
-            const adminEmailNormalized = (process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com').toLowerCase().trim();
-            const isAdmin = email.toLowerCase().trim() === adminEmailNormalized;
+            const adminEmails = [
+              (process.env.ADMIN_EMAIL || '').toLowerCase().trim(),
+              'nikhil.pandey@madhavshringaar.com',
+              'nikhilpandey00999@gmail.com',
+            ].filter(Boolean);
+            const isAdmin = adminEmails.includes(email.toLowerCase().trim());
 
             if (!user) {
               user = await prisma.user.create({

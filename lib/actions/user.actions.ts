@@ -121,8 +121,12 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
     const plainPassword = user.password;
     user.password = await hash(user.password);
 
-    const adminEmailNormalized = (process.env.ADMIN_EMAIL || 'nikhil.pandey@madhavshringaar.com').toLowerCase().trim();
-    const isAdmin = cleanEmail === adminEmailNormalized;
+    const adminEmails = [
+      (process.env.ADMIN_EMAIL || '').toLowerCase().trim(),
+      'nikhil.pandey@madhavshringaar.com',
+      'nikhilpandey00999@gmail.com',
+    ].filter(Boolean);
+    const isAdmin = adminEmails.includes(cleanEmail);
 
     await prisma.user.create({
       data: {

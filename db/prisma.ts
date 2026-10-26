@@ -1,12 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 
 function getDatabaseUrl(): string | undefined {
-  let url = (process.env.DATABASE_URL || process.env.ms_POSTGRES_PRISMA_URL || '').replace(/^["']|["']$/g, '').trim();
+  // Prioritize verified Supabase pooler URL from Vercel integration, fallback to DATABASE_URL
+  let url = (process.env.ms_POSTGRES_PRISMA_URL || process.env.DATABASE_URL || '').replace(/^["']|["']$/g, '').trim();
 
   // If URL points to the direct Supabase host (IPv6 only, unreachable from Vercel Lambda),
   // automatically redirect to the IPv4 connection pooler
   if (
-    url.includes('db.npadpknpiiwabigsexfb.supabase.co') &&
+    url.includes('.supabase.co') &&
     process.env.ms_POSTGRES_PRISMA_URL
   ) {
     url = process.env.ms_POSTGRES_PRISMA_URL.replace(/^["']|["']$/g, '').trim();

@@ -76,29 +76,36 @@ const ProductForm = ({
   const onSubmit: SubmitHandler<z.infer<typeof insertProductSchema>> = async (
     values
   ) => {
-    // If product has size variants, clean up pricing and auto-derive base price
-    if (selectedSizes.length > 0 && values.sizeVariants && values.sizeVariants.length > 0) {
-      const cleanedVariants = values.sizeVariants.map((v) => {
-        const p = Number(v.price) || 0;
-        const op = Number(v.originalPrice) || 0;
-        const effectivePrice = p > 0 ? String(v.price) : (op > 0 ? String(v.originalPrice) : '0');
-        const effectiveOriginalPrice = op > 0 ? String(v.originalPrice) : effectivePrice;
+    // If product has sizes, guarantee every selected size has a variant (falling back to base values if untouched)
+    if (selectedSizes.length > 0) {
+      const existingVariants = values.sizeVariants || [];
+      const fallbackPrice = values.price || values.originalPrice || '0';
+      const fallbackOriginalPrice = values.originalPrice || values.price || fallbackPrice;
+
+      const completeVariants = selectedSizes.map((sz) => {
+        const existing = existingVariants.find((v) => v.size === sz);
+        const p = Number(existing?.price) || 0;
+        const op = Number(existing?.originalPrice) || 0;
+        const effectivePrice = p > 0 ? String(existing!.price) : (op > 0 ? String(existing!.originalPrice) : String(fallbackPrice));
+        const effectiveOriginalPrice = op > 0 ? String(existing!.originalPrice) : (p > 0 ? String(existing!.price) : String(fallbackOriginalPrice));
+
         return {
-          ...v,
+          size: sz,
           price: effectivePrice,
           originalPrice: effectiveOriginalPrice,
+          stock: existing?.stock !== undefined ? existing.stock : Number(values.stock || 0),
         };
       });
-      values.sizeVariants = cleanedVariants;
+      values.sizeVariants = completeVariants;
 
       // Extract valid non-zero prices to determine base starting price
-      const validPrices = cleanedVariants
+      const validPrices = completeVariants
         .map((v) => Number(v.price))
         .filter((n) => !isNaN(n) && n > 0);
 
       if (validPrices.length > 0) {
         const minPrice = Math.min(...validPrices);
-        const matchingVariant = cleanedVariants.find((v) => Number(v.price) === minPrice);
+        const matchingVariant = completeVariants.find((v) => Number(v.price) === minPrice);
         const minOriginalPrice = matchingVariant?.originalPrice ? Number(matchingVariant.originalPrice) : minPrice;
 
         // Auto-assign base price if 0 or when using size-based matrix
@@ -508,10 +515,23 @@ const ProductForm = ({
                         checked={field.value?.includes(size)}
                         onCheckedChange={(checked) => {
                           const current = field.value || [];
+                          const currentVariants = form.getValues('sizeVariants') || [];
                           if (checked) {
                             field.onChange([...current, size]);
+                            if (!currentVariants.some((v) => v.size === size)) {
+                              form.setValue('sizeVariants', [
+                                ...currentVariants,
+                                {
+                                  size,
+                                  price: basePrice && Number(basePrice) > 0 ? String(basePrice) : (baseOriginalPrice || '0'),
+                                  originalPrice: baseOriginalPrice || basePrice || '0',
+                                  stock: Number(baseStock || 0),
+                                },
+                              ]);
+                            }
                           } else {
                             field.onChange(current.filter((val) => val !== size));
+                            form.setValue('sizeVariants', currentVariants.filter((v) => v.size !== size));
                           }
                         }}
                       />

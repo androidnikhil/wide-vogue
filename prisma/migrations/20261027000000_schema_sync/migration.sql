@@ -62,6 +62,11 @@ ALTER TABLE "Order"
     ADD COLUMN IF NOT EXISTS "pointsEarned" INTEGER NOT NULL DEFAULT 0,
     ADD COLUMN IF NOT EXISTS "pointsRedeemed" INTEGER NOT NULL DEFAULT 0;
 
+-- AlterTable Review: Add customer review photos and verification
+ALTER TABLE "Review"
+    ADD COLUMN IF NOT EXISTS "images" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    ADD COLUMN IF NOT EXISTS "isVerifiedPurchase" BOOLEAN NOT NULL DEFAULT true;
+
 -- CreateTable Wishlist
 CREATE TABLE IF NOT EXISTS "Wishlist" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),

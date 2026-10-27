@@ -10,12 +10,28 @@ const Productimages = ({ images }: { images: string[] }) => {
   const [current, setCurrent] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomCoords, setZoomCoords] = useState({ x: 50, y: 50 });
 
   useEffect(() => {
     setMounted(true);
+    const media = window.matchMedia('(pointer: fine) and (min-width: 1024px)');
+    setIsDesktop(media.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    media.addEventListener('change', handler);
+    return () => media.removeEventListener('change', handler);
   }, []);
 
   const safeImages = images && images.length > 0 ? images : ['/images/devotional/complete_shringar.webp'];
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDesktop) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    setZoomCoords({ x, y });
+  };
 
   const handleNext = useCallback(() => {
     setCurrent((prev) => (prev + 1) % safeImages.length);
@@ -47,10 +63,20 @@ const Productimages = ({ images }: { images: string[] }) => {
 
   return (
     <div className="space-y-4">
-      {/* Main Image Container — object-contain so NO deity crown or poshak is cropped */}
+      {/* Main Image Container — In-place hover zoom on desktop, click for full lightbox */}
       <div
-        className="relative w-full aspect-square bg-linear-to-b from-[#FDFCF9] via-white to-[#F8F6F0] rounded-2xl overflow-hidden border border-outline-variant/30 shadow-xs flex items-center justify-center p-2 sm:p-4 group cursor-zoom-in"
+        className={cn(
+          "relative w-full aspect-square bg-[#FAF8F5] rounded-2xl overflow-hidden border border-outline-variant/30 shadow-xs flex items-center justify-center group",
+          isDesktop ? (isZoomed ? "cursor-crosshair" : "cursor-zoom-in") : "cursor-zoom-in"
+        )}
         onClick={() => setIsLightboxOpen(true)}
+        onMouseEnter={() => {
+          if (isDesktop) setIsZoomed(true);
+        }}
+        onMouseLeave={() => {
+          if (isDesktop) setIsZoomed(false);
+        }}
+        onMouseMove={handleMouseMove}
       >
         <Image
           src={safeImages[current]}
@@ -58,9 +84,30 @@ const Productimages = ({ images }: { images: string[] }) => {
           width={1000}
           height={1000}
           sizes="(max-width: 1024px) 100vw, 50vw"
-          className="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-[1.02]"
+          style={
+            isDesktop && isZoomed
+              ? {
+                  transformOrigin: `${zoomCoords.x}% ${zoomCoords.y}%`,
+                  transform: 'scale(2.35)',
+                }
+              : undefined
+          }
+          className={cn(
+            "w-full h-full object-contain object-center will-change-transform",
+            isDesktop && isZoomed
+              ? "transition-transform duration-75 ease-out"
+              : "transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+          )}
           priority
         />
+
+        {/* Live Zoom indicator badge (Desktop only) */}
+        {isDesktop && isZoomed && (
+          <div className="absolute top-3 left-3 bg-[#003020]/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md border border-[#E6C16A]/40 text-[#F3D98F] flex items-center gap-1.5 text-[11px] font-bold pointer-events-none z-20 animate-in fade-in-50 duration-150">
+            <span>🔍 2.4x Zoom</span>
+            <span className="text-white/60 font-normal">• Move cursor to inspect</span>
+          </div>
+        )}
 
         {/* Click to Zoom Pill */}
         <button
@@ -69,7 +116,11 @@ const Productimages = ({ images }: { images: string[] }) => {
             e.stopPropagation();
             setIsLightboxOpen(true);
           }}
-          className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-neutral-200/80 text-neutral-800 hover:text-primary flex items-center gap-1.5 text-xs font-semibold transition-all hover:scale-105 active:scale-95"
+          className={cn(
+            "absolute bottom-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-neutral-200/80 text-neutral-800 hover:text-primary flex items-center gap-1.5 text-xs font-semibold transition-all hover:scale-105 active:scale-95 z-10",
+            isZoomed && "opacity-80"
+          )}
+          title="Click to open Fullscreen Lightbox"
         >
           <Maximize2 className="w-3.5 h-3.5 text-amber-700" />
           <span>Full View</span>
@@ -85,7 +136,7 @@ const Productimages = ({ images }: { images: string[] }) => {
               type="button"
               onClick={() => setCurrent(index)}
               className={cn(
-                'w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden cursor-pointer active:scale-95 border-2 transition-all shadow-2xs p-1 bg-white flex items-center justify-center',
+                'w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden cursor-pointer active:scale-95 border-2 transition-all shadow-2xs p-0.5 bg-white flex items-center justify-center',
                 index === current
                   ? 'border-secondary ring-2 ring-secondary/20 scale-105 shadow-sm'
                   : 'border-outline-variant/30 opacity-70 hover:opacity-100 hover:border-secondary/50'

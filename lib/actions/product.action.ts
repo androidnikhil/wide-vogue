@@ -4,29 +4,42 @@ import { prisma } from '@/db/prisma';
 import { convertToPlainObject, formatError } from "../utils";
 import { LATEST_PRODUCT_LIMIT, PAGE_SIZE } from "../constants";
 import { Prisma } from '@prisma/client';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag, unstable_cache } from 'next/cache';
 import { insertProductSchema, updateProductSchema } from '../validators';
 import { z } from 'zod';
 import { Product } from '@/types';
 
-// Get latest products
+// Get latest products (Cached in Server RAM with tag revalidation)
 export async function getLatestProducts() {
-  const data = await prisma.product.findMany({
-    take: Math.max(LATEST_PRODUCT_LIMIT || 4, 8),
-    orderBy: { createdAt: 'desc' },
-  });
+  const getCached = unstable_cache(
+    async () => {
+      const data = await prisma.product.findMany({
+        take: Math.max(LATEST_PRODUCT_LIMIT || 4, 8),
+        orderBy: { createdAt: 'desc' },
+      });
+      return convertToPlainObject(data) as unknown as Product[];
+    },
+    ['latest-products'],
+    { revalidate: 3600, tags: ['products', 'latest-products'] }
+  );
 
-  return convertToPlainObject(data) as unknown as Product[];
+  return getCached();
 }
-// Get  single product by it's slug
 
+// Get single product by its slug (Cached in Server RAM with tag revalidation)
 export async function getProductBySlug(slug: string) {
-    const data = await prisma.product.findFirst({
-        where: {
-            slug
-        }
-    });
-    return convertToPlainObject(data) as unknown as Product;
+  const getCached = unstable_cache(
+    async () => {
+      const data = await prisma.product.findFirst({
+        where: { slug },
+      });
+      return convertToPlainObject(data) as unknown as Product;
+    },
+    ['product-by-slug', slug],
+    { revalidate: 3600, tags: ['products', `product-${slug}`] }
+  );
+
+  return getCached();
 }
 
 // Get single product by it's ID
@@ -204,7 +217,9 @@ export async function deleteProduct(id: string) {
   
       await prisma.product.delete({ where: { id } });
   
+      revalidateTag('products', 'max');
       revalidatePath('/admin/products');
+      revalidatePath('/');
   
       return {
         success: true,
@@ -216,16 +231,22 @@ export async function deleteProduct(id: string) {
   }
   
 function normalizeProductPricing(product: any) {
-  if (product.sizeVariants && Array.isArray(product.sizeVariants) && product.sizeVariants.length > 0) {
-    const cleanedVariants = product.sizeVariants.map((v: any) => {
-      const p = Number(v.price) || 0;
-      const op = Number(v.originalPrice) || 0;
-      const effectivePrice = p > 0 ? String(v.price) : (op > 0 ? String(v.originalPrice) : '0');
-      const effectiveOriginalPrice = op > 0 ? String(v.originalPrice) : effectivePrice;
+  if (product.sizes && Array.isArray(product.sizes) && product.sizes.length > 0) {
+    const existingVariants = Array.isArray(product.sizeVariants) ? product.sizeVariants : [];
+    const fallbackPrice = product.price && Number(product.price) > 0 ? String(product.price) : (product.originalPrice || '0');
+    const fallbackOriginalPrice = product.originalPrice && Number(product.originalPrice) > 0 ? String(product.originalPrice) : fallbackPrice;
+
+    const cleanedVariants = product.sizes.map((sz: string) => {
+      const existing = existingVariants.find((v: any) => v.size === sz);
+      const p = Number(existing?.price) || 0;
+      const op = Number(existing?.originalPrice) || 0;
+      const effectivePrice = p > 0 ? String(existing.price) : (op > 0 ? String(existing.originalPrice) : String(fallbackPrice));
+      const effectiveOriginalPrice = op > 0 ? String(existing.originalPrice) : (p > 0 ? String(existing.price) : String(fallbackOriginalPrice));
       return {
-        ...v,
+        size: sz,
         price: effectivePrice,
         originalPrice: effectiveOriginalPrice,
+        stock: existing?.stock !== undefined ? Number(existing.stock) : Number(product.stock || 0),
       };
     });
     product.sizeVariants = cleanedVariants;
@@ -261,6 +282,7 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
     const product = normalizeProductPricing(insertProductSchema.parse(data));
     await prisma.product.create({ data: product });
 
+    revalidateTag('products', 'max');
     revalidatePath('/admin/products');
     revalidatePath('/');
 
@@ -290,6 +312,8 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
       data: product,
     });
 
+    revalidateTag('products', 'max');
+    revalidateTag(`product-${product.slug}`, 'max');
     revalidatePath('/admin/products');
     revalidatePath(`/product/${product.slug}`);
     revalidatePath('/');
@@ -303,23 +327,37 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
   }
 }
 
-// Get all categories
+// Get all categories (Cached in Server RAM with tag revalidation)
 export async function getAllCategories() {
-  const data = await prisma.product.groupBy({
-    by: ['category'],
-    _count: true,
-  });
+  const getCached = unstable_cache(
+    async () => {
+      const data = await prisma.product.groupBy({
+        by: ['category'],
+        _count: true,
+      });
+      return data;
+    },
+    ['all-categories'],
+    { revalidate: 86400, tags: ['products', 'categories'] }
+  );
 
-  return data;
+  return getCached();
 }
 
-// Get featured products
+// Get featured products (Cached in Server RAM with tag revalidation)
 export async function getFeaturedProducts() {
-  const data = await prisma.product.findMany({
-    where: { isFeatured: true },
-    orderBy: { createdAt: 'desc' },
-    take: 4,
-  });
+  const getCached = unstable_cache(
+    async () => {
+      const data = await prisma.product.findMany({
+        where: { isFeatured: true },
+        orderBy: { createdAt: 'desc' },
+        take: 4,
+      });
+      return convertToPlainObject(data);
+    },
+    ['featured-products'],
+    { revalidate: 3600, tags: ['products', 'featured-products'] }
+  );
 
-  return convertToPlainObject(data);
+  return getCached();
 }

@@ -35,5 +35,5 @@ if (isVercel && hasDbUrl) {
 }
 
 console.log('[Build] Compiling Next.js application (next build)...');
-execSync('next build', { stdio: 'inherit' });
+execSync('npx next build', { stdio: 'inherit' });
 console.log('✅ Build completed successfully.');

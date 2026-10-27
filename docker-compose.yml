@@ -49,6 +49,9 @@ services:
       AUTH_TRUST_HOST: "true"
       AUTH_URL: ${AUTH_URL:-http://localhost:3000}
       DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgrespassword}@db:5432/${POSTGRES_DB:-shringaarwebsite}?schema=public}
+      # Strict isolation: Explicitly route DIRECT_URL to local container and neutralize external pooler
+      ms_POSTGRES_PRISMA_URL: ""
+      DIRECT_URL: ${DATABASE_URL_DOCKER:-postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgrespassword}@db:5432/${POSTGRES_DB:-shringaarwebsite}?schema=public}
       AUTH_SECRET: ${AUTH_SECRET:-development-auth-secret-key-min-32-chars-long}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
@@ -57,7 +60,9 @@ services:
       - .:/app
       - /app/node_modules
       - /app/.next
-    command: sh -c "npx prisma generate && npx prisma db push && npm run dev"
+      - ./backups:/app/backups
+    # Prioritize version-controlled migration deployment; fallback to push only for local dev sync
+    command: sh -c "npx prisma generate && (npx prisma migrate deploy || npx prisma db push) && npm run db:sync:catalog && npm run dev"
     networks:
       - madhav-network
 

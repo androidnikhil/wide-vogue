@@ -43,3 +43,7 @@ yarn-error.log*
 next-env.d.ts
 pgsql/
 scratch/
+
+# database backups
+/backups/
+*.dump

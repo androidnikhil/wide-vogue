@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 import { productDefaultValues, PRODUCT_CATEGORIES, DEFAULT_RETURN_POLICY_HTML } from '@/lib/constants';
 import {
@@ -37,8 +37,34 @@ import { convertFilesToWebP } from '@/lib/utils/image-converter';
 import { Card, CardContent } from '../ui/card';
 import Image from 'next/image';
 import { Checkbox } from '../ui/checkbox';
-import { X, Sparkles, Layers } from 'lucide-react';
+import { X, Sparkles, Layers, Plus, Palette } from 'lucide-react';
 import RichTextEditor from './rich-text-editor';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+
+const COLOR_OPTIONS = [
+  { name: 'Yellow', hex: '#FFD700' },
+  { name: 'Red', hex: '#E53E3E' },
+  { name: 'Green', hex: '#38A169' },
+  { name: 'Pink', hex: '#ED64A6' },
+  { name: 'Orange', hex: '#DD6B20' },
+  { name: 'Sky Blue', hex: '#63B3ED' },
+  { name: 'Dark Blue', hex: '#2B6CB0' },
+  { name: 'White', hex: '#F7FAFC' },
+  { name: 'Purple', hex: '#805AD5' },
+  { name: 'Multicolor', hex: 'linear-gradient(135deg, #FFD700, #E53E3E, #38A169, #2B6CB0)' },
+  { name: 'Gold', hex: '#D69E2E' },
+];
+
+const getColorHex = (name: string): string => {
+  const clean = name.toLowerCase().trim();
+  const match = COLOR_OPTIONS.find((c) => c.name.toLowerCase() === clean);
+  return match ? match.hex : '#A0AEC0';
+};
+
 
 const ProductForm = ({
   type,
@@ -76,29 +102,36 @@ const ProductForm = ({
   const onSubmit: SubmitHandler<z.infer<typeof insertProductSchema>> = async (
     values
   ) => {
-    // If product has size variants, clean up pricing and auto-derive base price
-    if (selectedSizes.length > 0 && values.sizeVariants && values.sizeVariants.length > 0) {
-      const cleanedVariants = values.sizeVariants.map((v) => {
-        const p = Number(v.price) || 0;
-        const op = Number(v.originalPrice) || 0;
-        const effectivePrice = p > 0 ? String(v.price) : (op > 0 ? String(v.originalPrice) : '0');
-        const effectiveOriginalPrice = op > 0 ? String(v.originalPrice) : effectivePrice;
+    // If product has sizes, guarantee every selected size has a variant (falling back to base values if untouched)
+    if (selectedSizes.length > 0) {
+      const existingVariants = values.sizeVariants || [];
+      const fallbackPrice = values.price || values.originalPrice || '0';
+      const fallbackOriginalPrice = values.originalPrice || values.price || fallbackPrice;
+
+      const completeVariants = selectedSizes.map((sz) => {
+        const existing = existingVariants.find((v) => v.size === sz);
+        const p = Number(existing?.price) || 0;
+        const op = Number(existing?.originalPrice) || 0;
+        const effectivePrice = p > 0 ? String(existing!.price) : (op > 0 ? String(existing!.originalPrice) : String(fallbackPrice));
+        const effectiveOriginalPrice = op > 0 ? String(existing!.originalPrice) : (p > 0 ? String(existing!.price) : String(fallbackOriginalPrice));
+
         return {
-          ...v,
+          size: sz,
           price: effectivePrice,
           originalPrice: effectiveOriginalPrice,
+          stock: existing?.stock !== undefined ? existing.stock : Number(values.stock || 0),
         };
       });
-      values.sizeVariants = cleanedVariants;
+      values.sizeVariants = completeVariants;
 
       // Extract valid non-zero prices to determine base starting price
-      const validPrices = cleanedVariants
+      const validPrices = completeVariants
         .map((v) => Number(v.price))
         .filter((n) => !isNaN(n) && n > 0);
 
       if (validPrices.length > 0) {
         const minPrice = Math.min(...validPrices);
-        const matchingVariant = cleanedVariants.find((v) => Number(v.price) === minPrice);
+        const matchingVariant = completeVariants.find((v) => Number(v.price) === minPrice);
         const minOriginalPrice = matchingVariant?.originalPrice ? Number(matchingVariant.originalPrice) : minPrice;
 
         // Auto-assign base price if 0 or when using size-based matrix
@@ -462,7 +495,7 @@ const ProductForm = ({
                   {pricingMode === 'size' ? 'Base Selling Price (Auto-set)' : 'Selling Price (Auto-calculated)'}
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder='Calculated selling price' readOnly className="bg-gray-100" {...field} />
+                  <Input placeholder='Selling price (edit to round off)' {...field} className="bg-white font-medium text-primary" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -508,10 +541,23 @@ const ProductForm = ({
                         checked={field.value?.includes(size)}
                         onCheckedChange={(checked) => {
                           const current = field.value || [];
+                          const currentVariants = form.getValues('sizeVariants') || [];
                           if (checked) {
                             field.onChange([...current, size]);
+                            if (!currentVariants.some((v) => v.size === size)) {
+                              form.setValue('sizeVariants', [
+                                ...currentVariants,
+                                {
+                                  size,
+                                  price: basePrice && Number(basePrice) > 0 ? String(basePrice) : (baseOriginalPrice || '0'),
+                                  originalPrice: baseOriginalPrice || basePrice || '0',
+                                  stock: Number(baseStock || 0),
+                                },
+                              ]);
+                            }
                           } else {
                             field.onChange(current.filter((val) => val !== size));
+                            form.setValue('sizeVariants', currentVariants.filter((v) => v.size !== size));
                           }
                         }}
                       />
@@ -588,6 +634,38 @@ const ProductForm = ({
                   >
                     Auto-Fill from Base Values
                   </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-xs border-[#0F6F74] text-[#0F6F74] hover:bg-[#0F6F74]/10 flex items-center gap-1 font-semibold"
+                    onClick={() => {
+                      const firstWithColors = sizeVariants.find((v) => v.colors && v.colors.length > 0);
+                      if (!firstWithColors || !firstWithColors.colors || firstWithColors.colors.length === 0) {
+                        toast.info("Please choose colors for at least one size first, then click here to copy to all sizes.");
+                        return;
+                      }
+                      const colorsToCopy = [...firstWithColors.colors];
+                      const updated = selectedSizes.map((s) => {
+                        const existing = sizeVariants.find((v) => v.size === s) || {
+                          size: s,
+                          price: basePrice,
+                          originalPrice: baseOriginalPrice,
+                          stock: Number(baseStock || 0),
+                        };
+                        return {
+                          ...existing,
+                          colors: colorsToCopy,
+                        };
+                      });
+                      form.setValue('sizeVariants', updated);
+                      toast.success(`Copied colors (${colorsToCopy.join(', ')}) to all sizes!`);
+                    }}
+                  >
+                    <Palette className="w-3.5 h-3.5" />
+                    Copy Colors to All Sizes
+                  </Button>
                 </div>
               </div>
 
@@ -613,6 +691,7 @@ const ProductForm = ({
                       <th className="py-2.5 px-3 font-semibold">Selling Price (₹)</th>
                       <th className="py-2.5 px-3 font-semibold">Original MRP (₹)</th>
                       <th className="py-2.5 px-3 font-semibold">Stock Qty</th>
+                      <th className="py-2.5 px-3 font-semibold min-w-[200px]">Available Colors</th>
                       <th className="py-2.5 px-3 font-semibold text-right">Action</th>
                     </tr>
                   </thead>
@@ -625,7 +704,7 @@ const ProductForm = ({
                         stock: Number(baseStock || 0),
                       };
 
-                      const updateVariant = (field: 'price' | 'originalPrice' | 'stock', val: any) => {
+                      const updateVariant = (field: 'price' | 'originalPrice' | 'stock' | 'colors', val: any) => {
                         const others = sizeVariants.filter((v) => v.size !== sz);
                         const updatedVar = {
                           ...variant,
@@ -692,6 +771,81 @@ const ProductForm = ({
                               onChange={(e) => updateVariant('stock', Number(e.target.value || 0))}
                               className="h-8 w-24 text-xs bg-white"
                             />
+                          </td>
+                          <td className="py-2 px-3">
+                            <div className="flex flex-wrap items-center gap-1.5 min-w-[200px]">
+                              {((variant.colors as string[]) || []).map((col: string) => (
+                                <span
+                                  key={col}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-white border border-neutral-300 shadow-2xs"
+                                >
+                                  <span
+                                    className="w-2.5 h-2.5 rounded-full border border-black/15 shrink-0"
+                                    style={{ background: getColorHex(col) }}
+                                  />
+                                  <span className="text-neutral-800">{col}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const curr = (variant.colors as string[]) || [];
+                                      updateVariant('colors', curr.filter((c: string) => c !== col));
+                                    }}
+                                    className="text-neutral-400 hover:text-red-500 font-bold ml-0.5 leading-none cursor-pointer"
+                                    title="Remove color"
+                                  >
+                                    &times;
+                                  </button>
+                                </span>
+                              ))}
+
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button
+                                    type="button"
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium border border-dashed border-[#0F6F74] text-[#0F6F74] hover:bg-[#0F6F74]/10 transition-colors cursor-pointer bg-white"
+                                  >
+                                    <Plus className="w-3 h-3" />
+                                    <span>Add Color</span>
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start" className="w-48 p-1.5 bg-white rounded-xl shadow-lg border border-neutral-200 z-50">
+                                  <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-2 py-1 border-b border-neutral-100">
+                                    Choose Colors (Size {sz})
+                                  </div>
+                                  <div className="max-h-52 overflow-y-auto py-1 space-y-0.5 custom-scroll">
+                                    {COLOR_OPTIONS.map((c) => {
+                                      const isSelected = ((variant.colors as string[]) || []).includes(c.name);
+                                      return (
+                                        <button
+                                          key={c.name}
+                                          type="button"
+                                          onClick={() => {
+                                            const curr = (variant.colors as string[]) || [];
+                                            if (isSelected) {
+                                              updateVariant('colors', curr.filter((x: string) => x !== c.name));
+                                            } else {
+                                              updateVariant('colors', [...curr, c.name]);
+                                            }
+                                          }}
+                                          className={`w-full flex items-center justify-between px-2 py-1.5 rounded-md text-xs transition-colors text-left cursor-pointer ${
+                                            isSelected ? 'bg-amber-50 font-bold text-amber-900' : 'hover:bg-neutral-100 text-neutral-700'
+                                          }`}
+                                        >
+                                          <div className="flex items-center gap-2">
+                                            <span
+                                              className="w-3.5 h-3.5 rounded-full border border-black/15 shrink-0"
+                                              style={{ background: c.hex }}
+                                            />
+                                            <span>{c.name}</span>
+                                          </div>
+                                          {isSelected && <span className="text-amber-700 text-xs font-bold">✓</span>}
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </td>
                           <td className="py-2 px-3 text-right">
                             <button

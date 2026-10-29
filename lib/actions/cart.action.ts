@@ -216,7 +216,7 @@ export async function getMyCart() {
   }
 }
 
-export async function removeItemFromCart(productId: string, size?: string) {
+export async function removeItemFromCart(productId: string, size?: string, color?: string) {
   try {
     // Check for cart cookie
     const sessionCartId = (await cookies()).get('sessionCartId')?.value;

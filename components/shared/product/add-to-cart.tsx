@@ -6,7 +6,7 @@ import { Cart, CartItem } from "@/types";
 import { Plus, Minus, Loader2, ShoppingBag, Ruler } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import Link from "next/link";
 import WishlistButton from "./wishlist-button";
@@ -16,7 +16,29 @@ export interface SizeVariantItem {
   price: string | number;
   originalPrice?: string | number;
   stock?: number;
+  colors?: string[];
 }
+
+
+const COLOR_OPTIONS = [
+  { name: 'Yellow', hex: '#FFD700' },
+  { name: 'Red', hex: '#E53E3E' },
+  { name: 'Green', hex: '#38A169' },
+  { name: 'Pink', hex: '#ED64A6' },
+  { name: 'Orange', hex: '#DD6B20' },
+  { name: 'Sky Blue', hex: '#63B3ED' },
+  { name: 'Dark Blue', hex: '#2B6CB0' },
+  { name: 'White', hex: '#F7FAFC' },
+  { name: 'Purple', hex: '#805AD5' },
+  { name: 'Multicolor', hex: 'linear-gradient(135deg, #FFD700, #E53E3E, #38A169, #2B6CB0)' },
+  { name: 'Gold', hex: '#D69E2E' },
+];
+
+const getColorHex = (name: string): string => {
+  const clean = name.toLowerCase().trim();
+  const match = COLOR_OPTIONS.find((c) => c.name.toLowerCase() === clean);
+  return match ? match.hex : '#A0AEC0';
+};
 
 export interface AddToCartProps {
   cart?: Cart;
@@ -58,6 +80,23 @@ export default function AddToCart({
 
   const activeVariant = getVariant(selectedSize);
 
+  // Available colors for current size (if configured)
+  const availableColors = (activeVariant?.colors && Array.isArray(activeVariant.colors))
+    ? activeVariant.colors.filter(Boolean)
+    : [];
+
+  const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (availableColors.length > 0) {
+      if (!selectedColor || !availableColors.includes(selectedColor)) {
+        setSelectedColor(availableColors[0]);
+      }
+    } else {
+      setSelectedColor(undefined);
+    }
+  }, [selectedSize, activeVariant]);
+
   // Dynamic price calculation
   const variantPrice = activeVariant && Number(activeVariant.price) > 0 ? Number(activeVariant.price) : 0;
   const variantOriginalPrice = activeVariant && Number(activeVariant.originalPrice) > 0 ? Number(activeVariant.originalPrice) : 0;
@@ -89,7 +128,8 @@ export default function AddToCart({
   const targetClean = cleanSize(selectedSize);
   const existItem = cart && cart.items.find((x) => 
     x.productId === item.productId && 
-    (!selectedSize || x.size === formattedSize || cleanSize(x.size) === targetClean)
+    (!selectedSize || x.size === formattedSize || cleanSize(x.size) === targetClean) &&
+    (!selectedColor || x.color === selectedColor)
   );
 
   const handleAddToCart = async () => {
@@ -97,6 +137,7 @@ export default function AddToCart({
       const itemWithSize = { 
         ...item, 
         size: formattedSize,
+        color: selectedColor,
         price: effectivePrice > 0 ? effectivePrice.toString() : item.price,
       };
 
@@ -122,7 +163,7 @@ export default function AddToCart({
 
   const handleRemoveFromCart = async () => {
     startTransition(async () => {
-      const res = await removeItemFromCart(item.productId, formattedSize);
+      const res = await removeItemFromCart(item.productId, formattedSize, selectedColor);
       if (!res.success) {
         toast.error(res.message, {
           style: { backgroundColor: "#DC2626", color: "white" },
@@ -205,6 +246,43 @@ export default function AddToCart({
                       ₹{vPrice}
                     </span>
                   )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Color Selector - Shown only when colors exist for selected size */}
+      {availableColors.length > 0 && (
+        <div className="mb-6 flex flex-col gap-2">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#003020] uppercase tracking-wide">
+            <span className="h-2 w-2 rounded-full bg-[#0F6F74]"></span>
+            <span>{isHindi ? "रंग चुनें" : "Select Color"}:</span>
+            <span className="font-semibold text-neutral-600 normal-case ml-1">
+              {selectedColor || availableColors[0]}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {availableColors.map((color) => {
+              const isSelected = (selectedColor || availableColors[0]) === color;
+              const hex = getColorHex(color);
+              return (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => setSelectedColor(color)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all shadow-2xs active:scale-95 ${
+                    isSelected
+                      ? "border-[#0F6F74] bg-[#0F6F74]/10 text-[#003020] ring-2 ring-[#0F6F74]/30 font-bold"
+                      : "border-neutral-200 bg-white hover:border-[#E6C16A] text-neutral-700"
+                  }`}
+                >
+                  <span
+                    className="w-3.5 h-3.5 rounded-full border border-black/20 shrink-0"
+                    style={{ background: hex }}
+                  />
+                  <span>{color}</span>
                 </button>
               );
             })}

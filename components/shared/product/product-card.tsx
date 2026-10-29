@@ -67,7 +67,7 @@ const ProductCard = async ({ product }: { product: Product }) => {
       <div className="lg:hidden bg-white rounded-2xl border border-neutral-200/80 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between overflow-hidden group">
         
         {/* Top Image Container — object-contain so NO deity crown or poshak is cropped */}
-        <div className="relative bg-[#FAF8F5] aspect-[4/5] sm:aspect-square overflow-hidden flex items-center justify-center p-2.5">
+        <div className="relative bg-[#FAF8F5] aspect-[4/5] sm:aspect-square overflow-hidden flex items-center justify-center">
           {/* Category Pill */}
           <span className="absolute top-2 left-2 z-10 px-2 py-0.5 bg-[#003020]/90 backdrop-blur-xs text-[#F3D98F] text-[10px] font-bold rounded shadow-2xs">
             {displayCategory}
@@ -174,7 +174,7 @@ const ProductCard = async ({ product }: { product: Product }) => {
           2. DESKTOP VIEW (>= 1024px) — Original Madhav Shringaar Card Design
           ========================================================================= */}
       <div className="hidden lg:flex bg-white rounded-[1.5rem] border border-outline-variant/40 hover:border-secondary/50 shadow-sm hover:shadow-xl hover:-translate-y-2 active:scale-[0.99] transition-all duration-500 group-hover:rotate-1 flex-col justify-between overflow-hidden group">
-        <div className="relative bg-surface-container p-2 aspect-square overflow-hidden flex items-center justify-center">
+        <div className="relative bg-[#FAF8F5] aspect-square overflow-hidden flex items-center justify-center">
           <span className="absolute top-2 left-2 z-10 px-2 py-0.5 bg-primary-container text-surface font-label-sm text-label-sm rounded text-[10px]">
             {displayCategory}
           </span>
@@ -182,7 +182,7 @@ const ProductCard = async ({ product }: { product: Product }) => {
           <Link href={`/product/${product.slug}`} className="w-full h-full flex items-center justify-center">
             <Image
               alt={product.name}
-              className="w-full h-full object-contain p-1 group-hover:scale-[1.03] group-active:scale-[1.03] transition-transform duration-700 ease-out"
+              className="w-full h-full object-contain group-hover:scale-[1.03] group-active:scale-[1.03] transition-transform duration-700 ease-out"
               src={product.images[0] || "/images/devotional/complete_shringar.webp"}
               width={400}
               height={400}

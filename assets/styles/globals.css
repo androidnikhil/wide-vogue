@@ -274,3 +274,132 @@ p {
     transform: translateX(250%);
   }
 }
+
+/* ==========================================================================
+   Blog HTML Article Content Styling (for rich pasted HTML & lists)
+   ========================================================================== */
+.blog-html-content {
+  color: #262626;
+  font-size: 1.0625rem;
+  line-height: 1.85;
+}
+
+.blog-html-content h1,
+.blog-html-content h2 {
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif !important;
+  font-weight: 700 !important;
+  color: #003020 !important;
+  font-size: 1.65rem !important;
+  line-height: 1.35 !important;
+  margin-top: 2.25rem !important;
+  margin-bottom: 0.85rem !important;
+  padding-bottom: 0.5rem !important;
+  border-bottom: 1px solid rgba(230, 193, 106, 0.35) !important;
+}
+
+@media (min-width: 768px) {
+  .blog-html-content h1,
+  .blog-html-content h2 {
+    font-size: 1.85rem !important;
+  }
+}
+
+.blog-html-content h3 {
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif !important;
+  font-weight: 700 !important;
+  color: #003020 !important;
+  font-size: 1.35rem !important;
+  line-height: 1.4 !important;
+  margin-top: 1.75rem !important;
+  margin-bottom: 0.6rem !important;
+}
+
+.blog-html-content h4 {
+  font-weight: 700 !important;
+  color: #003020 !important;
+  font-size: 1.15rem !important;
+  margin-top: 1.25rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.blog-html-content p {
+  margin-top: 1.1rem !important;
+  margin-bottom: 1.1rem !important;
+  line-height: 1.85 !important;
+  color: #2e2e2e !important;
+}
+
+.blog-html-content ul {
+  list-style-type: disc !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1.25rem !important;
+  padding-left: 1.75rem !important;
+}
+
+.blog-html-content ol {
+  list-style-type: decimal !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1.25rem !important;
+  padding-left: 1.75rem !important;
+}
+
+.blog-html-content li {
+  margin-bottom: 0.6rem !important;
+  line-height: 1.75 !important;
+  color: #2e2e2e !important;
+  padding-left: 0.25rem !important;
+}
+
+.blog-html-content li::marker {
+  color: #C88A20 !important;
+  font-size: 1.15em !important;
+}
+
+.blog-html-content strong,
+.blog-html-content b {
+  font-weight: 700 !important;
+  color: #111827 !important;
+}
+
+.blog-html-content em,
+.blog-html-content i {
+  font-style: italic !important;
+}
+
+.blog-html-content a {
+  color: #0F6F74 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 4px !important;
+  font-weight: 500 !important;
+  transition: color 0.15s ease !important;
+}
+
+.blog-html-content a:hover {
+  color: #003020 !important;
+}
+
+.blog-html-content blockquote {
+  border-left: 4px solid #C88A20 !important;
+  background-color: rgba(250, 244, 230, 0.7) !important;
+  padding: 0.875rem 1.25rem !important;
+  margin: 1.5rem 0 !important;
+  border-radius: 0 0.75rem 0.75rem 0 !important;
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif !important;
+  font-style: italic !important;
+  color: #3a3a3a !important;
+}
+
+.blog-html-content img {
+  border-radius: 1rem !important;
+  margin: 1.5rem auto !important;
+  max-width: 100% !important;
+  height: auto !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+.blog-html-content hr {
+  margin: 2rem 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(230, 193, 106, 0.4) !important;
+}
+

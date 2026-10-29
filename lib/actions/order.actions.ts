@@ -10,7 +10,7 @@ import { insertOrderSchema } from "../validators";
 import { CartItem, PaymentResult, ShippingAddress } from "@/types";
 import { paypal } from "../paypal";
 import { razorpay } from "../razorpay";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "@prisma/client";
 import { 
@@ -251,6 +251,8 @@ export async function createOrder() {
     } catch (notifyErr) {
       console.error("Order notification dispatch error:", notifyErr);
     }
+
+    revalidateTag('products', 'max');
 
     return {
       success: true,
@@ -1185,6 +1187,8 @@ export async function createPaidOrderWithRazorpay(paymentData: {
     } catch (notifyErr) {
       console.error("Order notification dispatch error:", notifyErr);
     }
+
+    revalidateTag('products', 'max');
 
     return {
       success: true,

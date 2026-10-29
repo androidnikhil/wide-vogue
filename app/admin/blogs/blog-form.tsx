@@ -30,6 +30,8 @@ import {
 import { toast } from 'sonner';
 import { createBlogPost, updateBlogPost, BlogPostData } from '@/lib/actions/blog.actions';
 import BlogContentRenderer from '@/components/blog/blog-content-renderer';
+import { convertFilesToWebP } from '@/lib/utils/image-converter';
+import { UploadButton } from '@/lib/uploadthing';
 
 interface BlogFormProps {
   initialData?: any;
@@ -103,13 +105,13 @@ export default function BlogForm({ initialData, isEditMode = false }: BlogFormPr
     toast.success('Slug regenerated from title!');
   };
 
-  // Handle Cover Image Upload with server-side WebP conversion via Sharp
+  // Handle Cover Image Upload with client WebP conversion & cloud upload
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image size must be under 10MB.');
+    if (file.size > 15 * 1024 * 1024) {
+      toast.error('Image size must be under 15MB.');
       return;
     }
 
@@ -117,8 +119,12 @@ export default function BlogForm({ initialData, isEditMode = false }: BlogFormPr
     const toastId = toast.loading('Converting image to WebP & uploading...');
 
     try {
+      // 1. Client-side WebP compression for superfast upload
+      const [webpFile] = await convertFilesToWebP([file]);
+      const fileToUpload = webpFile || file;
+
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', fileToUpload);
 
       const res = await fetch('/api/upload', {
         method: 'POST',
@@ -557,6 +563,50 @@ export default function BlogForm({ initialData, isEditMode = false }: BlogFormPr
                   className="hidden"
                 />
               </label>
+
+              {/* Direct UploadThing Cloud CDN Option */}
+              <div className="pt-0.5">
+                <UploadButton
+                  endpoint="imageUploader"
+                  appearance={{
+                    button: "w-full bg-[#003020] text-[#F3D98F] text-xs font-bold rounded-xl py-2 px-3 hover:bg-[#003020]/90 transition-all shadow-2xs cursor-pointer ut-uploading:opacity-75",
+                    allowedContent: "text-neutral-400 text-[10px] mt-1 font-medium",
+                    container: "w-full border border-neutral-200/80 rounded-xl p-2 bg-neutral-50/50 flex flex-col items-center justify-center",
+                  }}
+                  content={{
+                    button({ ready, isUploading }) {
+                      if (isUploading) return 'Uploading to Cloud...';
+                      if (ready) return 'Cloud CDN Direct Upload';
+                      return 'Connecting to CDN...';
+                    },
+                    allowedContent({ ready, isUploading }) {
+                      if (isUploading) return 'Compressing & uploading...';
+                      if (ready) return 'Direct Cloud Storage (UploadThing)';
+                      return '';
+                    },
+                  }}
+                  onBeforeUploadBegin={async (files) => {
+                    toast.loading('Converting to WebP...', { id: 'blog-cloud-webp' });
+                    try {
+                      const webpFiles = await convertFilesToWebP(files);
+                      toast.dismiss('blog-cloud-webp');
+                      return webpFiles;
+                    } catch (e) {
+                      toast.dismiss('blog-cloud-webp');
+                      return files;
+                    }
+                  }}
+                  onClientUploadComplete={(res: { url: string }[]) => {
+                    if (res && res[0]?.url) {
+                      setFeaturedImage(res[0].url);
+                      toast.success('Cover image uploaded successfully to cloud!');
+                    }
+                  }}
+                  onUploadError={(error: Error) => {
+                    toast.error(`Cloud upload error: ${error.message}`);
+                  }}
+                />
+              </div>
             </div>
 
             {/* Direct Image URL input */}

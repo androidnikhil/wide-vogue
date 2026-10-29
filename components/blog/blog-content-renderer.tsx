@@ -71,17 +71,7 @@ export default function BlogContentRenderer({ content, className = '' }: BlogCon
   if (isHtml(content)) {
     return (
       <div
-        className={`prose prose-neutral max-w-none text-neutral-800 text-base md:text-[18px] leading-[1.85] font-sans
-          prose-headings:font-serif prose-headings:text-[#003020] prose-headings:font-bold
-          prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:pt-8 prose-h2:pb-2 prose-h2:border-b prose-h2:border-[#E6C16A]/30
-          prose-h3:text-xl md:prose-h3:text-2xl prose-h3:pt-6 prose-h3:text-[#003020]
-          prose-p:my-5 prose-p:leading-[1.85]
-          prose-strong:font-bold prose-strong:text-neutral-900
-          prose-blockquote:border-l-4 prose-blockquote:border-[#C88A20] prose-blockquote:bg-[#FAF4E6]/70 prose-blockquote:py-3 prose-blockquote:px-5 prose-blockquote:rounded-r-xl prose-blockquote:font-serif prose-blockquote:italic
-          prose-ul:list-disc prose-ul:pl-6 prose-ul:my-5 prose-ul:space-y-2
-          prose-ol:list-decimal prose-ol:pl-6 prose-ol:my-5 prose-ol:space-y-2
-          prose-li:leading-relaxed
-          ${className}`}
+        className={`blog-html-content max-w-none text-neutral-800 text-base md:text-[18px] leading-[1.85] font-sans ${className}`}
         dangerouslySetInnerHTML={{ __html: content }}
       />
     );

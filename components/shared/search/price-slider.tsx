@@ -82,29 +82,29 @@ export default function PriceSlider({ currentPrice = "all", onApply }: PriceSlid
       </div>
 
       {/* Manual Input Fields & Apply Button */}
-      <div className="flex items-center gap-2">
-        <div className="flex-1 flex items-center border border-outline-variant/40 rounded-lg px-2 py-1 bg-white">
-          <span className="text-xs text-gray-400 mr-1">₹</span>
+      <div className="flex items-center gap-1.5">
+        <div className="flex-1 min-w-0 flex items-center border border-outline-variant/40 rounded-lg px-1.5 py-1.5 bg-white shadow-2xs focus-within:border-[#C88A20]">
+          <span className="text-xs text-gray-400 mr-0.5 shrink-0">₹</span>
           <input
             type="number"
             min={0}
             max={maxPrice}
             value={minPrice}
             onChange={(e) => setMinPrice(Number(e.target.value))}
-            className="w-full text-xs font-medium text-primary outline-none"
+            className="w-full min-w-0 text-xs font-medium text-primary outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             placeholder="Min"
           />
         </div>
-        <span className="text-xs text-gray-400">-</span>
-        <div className="flex-1 flex items-center border border-outline-variant/40 rounded-lg px-2 py-1 bg-white">
-          <span className="text-xs text-gray-400 mr-1">₹</span>
+        <span className="text-xs text-gray-400 shrink-0">-</span>
+        <div className="flex-1 min-w-0 flex items-center border border-outline-variant/40 rounded-lg px-1.5 py-1.5 bg-white shadow-2xs focus-within:border-[#C88A20]">
+          <span className="text-xs text-gray-400 mr-0.5 shrink-0">₹</span>
           <input
             type="number"
             min={minPrice}
             max={10000}
             value={maxPrice}
             onChange={(e) => setMaxPrice(Number(e.target.value))}
-            className="w-full text-xs font-medium text-primary outline-none"
+            className="w-full min-w-0 text-xs font-medium text-primary outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             placeholder="Max"
           />
         </div>
@@ -112,7 +112,7 @@ export default function PriceSlider({ currentPrice = "all", onApply }: PriceSlid
           type="button"
           size="sm"
           onClick={() => applyPriceRange(minPrice, maxPrice)}
-          className="h-8 px-3 text-xs font-bold gold-gradient-btn text-primary-container rounded-lg hover:brightness-105"
+          className="h-8 px-2.5 shrink-0 text-xs font-bold gold-gradient-btn text-primary-container rounded-lg hover:brightness-105 shadow-2xs"
         >
           Go
         </Button>

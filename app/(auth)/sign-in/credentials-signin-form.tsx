@@ -70,7 +70,7 @@ const CredentialsSignInForm = () => {
   }, [confirmationResult, resendTimer]);
 
   // Fully automatic silent reCAPTCHA refresher
-  const initOrRefreshRecaptcha = () => {
+  const initOrRefreshRecaptcha = async () => {
     if (typeof window === 'undefined') return null;
 
     try {
@@ -108,6 +108,12 @@ const CredentialsSignInForm = () => {
           initOrRefreshRecaptcha();
         },
       });
+
+      try {
+        await verifier.render();
+      } catch (renderErr) {
+        console.warn('reCAPTCHA render warning:', renderErr);
+      }
 
       recaptchaVerifierRef.current = verifier;
       return verifier;
@@ -154,12 +160,12 @@ const CredentialsSignInForm = () => {
       // Ensure clean, fresh verifier so stale/consumed tokens never poison the request
       let appVerifier = recaptchaVerifierRef.current;
       if (!appVerifier) {
-        appVerifier = initOrRefreshRecaptcha();
+        appVerifier = await initOrRefreshRecaptcha();
       }
       
       if (!appVerifier) {
         toast.error("Security verification initializing. Retrying...");
-        appVerifier = initOrRefreshRecaptcha();
+        appVerifier = await initOrRefreshRecaptcha();
         if (!appVerifier) {
           throw new Error("Unable to initialize security check. Please click refresh.");
         }
@@ -169,7 +175,9 @@ const CredentialsSignInForm = () => {
       setConfirmationResult(confirmation);
       setResendTimer(30);
       setCanResend(false);
-      toast.success("OTP sent to your phone!");
+      toast.success(`OTP sent successfully to ${formattedPhone}! Valid for 10 minutes.`, {
+        duration: 5000,
+      });
     } catch (error: any) {
       console.error('Phone OTP error:', error);
       
@@ -197,9 +205,32 @@ const CredentialsSignInForm = () => {
   const handleResendOtp = async () => {
     if (!canResend || isSendingOtp) return;
     setCanResend(false);
-    setResendTimer(30);
-    initOrRefreshRecaptcha();
-    await handleSendOtp();
+    setIsSendingOtp(true);
+    const toastId = toast.loading("Resending OTP...");
+    try {
+      const cleanPhone = phoneNumber.replace(/\D/g, '');
+      const formattedPhone = `+91${cleanPhone.slice(-10)}`;
+      
+      const appVerifier = await initOrRefreshRecaptcha();
+      if (!appVerifier) {
+        throw new Error("Security verification initializing. Please try again.");
+      }
+      
+      const confirmation = await signInWithPhoneNumber(firebaseAuth, formattedPhone, appVerifier);
+      setConfirmationResult(confirmation);
+      setResendTimer(30);
+      setCanResend(false);
+      toast.success(`New OTP sent successfully to ${formattedPhone}! Valid for 10 minutes.`, { 
+        id: toastId, 
+        duration: 5000 
+      });
+    } catch (error: any) {
+      console.error("Resend OTP error:", error);
+      setCanResend(true);
+      toast.error(error.message || "Failed to resend OTP. Please try again.", { id: toastId });
+    } finally {
+      setIsSendingOtp(false);
+    }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -238,6 +269,16 @@ const CredentialsSignInForm = () => {
       }
     } catch (error: any) {
       console.error('OTP confirmation error:', error);
+      if (error.code === 'auth/code-expired') {
+        toast.error("This OTP has expired. Please click 'Resend code' to get a fresh OTP.", { duration: 6000 });
+        setCanResend(true);
+        return;
+      }
+      if (error.code === 'auth/invalid-verification-code') {
+        const failRes = await recordFailedLogin(`phone:${cleanPhone}`);
+        toast.error("Incorrect 6-digit OTP code. Please check and try again.", { duration: 5000 });
+        return;
+      }
       const failRes = await recordFailedLogin(`phone:${cleanPhone}`);
       toast.error(failRes.message || "Invalid OTP. Please try again.", { duration: 6000 });
     } finally {
@@ -406,10 +447,10 @@ const CredentialsSignInForm = () => {
             </form>
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-5">
-              <div className="space-y-1 text-center sm:text-left">
+              <div className="space-y-2 text-center sm:text-left">
                 <p className="text-sm text-on-surface-variant leading-relaxed">
-                  Please enter the verification code we&apos;ve sent you on{' '}
-                  <span className="font-bold text-primary">+91 {phoneNumber}</span>
+                  Please enter the 6-digit verification code sent to{' '}
+                  <span className="font-bold text-primary">+91 {phoneNumber.replace(/\D/g, '').slice(-10)}</span>
                   <button
                     type="button"
                     onClick={() => {
@@ -422,6 +463,10 @@ const CredentialsSignInForm = () => {
                     Edit
                   </button>
                 </p>
+                <div className="inline-flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 border border-emerald-200/80 rounded-lg px-2.5 py-1 font-medium">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                  <span>OTP is valid for 10 minutes</span>
+                </div>
               </div>
 
               <div>

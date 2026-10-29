@@ -7,20 +7,14 @@ definitions:
     docker:
       memory: 2048
   steps:
-    - step: &validate-and-test
-        name: Code Quality & Automated Tests
+    - step: &validate-and-sync
+        name: Fast Validation & Mirror Sync (< 1 min)
         caches:
           - npm
         script:
           - npm ci --legacy-peer-deps
           - npm run lint
           - npm run type-check
-          - npm test
-
-    - step: &sync-to-github
-        name: Sync to GitHub Mirror
-        image: atlassian/default-image:4
-        script:
           - |
             set -e
             if [ -z "$GITHUB_TOKEN" ]; then
@@ -46,6 +40,23 @@ definitions:
               git push github HEAD:main
             fi
 
+    - step: &deploy-database-migrations
+        name: Apply Production Database Migrations
+        deployment: Production
+        caches:
+          - npm
+        script:
+          - npm ci --legacy-peer-deps
+          - npx prisma migrate deploy
+
+    - step: &test-suite-ondemand
+        name: Automated Test Suite (On-Demand)
+        caches:
+          - npm
+        script:
+          - npm ci --legacy-peer-deps
+          - npm test
+
     - step: &docker-build-check
         name: Docker Build Verification (On-Demand)
         services:
@@ -55,13 +66,16 @@ definitions:
 
 pipelines:
   # Trigger ONLY when code is pushed to the main branch
-  # Zero build minutes wasted on feature/bugfix branches
+  # Consolidated into 1 single step under 1 minute to save monthly build units
   branches:
     main:
-      - step: *validate-and-test
-      - step: *sync-to-github
+      - step: *validate-and-sync
 
-  # Manual on-demand trigger (never runs automatically)
+  # Manual on-demand triggers (conserve Bitbucket build units)
   custom:
+    apply-production-migrations:
+      - step: *deploy-database-migrations
+    run-tests-manually:
+      - step: *test-suite-ondemand
     docker-verify:
       - step: *docker-build-check

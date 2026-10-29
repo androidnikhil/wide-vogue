@@ -70,7 +70,7 @@ const CredentialsSignInForm = () => {
   }, [confirmationResult, resendTimer]);
 
   // Fully automatic silent reCAPTCHA refresher
-  const initOrRefreshRecaptcha = () => {
+  const initOrRefreshRecaptcha = async () => {
     if (typeof window === 'undefined') return null;
 
     try {
@@ -108,6 +108,12 @@ const CredentialsSignInForm = () => {
           initOrRefreshRecaptcha();
         },
       });
+
+      try {
+        await verifier.render();
+      } catch (renderErr) {
+        console.warn('reCAPTCHA render warning:', renderErr);
+      }
 
       recaptchaVerifierRef.current = verifier;
       return verifier;
@@ -154,12 +160,12 @@ const CredentialsSignInForm = () => {
       // Ensure clean, fresh verifier so stale/consumed tokens never poison the request
       let appVerifier = recaptchaVerifierRef.current;
       if (!appVerifier) {
-        appVerifier = initOrRefreshRecaptcha();
+        appVerifier = await initOrRefreshRecaptcha();
       }
       
       if (!appVerifier) {
         toast.error("Security verification initializing. Retrying...");
-        appVerifier = initOrRefreshRecaptcha();
+        appVerifier = await initOrRefreshRecaptcha();
         if (!appVerifier) {
           throw new Error("Unable to initialize security check. Please click refresh.");
         }
@@ -197,9 +203,29 @@ const CredentialsSignInForm = () => {
   const handleResendOtp = async () => {
     if (!canResend || isSendingOtp) return;
     setCanResend(false);
-    setResendTimer(30);
-    initOrRefreshRecaptcha();
-    await handleSendOtp();
+    setIsSendingOtp(true);
+    const toastId = toast.loading("Resending OTP...");
+    try {
+      const cleanPhone = phoneNumber.replace(/\D/g, '');
+      const formattedPhone = `+91${cleanPhone.slice(-10)}`;
+      
+      const appVerifier = await initOrRefreshRecaptcha();
+      if (!appVerifier) {
+        throw new Error("Security verification initializing. Please try again.");
+      }
+      
+      const confirmation = await signInWithPhoneNumber(firebaseAuth, formattedPhone, appVerifier);
+      setConfirmationResult(confirmation);
+      setResendTimer(30);
+      setCanResend(false);
+      toast.success("New OTP sent to your phone!", { id: toastId });
+    } catch (error: any) {
+      console.error("Resend OTP error:", error);
+      setCanResend(true);
+      toast.error(error.message || "Failed to resend OTP. Please try again.", { id: toastId });
+    } finally {
+      setIsSendingOtp(false);
+    }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {

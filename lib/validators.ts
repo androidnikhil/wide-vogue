@@ -14,6 +14,7 @@ export const sizeVariantSchema = z.object({
   price: z.string().or(z.number().transform(v => String(v))),
   originalPrice: z.string().or(z.number().transform(v => String(v))).optional(),
   stock: z.coerce.number().int().min(0).default(0),
+  colors: z.array(z.string()).optional(),
 });
 
 export type SizeVariant = z.infer<typeof sizeVariantSchema>;
@@ -88,6 +89,7 @@ export const cartItemSchema = z.object({
   image: z.string().min(1, 'Image is required'),
   price: currency,
   size: z.string().optional(),
+  color: z.string().optional(),
 });
 
 export const insertCartSchema = z.object({

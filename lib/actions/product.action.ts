@@ -96,13 +96,24 @@ export async function getProductById(productId: string) {
             { category: { contains: 'Poshak', mode: 'insensitive' } },
           ],
         };
-      } else if (catLower === 'mukut & bansuri' || catLower === 'mukut & pagdi') {
+      } else if (catLower === 'mukut & bansuri') {
         categoryFilter = {
           OR: [
             { category: { contains: 'Mukut', mode: 'insensitive' } },
             { category: { contains: 'Pagdi', mode: 'insensitive' } },
             { category: { contains: 'Bansuri', mode: 'insensitive' } },
           ],
+        };
+      } else if (catLower === 'mukut & pagdi' || catLower === 'mukut' || catLower === 'pagdi') {
+        categoryFilter = {
+          OR: [
+            { category: { contains: 'Mukut', mode: 'insensitive' } },
+            { category: { contains: 'Pagdi', mode: 'insensitive' } },
+          ],
+        };
+      } else if (catLower === 'bansuri') {
+        categoryFilter = {
+          category: { contains: 'Bansuri', mode: 'insensitive' },
         };
       } else if (catLower === 'jewellery & mala') {
         categoryFilter = {

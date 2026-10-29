@@ -13,8 +13,12 @@ RUN apk add --no-cache libc6-compat openssl
 # ------------------------------------------------------------------------------
 FROM base AS deps
 COPY package.json package-lock.json .npmrc* ./
-COPY prisma ./prisma/
-RUN npm ci --legacy-peer-deps
+COPY prisma/schema.prisma ./prisma/schema.prisma
+RUN npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set fetch-timeout 300000 && \
+    npm ci --legacy-peer-deps
 
 # ------------------------------------------------------------------------------
 # Development stage

@@ -143,7 +143,7 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                             className="h-8 w-8 rounded-full hover:bg-white hover:text-error transition-colors"
                             onClick={() =>
                               startTransition(async () => {
-                                const res = await removeItemFromCart(item.productId, item.size);
+                                const res = await removeItemFromCart(item.productId, item.size, (item as any).color);
                                 if (!res.success) {
                                   toast.error(res.message);
                                 }

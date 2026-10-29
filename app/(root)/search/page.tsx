@@ -124,7 +124,7 @@ const SearchPage = async (props: {
   return (
     <div className='container mx-auto px-4 lg:px-8 grid lg:grid-cols-5 lg:gap-8 my-6 md:my-10'>
       {/* Desktop Filter Sidebar - Shown on Desktop only (lg:), button drawer on Mobile & iPad */}
-      <div className='hidden lg:block lg:col-span-1 bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/30 h-fit sticky top-24'>
+      <div className='hidden lg:block lg:col-span-1 bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/30 sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto custom-scroll pr-3'>
         {/* Category Links */}
         <div className='font-title-lg text-primary mb-4 border-b border-outline-variant/30 pb-2 flex items-center gap-2'>
           <span className="material-symbols-outlined text-secondary text-xl">category</span>

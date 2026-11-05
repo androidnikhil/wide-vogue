@@ -14,6 +14,7 @@ export async function getLatestProducts() {
   const getCached = unstable_cache(
     async () => {
       const data = await prisma.product.findMany({
+        where: { isPublished: true },
         take: Math.max(LATEST_PRODUCT_LIMIT || 4, 8),
         orderBy: { createdAt: 'desc' },
       });
@@ -61,6 +62,7 @@ export async function getProductById(productId: string) {
     rating,
     sort,
     size,
+    isPublished,
   }: {
     query: string;
     limit?: number;
@@ -70,6 +72,7 @@ export async function getProductById(productId: string) {
     rating?: string;
     sort?: string;
     size?: string;
+    isPublished?: boolean;
   }) {
     // Split query into words to allow partial matches (e.g., "laddu gopal" matching "Laadu Gopal" because "Gopal" matches)
     const queryWords = query && query !== 'all' ? query.split(' ').filter(w => w.length > 1) : [];
@@ -177,6 +180,7 @@ export async function getProductById(productId: string) {
         
     // Size filter
     const sizeFilter = size && size !== 'all' ? { sizes: { has: size } } : {};
+    const publishedFilter = isPublished !== undefined ? { isPublished } : {};
   
     const data = await prisma.product.findMany({
       where: {
@@ -185,6 +189,7 @@ export async function getProductById(productId: string) {
         ...priceFilter,
         ...ratingFilter,
         ...sizeFilter,
+        ...publishedFilter,
       },
       orderBy:
         sort === 'lowest'
@@ -205,6 +210,7 @@ export async function getProductById(productId: string) {
         ...priceFilter,
         ...ratingFilter,
         ...sizeFilter,
+        ...publishedFilter,
       }
     });
   
@@ -258,6 +264,7 @@ function normalizeProductPricing(product: any) {
         price: effectivePrice,
         originalPrice: effectiveOriginalPrice,
         stock: existing?.stock !== undefined ? Number(existing.stock) : Number(product.stock || 0),
+        colors: existing?.colors && Array.isArray(existing.colors) ? existing.colors : [],
       };
     });
     product.sizeVariants = cleanedVariants;
@@ -360,7 +367,7 @@ export async function getFeaturedProducts() {
   const getCached = unstable_cache(
     async () => {
       const data = await prisma.product.findMany({
-        where: { isFeatured: true },
+        where: { isFeatured: true, isPublished: true },
         orderBy: { createdAt: 'desc' },
         take: 4,
       });
@@ -371,4 +378,34 @@ export async function getFeaturedProducts() {
   );
 
   return getCached();
+}
+// Toggle product published status
+export async function toggleProductPublished(id: string) {
+  try {
+    const session = await auth();
+    if (session?.user?.role !== 'admin') throw new Error('Unauthorized');
+
+    const product = await prisma.product.findUnique({ where: { id } });
+    if (!product) throw new Error('Product not found');
+
+    const updated = await prisma.product.update({
+      where: { id },
+      data: { isPublished: !product.isPublished },
+    });
+
+    revalidateTag('products', 'max');
+    revalidateTag('latest-products', 'max');
+    revalidateTag('featured-products', 'max');
+    revalidatePath('/admin/products');
+    revalidatePath('/');
+    revalidatePath(`/product/${product.slug}`);
+
+    return {
+      success: true,
+      message: updated.isPublished ? 'Product is now Live!' : 'Product moved to Draft',
+      isPublished: updated.isPublished,
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
 }

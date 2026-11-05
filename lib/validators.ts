@@ -37,6 +37,7 @@ export const insertProductSchema = z.object({
   sizes: z.array(z.string()).default([]),
   sizeVariants: z.array(sizeVariantSchema).optional().default([]),
   isFeatured: z.boolean(),
+  isPublished: z.boolean().default(true),
   banner: z.string().nullable(),
   price: currency,
   originalPrice: currency,

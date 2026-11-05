@@ -120,6 +120,7 @@ const ProductForm = ({
           price: effectivePrice,
           originalPrice: effectiveOriginalPrice,
           stock: existing?.stock !== undefined ? existing.stock : Number(values.stock || 0),
+          colors: existing?.colors && Array.isArray(existing.colors) ? existing.colors : [],
         };
       });
       values.sizeVariants = completeVariants;
@@ -937,6 +938,50 @@ const ProductForm = ({
             )}
           />
         </div>
+        {/* Product Visibility (Live vs Draft) */}
+        <div className='upload-field mb-6'>
+          <div className="flex flex-col gap-1 mb-2">
+            <span className="font-semibold text-primary">Product Visibility Status</span>
+            <span className="text-xs text-on-surface-variant">Choose whether this product should be live and visible to customers in the store, search, and categories, or saved as a draft.</span>
+          </div>
+          <Card className="border border-outline-variant/40 bg-surface-container-lowest">
+            <CardContent className='p-4'>
+              <FormField
+                control={form.control}
+                name='isPublished'
+                render={({ field }) => (
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => field.onChange(true)}
+                      className={`flex-1 flex items-center justify-center gap-2.5 p-3.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                        field.value !== false
+                          ? 'bg-emerald-50 text-emerald-900 border-emerald-500 ring-2 ring-emerald-500/20 shadow-sm'
+                          : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50'
+                      }`}
+                    >
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>🟢 Live / Published (Visible to Customers)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => field.onChange(false)}
+                      className={`flex-1 flex items-center justify-center gap-2.5 p-3.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                        field.value === false
+                          ? 'bg-amber-50 text-amber-900 border-amber-500 ring-2 ring-amber-500/20 shadow-sm'
+                          : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50'
+                      }`}
+                    >
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                      <span>🟡 Draft / Hidden (Admin Only)</span>
+                    </button>
+                  </div>
+                )}
+              />
+            </CardContent>
+          </Card>
+        </div>
+
         <div className='upload-field'>
           {/* isFeatured */}
           <div className="flex flex-col gap-1 mb-2">

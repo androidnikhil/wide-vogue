@@ -131,6 +131,7 @@ export const productDefaultValues = {
   rating: '0',
   numReviews: '0',
   isFeatured: false,
+  isPublished: true,
   banner: null,
   isReturnable: false,
   returnWindowDays: 0,

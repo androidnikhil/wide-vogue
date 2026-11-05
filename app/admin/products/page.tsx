@@ -13,6 +13,7 @@ import {
 import Pagination from '@/components/shared/pagination';
 import DeleteDialog from '@/components/shared/delete-dialog';
 import { requireAdmin } from '@/lib/auth-guard';
+import PublishToggleButton from '@/components/admin/publish-toggle-button';
 
 const AdminProductsPage = async (props: {
   searchParams: Promise<{
@@ -65,6 +66,7 @@ const AdminProductsPage = async (props: {
             <TableHead className='text-right'>PRICE</TableHead>
             <TableHead>CATEGORY</TableHead>
             <TableHead>STOCK</TableHead>
+            <TableHead>STATUS</TableHead>
             <TableHead>RATING</TableHead>
             <TableHead className='w-[100px]'>ACTIONS</TableHead>
           </TableRow>
@@ -79,6 +81,9 @@ const AdminProductsPage = async (props: {
               </TableCell>
               <TableCell>{product.category}</TableCell>
               <TableCell>{product.stock}</TableCell>
+              <TableCell>
+                <PublishToggleButton id={product.id} isPublished={product.isPublished !== false} />
+              </TableCell>
               <TableCell>{product.rating}</TableCell>
               <TableCell className='flex gap-1'>
                 <Button asChild variant='outline' size='sm'>

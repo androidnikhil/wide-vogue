@@ -117,6 +117,7 @@ const SearchPage = async (props: {
     page: Number(page),
     limit: 24,
     size,
+    isPublished: true,
   });
 
   const categories = await getAllCategories();

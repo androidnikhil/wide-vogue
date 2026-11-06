@@ -39,31 +39,8 @@ import Image from 'next/image';
 import { Checkbox } from '../ui/checkbox';
 import { X, Sparkles, Layers, Plus, Palette } from 'lucide-react';
 import RichTextEditor from './rich-text-editor';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-
-const COLOR_OPTIONS = [
-  { name: 'Yellow', hex: '#FFD700' },
-  { name: 'Red', hex: '#E53E3E' },
-  { name: 'Green', hex: '#38A169' },
-  { name: 'Pink', hex: '#ED64A6' },
-  { name: 'Orange', hex: '#DD6B20' },
-  { name: 'Sky Blue', hex: '#63B3ED' },
-  { name: 'Dark Blue', hex: '#2B6CB0' },
-  { name: 'White', hex: '#F7FAFC' },
-  { name: 'Purple', hex: '#805AD5' },
-  { name: 'Multicolor', hex: 'linear-gradient(135deg, #FFD700, #E53E3E, #38A169, #2B6CB0)' },
-  { name: 'Gold', hex: '#D69E2E' },
-];
-
-const getColorHex = (name: string): string => {
-  const clean = name.toLowerCase().trim();
-  const match = COLOR_OPTIONS.find((c) => c.name.toLowerCase() === clean);
-  return match ? match.hex : '#A0AEC0';
-};
+import { getColorHex, getColorDisplayName } from '@/lib/utils/color-utils';
+import ColorPickerDropdown from './color-picker-dropdown';
 
 
 const ProductForm = ({
@@ -784,7 +761,7 @@ const ProductForm = ({
                                     className="w-2.5 h-2.5 rounded-full border border-black/15 shrink-0"
                                     style={{ background: getColorHex(col) }}
                                   />
-                                  <span className="text-neutral-800">{col}</span>
+                                  <span className="text-neutral-800">{getColorDisplayName(col)}</span>
                                   <button
                                     type="button"
                                     onClick={() => {
@@ -799,53 +776,24 @@ const ProductForm = ({
                                 </span>
                               ))}
 
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button
-                                    type="button"
-                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium border border-dashed border-[#0F6F74] text-[#0F6F74] hover:bg-[#0F6F74]/10 transition-colors cursor-pointer bg-white"
-                                  >
-                                    <Plus className="w-3 h-3" />
-                                    <span>Add Color</span>
-                                  </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="start" className="w-48 p-1.5 bg-white rounded-xl shadow-lg border border-neutral-200 z-50">
-                                  <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-2 py-1 border-b border-neutral-100">
-                                    Choose Colors (Size {sz})
-                                  </div>
-                                  <div className="max-h-52 overflow-y-auto py-1 space-y-0.5 custom-scroll">
-                                    {COLOR_OPTIONS.map((c) => {
-                                      const isSelected = ((variant.colors as string[]) || []).includes(c.name);
-                                      return (
-                                        <button
-                                          key={c.name}
-                                          type="button"
-                                          onClick={() => {
-                                            const curr = (variant.colors as string[]) || [];
-                                            if (isSelected) {
-                                              updateVariant('colors', curr.filter((x: string) => x !== c.name));
-                                            } else {
-                                              updateVariant('colors', [...curr, c.name]);
-                                            }
-                                          }}
-                                          className={`w-full flex items-center justify-between px-2 py-1.5 rounded-md text-xs transition-colors text-left cursor-pointer ${
-                                            isSelected ? 'bg-amber-50 font-bold text-amber-900' : 'hover:bg-neutral-100 text-neutral-700'
-                                          }`}
-                                        >
-                                          <div className="flex items-center gap-2">
-                                            <span
-                                              className="w-3.5 h-3.5 rounded-full border border-black/15 shrink-0"
-                                              style={{ background: c.hex }}
-                                            />
-                                            <span>{c.name}</span>
-                                          </div>
-                                          {isSelected && <span className="text-amber-700 text-xs font-bold">✓</span>}
-                                        </button>
-                                      );
-                                    })}
-                                  </div>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                              <ColorPickerDropdown
+                                size={sz}
+                                selectedColors={(variant.colors as string[]) || []}
+                                onToggleColor={(c) => {
+                                  const curr = (variant.colors as string[]) || [];
+                                  if (curr.includes(c)) {
+                                    updateVariant('colors', curr.filter((x: string) => x !== c));
+                                  } else {
+                                    updateVariant('colors', [...curr, c]);
+                                  }
+                                }}
+                                onAddCustomColor={(c) => {
+                                  const curr = (variant.colors as string[]) || [];
+                                  if (!curr.includes(c)) {
+                                    updateVariant('colors', [...curr, c]);
+                                  }
+                                }}
+                              />
                             </div>
                           </td>
                           <td className="py-2 px-3 text-right">

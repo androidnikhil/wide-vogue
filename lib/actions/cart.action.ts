@@ -132,9 +132,12 @@ export async function addItemToCart(data: CartItem) {
         message: `${product.name} added to cart`,
       };
     } else {
-      // Check if item is already in cart
+      // Check if item is already in cart (matching productId, size, and color)
       const existItem = (cart.items as CartItem[]).find(
-        (x) => x.productId === item.productId && x.size === item.size
+        (x) =>
+          x.productId === item.productId &&
+          x.size === item.size &&
+          (!item.color || (x as any).color === item.color)
       );
 
       if (existItem) {
@@ -145,7 +148,10 @@ export async function addItemToCart(data: CartItem) {
 
         // Increase the quantity
         (cart.items as CartItem[]).find(
-          (x) => x.productId === item.productId && x.size === item.size
+          (x) =>
+            x.productId === item.productId &&
+            x.size === item.size &&
+            (!item.color || (x as any).color === item.color)
         )!.qty = existItem.qty + 1;
       } else {
         // If item does not exist in cart
@@ -232,9 +238,12 @@ export async function removeItemFromCart(productId: string, size?: string, color
     const cart = await getMyCart();
     if (!cart) throw new Error('Cart not found');
 
-    // Check for item
+    // Check for item (matching productId, size, and color)
     const exist = (cart.items as CartItem[]).find(
-      (x) => x.productId === productId && x.size === size
+      (x) =>
+        x.productId === productId &&
+        x.size === size &&
+        (!color || (x as any).color === color)
     );
     if (!exist) throw new Error('Item not found');
 
@@ -242,11 +251,21 @@ export async function removeItemFromCart(productId: string, size?: string, color
     if (exist.qty === 1) {
       // Remove from cart
       cart.items = (cart.items as CartItem[]).filter(
-        (x) => !(x.productId === exist.productId && x.size === exist.size)
+        (x) =>
+          !(
+            x.productId === exist.productId &&
+            x.size === exist.size &&
+            (!color || (x as any).color === color)
+          )
       );
     } else {
       // Decrease qty
-      (cart.items as CartItem[]).find((x) => x.productId === productId && x.size === size)!.qty =
+      (cart.items as CartItem[]).find(
+        (x) =>
+          x.productId === productId &&
+          x.size === size &&
+          (!color || (x as any).color === color)
+      )!.qty =
         exist.qty - 1;
     }
 

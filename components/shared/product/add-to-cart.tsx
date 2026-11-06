@@ -10,6 +10,7 @@ import { useState, useTransition, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import Link from "next/link";
 import WishlistButton from "./wishlist-button";
+import { getColorHex, getColorDisplayName } from "@/lib/utils/color-utils";
 
 export interface SizeVariantItem {
   size: string;
@@ -18,27 +19,6 @@ export interface SizeVariantItem {
   stock?: number;
   colors?: string[];
 }
-
-
-const COLOR_OPTIONS = [
-  { name: 'Yellow', hex: '#FFD700' },
-  { name: 'Red', hex: '#E53E3E' },
-  { name: 'Green', hex: '#38A169' },
-  { name: 'Pink', hex: '#ED64A6' },
-  { name: 'Orange', hex: '#DD6B20' },
-  { name: 'Sky Blue', hex: '#63B3ED' },
-  { name: 'Dark Blue', hex: '#2B6CB0' },
-  { name: 'White', hex: '#F7FAFC' },
-  { name: 'Purple', hex: '#805AD5' },
-  { name: 'Multicolor', hex: 'linear-gradient(135deg, #FFD700, #E53E3E, #38A169, #2B6CB0)' },
-  { name: 'Gold', hex: '#D69E2E' },
-];
-
-const getColorHex = (name: string): string => {
-  const clean = name.toLowerCase().trim();
-  const match = COLOR_OPTIONS.find((c) => c.name.toLowerCase() === clean);
-  return match ? match.hex : '#A0AEC0';
-};
 
 export interface AddToCartProps {
   cart?: Cart;
@@ -260,7 +240,7 @@ export default function AddToCart({
             <span className="h-2 w-2 rounded-full bg-[#0F6F74]"></span>
             <span>{isHindi ? "रंग चुनें" : "Select Color"}:</span>
             <span className="font-semibold text-neutral-600 normal-case ml-1">
-              {selectedColor || availableColors[0]}
+              {getColorDisplayName(selectedColor || availableColors[0])}
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -282,7 +262,7 @@ export default function AddToCart({
                     className="w-3.5 h-3.5 rounded-full border border-black/20 shrink-0"
                     style={{ background: hex }}
                   />
-                  <span>{color}</span>
+                  <span>{getColorDisplayName(color)}</span>
                 </button>
               );
             })}

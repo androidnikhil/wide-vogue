@@ -7,6 +7,7 @@ import { addItemToCart, removeItemFromCart } from '@/lib/actions/cart.action';
 import { toast } from 'sonner';
 import { Minus, Plus, Trash2, Loader2, ShoppingBag } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/language-context';
+import { getColorHex, getColorDisplayName } from '@/lib/utils/color-utils';
 
 export default function CartDrawerWrapper({ cart }: { cart: any }) {
   const { t, language } = useLanguage();
@@ -28,7 +29,7 @@ export default function CartDrawerWrapper({ cart }: { cart: any }) {
   }, []);
 
   const handleIncrease = (item: any) => {
-    const itemKey = `${item.productId}-${item.size || ''}`;
+    const itemKey = `${item.productId}-${item.size || ''}-${item.color || ''}`;
     setLoadingKey(itemKey);
     startTransition(async () => {
       try {
@@ -47,11 +48,11 @@ export default function CartDrawerWrapper({ cart }: { cart: any }) {
   };
 
   const handleDecrease = (item: any) => {
-    const itemKey = `${item.productId}-${item.size || ''}`;
+    const itemKey = `${item.productId}-${item.size || ''}-${item.color || ''}`;
     setLoadingKey(itemKey);
     startTransition(async () => {
       try {
-        const res = await removeItemFromCart(item.productId, item.size);
+        const res = await removeItemFromCart(item.productId, item.size, item.color);
         if (!res.success) {
           toast.error(res.message);
         } else {
@@ -96,7 +97,7 @@ export default function CartDrawerWrapper({ cart }: { cart: any }) {
          <div className="flex-1 flex flex-col gap-3.5 overflow-y-auto custom-scroll pr-1">
             {cart && cart.items && cart.items.length > 0 ? (
                 cart.items.map((item: any) => {
-                    const itemKey = `${item.productId}-${item.size || ''}`;
+                    const itemKey = `${item.productId}-${item.size || ''}-${item.color || ''}`;
                     const isItemLoading = isPending && loadingKey === itemKey;
 
                     let itemImage = item.image || '';
@@ -118,10 +119,19 @@ export default function CartDrawerWrapper({ cart }: { cart: any }) {
                               <div className="flex flex-col justify-between flex-1 min-w-0">
                                   <div>
                                     <h4 className="font-bold text-primary text-sm truncate font-sans">{item.name}</h4>
-                                    <div className="flex items-center gap-2 mt-0.5">
+                                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                                       {item.size && (
                                         <span className="text-[10px] bg-secondary/10 text-[#8A5A0A] font-semibold px-1.5 py-0.2 rounded font-sans">
                                           Size {item.size}
+                                        </span>
+                                      )}
+                                      {item.color && (
+                                        <span className="inline-flex items-center gap-1 text-[10px] bg-neutral-100 text-neutral-800 border border-neutral-300 px-1.5 py-0.2 rounded font-sans">
+                                          <span
+                                            className="w-2 h-2 rounded-full border border-black/15 shrink-0"
+                                            style={{ background: getColorHex(item.color) }}
+                                          />
+                                          <span>{getColorDisplayName(item.color)}</span>
                                         </span>
                                       )}
                                       <span className="font-bold text-secondary text-xs font-sans">

@@ -23,6 +23,7 @@ import CouponForm from "@/components/shared/cart/coupon-form";
 import GiftWrapToggle from "@/components/shared/cart/gift-wrap-toggle";
 import GiftCardForm from "@/components/shared/cart/gift-card-form";
 import BhaktiPointsForm from "@/components/shared/cart/bhakti-points-form";
+import { getColorHex, getColorDisplayName } from "@/lib/utils/color-utils";
 import { LOYALTY_CONFIG } from "@/lib/loyalty.config";
 import { calculateShiprocketRatesForPincode } from "@/lib/actions/shiprocket.actions";
 import CopyButton from "@/components/shared/copy-button";
@@ -103,7 +104,7 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                 </TableHeader>
                 <TableBody>
                   {cart.items.map((item) => (
-                    <TableRow key={item.productId + (item.size || '')} className="border-b border-secondary/10 hover:bg-surface-container/50 transition-colors">
+                    <TableRow key={item.productId + (item.size || '') + ((item as any).color || '')} className="border-b border-secondary/10 hover:bg-surface-container/50 transition-colors">
                       <TableCell>
                         <div className="flex items-center gap-4 py-2">
                           <Link href={`/product/${item.slug}`} className="shrink-0 relative w-20 h-20 rounded-md overflow-hidden border border-secondary/20">
@@ -124,11 +125,22 @@ const CartTable = ({ cart, availablePoints = 0 }: { cart?: Cart; availablePoints
                             </Link>
                             <div className="flex flex-col gap-1 mt-1 text-sm text-on-surface-variant">
                               <span>Price: {formatCurrency(item.price)}</span>
-                              {item.size && (
-                                <span className="inline-flex bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-semibold w-fit">
-                                  Size: {item.size}
-                                </span>
-                              )}
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                {item.size && (
+                                  <span className="inline-flex bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-semibold w-fit">
+                                    Size: {item.size}
+                                  </span>
+                                )}
+                                {(item as any).color && (
+                                  <span className="inline-flex items-center gap-1 bg-neutral-100 text-neutral-800 border border-neutral-300 px-2 py-0.5 rounded-full text-xs font-semibold w-fit">
+                                    <span
+                                      className="w-2 h-2 rounded-full border border-black/15 shrink-0"
+                                      style={{ background: getColorHex((item as any).color) }}
+                                    />
+                                    <span>{getColorDisplayName((item as any).color)}</span>
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>

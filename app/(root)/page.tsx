@@ -75,16 +75,16 @@ export default async function Homepage({
         <span className="material-symbols-outlined absolute bottom-40 left-[40%] text-4xl text-[#0F6F74]/30 -rotate-12" style={{ fontVariationSettings: "'FILL' 1" }}>spa</span>
         <span className="material-symbols-outlined absolute top-40 right-[15%] text-6xl text-rose-300/40 rotate-45" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_nature</span>
         
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-20">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-20">
           
           {/* LEFT: Expressive Typography */}
-          <div className="lg:col-span-5 flex flex-col items-start text-left z-30 pt-10">
-            <div className="inline-flex items-center gap-3 bg-white/70 backdrop-blur-md px-6 py-2 rounded-full border border-white/40 shadow-sm mb-8 transform -rotate-2">
+          <div className="lg:col-span-6 xl:col-span-6 flex flex-col items-start text-left z-30 pt-4 lg:pt-0">
+            <div className="inline-flex items-center gap-3 bg-white/70 backdrop-blur-md px-6 py-2 rounded-full border border-white/40 shadow-sm mb-6 transform -rotate-2">
               <span className="w-2 h-2 rounded-full bg-[#C88A20] animate-ping"></span>
               <span className="font-bold text-xs uppercase tracking-[0.2em] text-[#003020]">{t.home.divineEssentials}</span>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-[5.5rem] text-[#003020] font-bold tracking-tight leading-[1.05] md:leading-[1] lg:leading-[0.95] font-serif mb-6 relative z-10 drop-shadow-sm">
+            <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-5xl xl:text-6xl text-[#003020] font-bold tracking-tight leading-[1.1] md:leading-[1.05] lg:leading-[1] font-serif mb-6 relative z-10 drop-shadow-sm">
               {isHindi ? (
                 <>
                   सजाएं अपने <br />
@@ -113,32 +113,32 @@ export default async function Homepage({
           </div>
 
           {/* RIGHT: Floating Artwork & Organic Layout */}
-          <div className="lg:col-span-7 relative h-[420px] sm:h-[500px] lg:h-[750px] w-full flex justify-center lg:justify-end items-center mt-6 lg:mt-0">
+          <div className="lg:col-span-6 xl:col-span-6 relative h-[420px] sm:h-[500px] lg:h-[620px] xl:h-[680px] w-full flex justify-center items-center mt-6 lg:mt-0">
             {/* Organic Blob Background for Image - Hardware Accelerated */}
-            <div className="absolute w-[90%] h-[90%] bg-gradient-to-tr from-[#E6C16A] to-[#FDE8DF] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-50 blur-xl pointer-events-none"></div>
-            <div className="absolute w-[80%] h-[80%] bg-[#0F6F74] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] opacity-20 blur-2xl pointer-events-none"></div>
+            <div className="absolute w-[95%] h-[95%] bg-gradient-to-tr from-[#E6C16A] to-[#FDE8DF] rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-50 blur-xl pointer-events-none"></div>
+            <div className="absolute w-[85%] h-[85%] bg-[#0F6F74] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] opacity-20 blur-2xl pointer-events-none"></div>
 
-            {/* The Main Artwork - Breaking out slightly */}
-            <div className="relative w-full lg:w-[110%] h-[110%] ml-auto z-20 flex items-center justify-center transform lg:translate-x-12">
-              <div className="w-[85%] h-[85%] relative rounded-[3rem] lg:rounded-[6rem] overflow-visible shadow-2xl rotate-2 hover:rotate-0 active:rotate-0 transition-transform duration-700 bg-white p-3 border-4 border-white/60">
+            {/* The Main Artwork */}
+            <div className="relative w-full h-full z-20 flex items-center justify-center">
+              <div className="w-[90%] sm:w-[85%] lg:w-[92%] xl:w-[88%] aspect-square relative rounded-[3rem] lg:rounded-[5.5rem] overflow-visible shadow-2xl rotate-2 hover:rotate-0 active:rotate-0 transition-transform duration-700 bg-white p-3 border-4 border-white/60">
                 <Image
                   src="/images/devotional/hero_krishna.webp"
                   alt="Divine Kanha Artwork" 
-                  className="w-full h-full object-cover rounded-[2.5rem] lg:rounded-[5.5rem]"
+                  className="w-full h-full object-cover rounded-[2.5rem] lg:rounded-[5rem]"
                   width={900}
                   height={900}
                   priority
                   loading="eager"
                   fetchPriority="high"
-                  sizes="(max-width: 640px) 90vw, (max-width: 1024px) 60vw, 650px"
+                  sizes="(max-width: 640px) 90vw, (max-width: 1024px) 50vw, 600px"
                 />
                 
                 {/* Floating Detail Elements bursting from the frame */}
-                <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white rounded-full flex items-center justify-center p-2 shadow-xl border-4 border-[#FBF7EE] transform -rotate-12 z-30">
+                <div className="absolute -bottom-6 -left-6 sm:-bottom-8 sm:-left-8 w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-full flex items-center justify-center p-2 shadow-xl border-4 border-[#FBF7EE] transform -rotate-12 z-30">
                    <Image src="/images/devotional/mukut.webp" className="w-full h-full object-cover rounded-full" alt="Mukut Detail" width={180} height={180} sizes="128px" loading="lazy" />
                 </div>
                 
-                <div className="absolute -top-10 -right-10 w-28 h-28 bg-[#FDFBF7] rounded-[2rem] flex items-center justify-center p-2 shadow-lg border-2 border-[#E6C16A]/50 transform rotate-12 z-30">
+                <div className="absolute -top-8 -right-8 sm:-top-10 sm:-right-10 w-22 h-22 sm:w-28 sm:h-28 bg-[#FDFBF7] rounded-[2rem] flex items-center justify-center p-2 shadow-lg border-2 border-[#E6C16A]/50 transform rotate-12 z-30">
                    <Image src="/images/devotional/bansuri.webp" className="w-full h-full object-cover rounded-[1.5rem]" alt="Bansuri Detail" width={180} height={180} sizes="112px" loading="lazy" />
                 </div>
               </div>
